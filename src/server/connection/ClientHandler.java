@@ -8,6 +8,7 @@ import common.MessageType;
 import server.service.UtenteService;
 import server.service.RistoranteService;
 import server.service.RecensioneService;
+import server.dao.PreferitiDAO;
 
 import java.io.*;
 import java.net.Socket;
@@ -17,7 +18,6 @@ public class ClientHandler implements Runnable {
     private final Socket socket;
     private final Gson gson = new Gson();
 
-    // 🔥 QUESTO È IL COSTRUTTORE CHE TI MANCA
     public ClientHandler(Socket socket) {
         this.socket = socket;
     }
@@ -51,16 +51,54 @@ public class ClientHandler implements Runnable {
 
         return switch (req.type) {
 
+            // 🔹 UTENTE
             case LOGIN -> UtenteService.login(req);
             case REGISTRAZIONE -> UtenteService.registra(req);
 
+            // 🔹 RISTORANTI
             case CERCA_RISTORANTI -> RistoranteService.cerca(req);
             case VISUALIZZA_RISTORANTE -> RistoranteService.visualizza(req);
 
+            // 🔹 RECENSIONI
             case AGGIUNGI_RECENSIONE -> RecensioneService.aggiungi(req);
             case MODIFICA_RECENSIONE -> RecensioneService.modifica(req);
             case ELIMINA_RECENSIONE -> RecensioneService.elimina(req);
 
+            // 🔹 PREFERITI
+            case AGGIUNGI_PREFERITO -> {
+                int idUtente = req.payload.get("idUtente").getAsInt();
+                int idRistorante = req.payload.get("idRistorante").getAsInt();
+
+                boolean ok = PreferitiDAO.aggiungi(idUtente, idRistorante);
+                if (!ok) yield Response.error("Impossibile aggiungere ai preferiti");
+                yield Response.ok();
+            }
+
+            case RIMUOVI_PREFERITO -> {
+                int idUtente = req.payload.get("idUtente").getAsInt();
+                int idRistorante = req.payload.get("idRistorante").getAsInt();
+
+                boolean ok = PreferitiDAO.rimuovi(idUtente, idRistorante);
+                if (!ok) yield Response.error("Impossibile rimuovere dai preferiti");
+                yield Response.ok();
+            }
+
+            case VISUALIZZA_PREFERITI -> {
+                int idUtente = req.payload.get("idUtente").getAsInt();
+
+                var lista = PreferitiDAO.getPreferiti(idUtente);
+
+                var payload = new com.google.gson.JsonObject();
+                var arr = new com.google.gson.JsonArray();
+
+                for (Integer id : lista) arr.add(id);
+
+                payload.add("preferiti", arr);
+
+                yield Response.ok(payload);
+            }
+
+            // 🔹 NON GESTITI
             default -> Response.error("Tipo messaggio non gestito: " + req.type);
         };
     }

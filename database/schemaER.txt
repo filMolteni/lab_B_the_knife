@@ -1,0 +1,85 @@
+===========================================================
+                    SCHEMA ER — THEKNIFE
+===========================================================
+
+ENTITÀ PRINCIPALI
+-----------------
+
+1) UTENTI
+   - id (PK, INT, AUTO_INCREMENT)
+   - nome (VARCHAR)
+   - email (VARCHAR, UNIQUE)
+   - password (VARCHAR)
+   - ruolo (VARCHAR)
+
+   Relazioni:
+   - 1:N con RECENSIONI
+   - 1:N con PREFERITI
+
+-----------------------------------------------------------
+
+2) RISTORANTI
+   - id (PK, INT, AUTO_INCREMENT)
+   - nome (VARCHAR)
+   - indirizzo (VARCHAR)
+   - categoria (VARCHAR)
+   - descrizione (TEXT)
+
+   Relazioni:
+   - 1:N con RECENSIONI
+   - 1:N con PREFERITI
+
+-----------------------------------------------------------
+
+3) RECENSIONI
+   - id (PK, INT, AUTO_INCREMENT)
+   - id_utente (FK → UTENTI.id)
+   - id_ristorante (FK → RISTORANTI.id)
+   - voto (INT, 1–5)
+   - testo (TEXT)
+
+   Relazioni:
+   - 1:1 o 1:N con RISPOSTE (una recensione può avere 0 o 1 risposta)
+
+-----------------------------------------------------------
+
+4) RISPOSTE
+   - id (PK, INT, AUTO_INCREMENT)
+   - id_recensione (FK → RECENSIONI.id)
+   - testo (TEXT)
+
+   Relazioni:
+   - N:1 con RECENSIONI
+
+-----------------------------------------------------------
+
+5) PREFERITI
+   - id_utente (FK → UTENTI.id)
+   - id_ristorante (FK → RISTORANTI.id)
+   - PRIMARY KEY (id_utente, id_ristorante)
+
+   Relazioni:
+   - N:M tra UTENTI e RISTORANTI
+     (risolta tramite tabella ponte PREFERITI)
+
+===========================================================
+                   RELAZIONI (RIASSUNTO)
+===========================================================
+
+UTENTI (1) --------< RECENSIONI >-------- (1) RISTORANTI
+
+RECENSIONI (1) --------< RISPOSTE
+
+UTENTI (N) --------< PREFERITI >-------- (N) RISTORANTI
+
+===========================================================
+                   NOTE SUL MODELLO
+===========================================================
+
+• Tutte le FK hanno ON DELETE CASCADE
+• PREFERITI implementa una relazione molti-a-molti
+• RISPOSTE è opzionale (una recensione può non avere risposta)
+• Tutte le tabelle sono ENGINE=InnoDB
+• Tutti gli id sono INT AUTO_INCREMENT
+
+===========================================================
