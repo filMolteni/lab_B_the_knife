@@ -1,4 +1,4 @@
-package src.client.gui;
+package client.gui;
 
 public class GestoreRistorantiView {
     
