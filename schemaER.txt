@@ -1,0 +1,14 @@
+UTENTE  
+(id, nome, cognome, email, password_hash, data_nascita, domicilio, ruolo)
+
+RISTORANTE  
+(id, nome, nazione, città, indirizzo, latitudine, longitudine, fascia_prezzo, delivery, prenotazione, tipo_cucina, id_gestore)
+
+RECENSIONE  
+(id, id_utente, id_ristorante, stelle, testo, data)
+
+RISPOSTA  
+(id, id_recensione, testo, data)
+
+PREFERITI  
+(id_utente, id_ristorante)
