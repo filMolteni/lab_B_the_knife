@@ -18,7 +18,7 @@ public class ClientConnection {
     private Gson gson = new Gson();
 
     private static final String SERVER_IP = "localhost";
-    private static final int SERVER_PORT = 9999;
+    private static final int SERVER_PORT = 5555;
 
     public ClientConnection() throws IOException {
         connect();
