@@ -25,7 +25,7 @@ public class HomeView extends BorderPane {
         // ============================
         // TITOLO
         // ============================
-        Label titolo = new Label("Benvenuto in FoodAdvisor");
+        Label titolo = new Label("Benvenuto in TheKnife");
         titolo.setFont(new Font(28));
         titolo.setPadding(new Insets(20, 0, 30, 0));
 

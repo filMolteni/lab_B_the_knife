@@ -9,7 +9,7 @@ public class ServerMain {
 
     public static void main(String[] args) {
 
-        Scanner sc = new Scanner(System.in);
+       /*  Scanner sc = new Scanner(System.in);
 
         System.out.println("=== TheKnife Server ===");
 
@@ -23,7 +23,13 @@ public class ServerMain {
         String user = sc.nextLine();
 
         System.out.print("DB Password: ");
-        String password = sc.nextLine();
+        String password = sc.nextLine();*/
+
+        String host = "localhost";
+        String dbName = "theknife";
+        String user = "root";
+        String password = "";
+
 
         DBConnectionPool.initialize(host, dbName, user, password);
 

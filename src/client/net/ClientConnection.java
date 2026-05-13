@@ -1,59 +1,49 @@
 package client.net;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
-
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
+import client.net.Request;
+import client.net.Response;
+
 
 public class ClientConnection {
 
     private Socket socket;
-    private PrintWriter out;
     private BufferedReader in;
+    private PrintWriter out;
 
-    private Gson gson = new Gson();
-
-    private static final String SERVER_IP = "localhost";
-    private static final int SERVER_PORT = 5555;
-
-    public ClientConnection() throws IOException {
-        connect();
-    }
-
-    private void connect() throws IOException {
-        socket = new Socket(SERVER_IP, SERVER_PORT);
-        out = new PrintWriter(socket.getOutputStream(), true);
-        in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-    }
-
-    /**
-     * Invia una richiesta al server e restituisce la risposta
-     */
-    public Response sendRequest(Request req) throws IOException {
-
-        // Serializza la richiesta in JSON
-        String json = gson.toJson(req);
-        out.println(json);
-
-        // Legge la risposta JSON
-        String responseJson = in.readLine();
-
-        // Deserializza la risposta
-        return gson.fromJson(responseJson, Response.class);
-    }
-
-    /**
-     * Chiude la connessione
-     */
-    public void close() {
+    public ClientConnection(String host, int port) {
         try {
-            if (socket != null) socket.close();
+            socket = new Socket(host, port);
+
+            in = new BufferedReader(
+                    new InputStreamReader(socket.getInputStream())
+            );
+
+            out = new PrintWriter(
+                    socket.getOutputStream(), true
+            );
+
+            System.out.println("Connessione stabilita con il server");
+
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("Errore di connessione al server: " + e.getMessage());
+            throw new RuntimeException("Connessione fallita");
+        }
+    }
+
+    public Response sendRequest(Request req) {
+        try {
+            out.println(req.toJson());   // <-- ora NON è più null
+            String json = in.readLine();
+            Gson gson = new Gson();
+            return gson.fromJson(json, Response.class);
+
+        } catch (Exception e) {
+            System.err.println("Errore durante l'invio della richiesta: " + e.getMessage());
+            Gson gson = new Gson();
+            return gson.fromJson("{\"success\":false,\"message\":\"Errore di comunicazione\"}", Response.class);
         }
     }
 }
