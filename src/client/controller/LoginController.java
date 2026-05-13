@@ -1,6 +1,7 @@
 package client.controller;
 
 import client.gui.LoginView;
+import client.model.UtenteDTO;
 import client.net.ClientConnection;
 import client.net.Request;
 import client.net.Response;
@@ -44,33 +45,47 @@ public class LoginController {
 
     private void doLogin() {
 
-        String email = view.getTxtEmail().getText().trim();
-        String password = view.getTxtPassword().getText().trim();
+    String email = view.getTxtEmail().getText().trim();
+    String password = view.getTxtPassword().getText().trim();
 
-        if (email.isEmpty() || password.isEmpty()) {
-            System.out.println("Campi vuoti");
-            return;
-        }
-
-        JsonObject params = new JsonObject();
-        params.addProperty("email", email);
-        params.addProperty("password", password);
-
-        Request req = new Request(MessageType.LOGIN, params);
-
-        try {
-            Response res = connection.sendRequest(req);
-
-            if (res.isSuccess()) {
-                System.out.println("Login OK");
-                onLoginSuccess.run();
-            } else {
-                System.out.println("Errore login: " + res.getMessage());
-            }
-
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            System.out.println("Errore di connessione al server");
-        }
+    if (email.isEmpty() || password.isEmpty()) {
+        System.out.println("Campi vuoti");
+        return;
     }
+
+    JsonObject params = new JsonObject();
+    params.addProperty("email", email);
+    params.addProperty("password", password);
+
+    Request req = new Request(MessageType.LOGIN, params);
+
+    try {
+        Response res = connection.sendRequest(req);
+
+        if (res.isSuccess()) {
+
+            JsonObject p = res.getPayload();
+
+            
+            UtenteDTO.creaUtenteLoggato(
+                p.get("id").getAsInt(),
+                p.get("username").getAsString(),
+                p.get("email").getAsString(),
+                p.get("ruolo").getAsString()
+            );
+
+            System.out.println("Login OK: " + UtenteDTO.getUtenteLoggato().getUsername());
+
+            onLoginSuccess.run();
+
+        } else {
+            System.out.println("Errore login: " + res.getMessage());
+        }
+
+    } catch (Exception ex) {
+        ex.printStackTrace();
+        System.out.println("Errore di connessione al server");
+    }
+}
+
 }

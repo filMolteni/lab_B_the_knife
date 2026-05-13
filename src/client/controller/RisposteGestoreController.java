@@ -2,6 +2,8 @@ package client.controller;
 
 import client.gui.RisposteGestoreView;
 import client.gui.RispostaRow;
+import client.gui.RispondiRecensioneView;
+import client.model.UtenteDTO;
 import client.net.ClientConnection;
 import client.net.Request;
 import client.net.Response;
@@ -9,8 +11,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import common.MessageType;
 import javafx.application.Platform;
-
-import javax.swing.JOptionPane;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
 
 public class RisposteGestoreController {
 
@@ -34,8 +36,8 @@ public class RisposteGestoreController {
         // TORNA INDIETRO
         view.getBtnIndietro().setOnAction(e -> onGoBack.run());
 
-        // RISPONDI
-        view.getBtnRispondi().setOnAction(e -> rispondi());
+        // APRI FORM RISPOSTA
+        view.getBtnRispondi().setOnAction(e -> apriFormRisposta());
     }
 
     /**
@@ -43,7 +45,10 @@ public class RisposteGestoreController {
      */
     public void loadRecensioni() {
 
-        Request req = new Request(MessageType.VISUALIZZA_RECENSIONI_GESTORE, new JsonObject());
+        JsonObject params = new JsonObject();
+        params.addProperty("idGestore", UtenteDTO.getUtenteLoggato().getId());
+
+        Request req = new Request(MessageType.VISUALIZZA_RECENSIONI_GESTORE, params);
 
         try {
             Response res = connection.sendRequest(req);
@@ -63,9 +68,9 @@ public class RisposteGestoreController {
 
                     RispostaRow row = new RispostaRow(
                             r.get("id").getAsInt(),
-                            r.get("utente").getAsString(),
+                            String.valueOf(r.get("idUtente").getAsInt()), // non hai il nome utente
                             r.get("voto").getAsInt(),
-                            r.get("commento").getAsString(),
+                            r.get("testo").getAsString(),
                             r.has("risposta") ? r.get("risposta").getAsString() : ""
                     );
 
@@ -80,9 +85,9 @@ public class RisposteGestoreController {
     }
 
     /**
-     * Risponde alla recensione selezionata
+     * Apre la finestra per rispondere alla recensione
      */
-    private void rispondi() {
+    private void apriFormRisposta() {
 
         RispostaRow selected = view.getTabella().getSelectionModel().getSelectedItem();
 
@@ -91,37 +96,22 @@ public class RisposteGestoreController {
             return;
         }
 
-        // Popup per inserire la risposta
-        String risposta = JOptionPane.showInputDialog(
-                null,
-                "Inserisci la risposta del gestore:",
-                "Rispondi alla recensione",
-                JOptionPane.PLAIN_MESSAGE
+        // VIEW
+        RispondiRecensioneView rispostaView = new RispondiRecensioneView();
+
+        // CONTROLLER
+        new RispondiRecensioneController(
+                rispostaView,
+                connection,
+                this::loadRecensioni,
+                selected.getId(),
+                selected.getCommento()
         );
 
-        if (risposta == null || risposta.trim().isEmpty()) {
-            System.out.println("Risposta vuota, annullato");
-            return;
-        }
-
-        JsonObject params = new JsonObject();
-        params.addProperty("id", selected.getId());
-        params.addProperty("risposta", risposta.trim());
-
-        Request req = new Request(MessageType.RISPONDI_RECENSIONE, params);
-
-        try {
-            Response res = connection.sendRequest(req);
-
-            if (res.isSuccess()) {
-                System.out.println("Risposta inviata correttamente");
-                loadRecensioni();
-            } else {
-                System.out.println("Errore risposta: " + res.getMessage());
-            }
-
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
+        // MOSTRA FINESTRA
+        Stage stage = new Stage();
+        stage.setTitle("Rispondi alla recensione");
+        stage.setScene(new Scene(rispostaView, 500, 350));
+        stage.show();
     }
 }

@@ -1,5 +1,6 @@
 package client.gui;
 
+import client.model.UtenteDTO;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -14,6 +15,7 @@ public class HomeView extends BorderPane {
     private Button btnPreferiti;
     private Button btnRecensioni;
     private Button btnGestione;
+    private Button btnRecensioniRicevute;   // <-- AGGIUNTO
     private Button btnLogin;
     private Button btnLogout;
 
@@ -23,9 +25,6 @@ public class HomeView extends BorderPane {
 
     private void creaLayout() {
 
-        // ============================
-        // TITOLO
-        // ============================
         Label titolo = new Label("Benvenuto in TheKnife");
         titolo.setFont(new Font(28));
         titolo.setPadding(new Insets(20, 0, 30, 0));
@@ -34,9 +33,6 @@ public class HomeView extends BorderPane {
         topBox.setAlignment(Pos.CENTER);
         this.setTop(topBox);
 
-        // ============================
-        // BOTTONI PRINCIPALI
-        // ============================
         btnCerca = new Button("Cerca Ristoranti");
         btnCerca.setPrefWidth(220);
 
@@ -49,6 +45,9 @@ public class HomeView extends BorderPane {
         btnGestione = new Button("Gestione Ristoranti");
         btnGestione.setPrefWidth(220);
 
+        btnRecensioniRicevute = new Button("Recensioni ricevute");  // <-- AGGIUNTO
+        btnRecensioniRicevute.setPrefWidth(220);
+
         btnLogin = new Button("Login");
         btnLogin.setPrefWidth(220);
 
@@ -60,6 +59,7 @@ public class HomeView extends BorderPane {
                 btnPreferiti,
                 btnRecensioni,
                 btnGestione,
+                btnRecensioniRicevute,   // <-- AGGIUNTO
                 btnLogin,
                 btnLogout
         );
@@ -69,21 +69,53 @@ public class HomeView extends BorderPane {
 
         this.setCenter(menu);
 
-        // ============================
-        // STILE GENERALE
-        // ============================
         this.setPadding(new Insets(15));
         this.setStyle("-fx-background-color: #f8f8f8;");
     }
 
-    // ============================
-    // GETTER PER IL CONTROLLER
-    // ============================
+    public void refreshVisibility() {
+
+        UtenteDTO u = UtenteDTO.getUtenteLoggato();
+
+        if (u == null) {
+            btnCerca.setVisible(true);
+            btnPreferiti.setVisible(false);
+            btnRecensioni.setVisible(false);
+            btnGestione.setVisible(false);
+            btnRecensioniRicevute.setVisible(false);
+
+            btnLogin.setVisible(true);
+            btnLogout.setVisible(false);
+            return;
+        }
+
+        btnLogin.setVisible(false);
+        btnLogout.setVisible(true);
+
+        if (u.isCliente()) {
+            btnCerca.setVisible(true);
+            btnPreferiti.setVisible(true);
+            btnRecensioni.setVisible(true);
+
+            btnGestione.setVisible(false);
+            btnRecensioniRicevute.setVisible(false);
+        }
+
+        if (u.isGestore()) {
+            btnCerca.setVisible(false);
+            btnPreferiti.setVisible(false);
+            btnRecensioni.setVisible(false);
+
+            btnGestione.setVisible(true);
+            btnRecensioniRicevute.setVisible(true);
+        }
+    }
 
     public Button getBtnCerca() { return btnCerca; }
     public Button getBtnPreferiti() { return btnPreferiti; }
     public Button getBtnRecensioni() { return btnRecensioni; }
     public Button getBtnGestione() { return btnGestione; }
+    public Button getBtnRecensioniRicevute() { return btnRecensioniRicevute; } // <-- AGGIUNTO
     public Button getBtnLogin() { return btnLogin; }
     public Button getBtnLogout() { return btnLogout; }
 }

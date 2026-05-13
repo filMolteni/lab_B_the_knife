@@ -27,6 +27,7 @@ public class GestoreRistorantiView extends BorderPane {
     private Button btnModifica;
     private Button btnElimina;
     private Button btnPulisci;
+    private Button btnIndietro;
 
     public GestoreRistorantiView() {
         creaLayout();
@@ -34,14 +35,25 @@ public class GestoreRistorantiView extends BorderPane {
 
     private void creaLayout() {
 
+        // TITOLO
         Label titolo = new Label("Gestione Ristoranti");
         titolo.setFont(new Font(26));
-        titolo.setPadding(new Insets(10, 0, 20, 0));
+        titolo.setPadding(new Insets(10, 0, 10, 0));
 
-        VBox topBox = new VBox(titolo);
+        // 🔙 BOTTONE INDIETRO
+        btnIndietro = new Button("Indietro");
+
+        HBox topButtons = new HBox(btnIndietro);
+        topButtons.setAlignment(Pos.CENTER_LEFT);
+        topButtons.setPadding(new Insets(0, 0, 10, 10));
+
+        VBox topBox = new VBox(titolo, topButtons);
         topBox.setAlignment(Pos.CENTER);
         this.setTop(topBox);
 
+        // ============================
+        // TABELLA
+        // ============================
         tabella = new TableView<>();
 
         TableColumn<RistoranteRow, Integer> colId = new TableColumn<>("ID");
@@ -68,6 +80,9 @@ public class GestoreRistorantiView extends BorderPane {
 
         this.setCenter(tabella);
 
+        // ============================
+        // FORM (ANCORA PRESENTE, MA NON USATO)
+        // ============================
         GridPane form = new GridPane();
         form.setPadding(new Insets(20));
         form.setHgap(10);
@@ -91,6 +106,7 @@ public class GestoreRistorantiView extends BorderPane {
         form.add(new Label("Descrizione:"), 0, 3);
         form.add(txtDescrizione, 1, 3);
 
+        // BOTTONI
         btnAggiungi = new Button("Aggiungi");
         btnModifica = new Button("Modifica");
         btnElimina = new Button("Elimina");
@@ -105,6 +121,7 @@ public class GestoreRistorantiView extends BorderPane {
         this.setBottom(bottomBox);
     }
 
+    // GETTER
     public TableView<RistoranteRow> getTabella() { return tabella; }
 
     public TextField getTxtNome() { return txtNome; }
@@ -116,4 +133,5 @@ public class GestoreRistorantiView extends BorderPane {
     public Button getBtnModifica() { return btnModifica; }
     public Button getBtnElimina() { return btnElimina; }
     public Button getBtnPulisci() { return btnPulisci; }
+    public Button getBtnIndietro() { return btnIndietro; }
 }

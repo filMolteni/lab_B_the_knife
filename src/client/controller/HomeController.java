@@ -1,6 +1,7 @@
 package client.controller;
 
 import client.gui.HomeView;
+import client.model.UtenteDTO;
 import client.net.ClientConnection;
 import client.net.Request;
 import client.net.Response;
@@ -17,17 +18,19 @@ public class HomeController {
     private final Runnable onGoPreferiti;
     private final Runnable onGoRecensioni;
     private final Runnable onGoGestione;
+    private final Runnable onGoRecensioniRicevute;   // <-- NUOVO
     private final Runnable onGoLogin;
     private final Runnable onLogout;
 
     public HomeController(HomeView view,
-                          ClientConnection connection,
-                          Runnable onGoSearch,
-                          Runnable onGoPreferiti,
-                          Runnable onGoRecensioni,
-                          Runnable onGoGestione,
-                          Runnable onGoLogin,
-                          Runnable onLogout) {
+                      ClientConnection connection,
+                      Runnable onGoSearch,
+                      Runnable onGoPreferiti,
+                      Runnable onGoRecensioni,
+                      Runnable onGoGestione,
+                      Runnable onGoRecensioniRicevute,
+                      Runnable onGoLogin,
+                      Runnable onLogout){
 
         this.view = view;
         this.connection = connection;
@@ -36,10 +39,14 @@ public class HomeController {
         this.onGoPreferiti = onGoPreferiti;
         this.onGoRecensioni = onGoRecensioni;
         this.onGoGestione = onGoGestione;
+        this.onGoRecensioniRicevute = onGoRecensioniRicevute;   // <-- NUOVO
         this.onGoLogin = onGoLogin;
         this.onLogout = onLogout;
 
         initHandlers();
+
+        // aggiorna visibilità all'avvio
+        view.refreshVisibility();
     }
 
     private void initHandlers() {
@@ -56,14 +63,21 @@ public class HomeController {
         // RECENSIONI UTENTE
         view.getBtnRecensioni().setOnAction(e -> onGoRecensioni.run());
 
-        // GESTIONE RISTORANTI
+        // GESTIONE RISTORANTI (solo gestore)
         view.getBtnGestione().setOnAction(e -> onGoGestione.run());
+
+        // RECENSIONI RICEVUTE (solo gestore)
+        view.getBtnRecensioniRicevute().setOnAction(e -> onGoRecensioniRicevute.run());  // <-- NUOVO
 
         // LOGIN
         view.getBtnLogin().setOnAction(e -> onGoLogin.run());
 
         // LOGOUT
-        view.getBtnLogout().setOnAction(e -> onLogout.run());
+        view.getBtnLogout().setOnAction(e -> {
+            UtenteDTO.creaUtenteLoggato(0, null, null, null);
+            view.refreshVisibility();
+            onLogout.run();
+        });
     }
 
     /**
@@ -82,5 +96,11 @@ public class HomeController {
             System.out.println("Errore di connessione al server");
         }
     }
-}
 
+    /**
+     * Metodo da chiamare quando si torna alla Home
+     */
+    public void refresh() {
+        view.refreshVisibility();
+    }
+}

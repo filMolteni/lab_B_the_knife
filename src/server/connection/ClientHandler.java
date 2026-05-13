@@ -51,20 +51,36 @@ public class ClientHandler implements Runnable {
 
         return switch (req.type) {
 
-            // 🔹 UTENTE
+            // ============================
+            // UTENTE
+            // ============================
             case LOGIN -> UtenteService.login(req);
-            case REGISTRAZIONE -> UtenteService.registra(req);
+            case REGISTRAZIONE -> UtenteService.registrati(req);
 
-            // 🔹 RISTORANTI
+            // ============================
+            // RISTORANTI
+            // ============================
             case CERCA_RISTORANTI -> RistoranteService.cerca(req);
             case VISUALIZZA_RISTORANTE -> RistoranteService.visualizza(req);
 
-            // 🔹 RECENSIONI
+            case AGGIUNGI_RISTORANTE -> RistoranteService.aggiungi(req);
+            case MODIFICA_RISTORANTE -> RistoranteService.modifica(req);
+            case ELIMINA_RISTORANTE -> RistoranteService.elimina(req);
+
+            case VISUALIZZA_RIEPILOGO_GESTORE -> RistoranteService.riepilogoGestore(req);
+            case VISUALIZZA_RECENSIONI_GESTORE -> RistoranteService.recensioniGestore(req);
+            case RISPONDI_RECENSIONE -> RistoranteService.rispondi(req);
+
+            // ============================
+            // RECENSIONI
+            // ============================
             case AGGIUNGI_RECENSIONE -> RecensioneService.aggiungi(req);
             case MODIFICA_RECENSIONE -> RecensioneService.modifica(req);
             case ELIMINA_RECENSIONE -> RecensioneService.elimina(req);
 
-            // 🔹 PREFERITI
+            // ============================
+            // PREFERITI
+            // ============================
             case AGGIUNGI_PREFERITO -> {
                 int idUtente = req.payload.get("idUtente").getAsInt();
                 int idRistorante = req.payload.get("idRistorante").getAsInt();
@@ -98,8 +114,11 @@ public class ClientHandler implements Runnable {
                 yield Response.ok(payload);
             }
 
-            // 🔹 NON GESTITI
+            // ============================
+            // DEFAULT
+            // ============================
             default -> Response.error("Tipo messaggio non gestito: " + req.type);
         };
     }
+
 }

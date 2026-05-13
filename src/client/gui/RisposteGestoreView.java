@@ -4,11 +4,13 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.text.Font;
+import javafx.util.Callback;
 
 public class RisposteGestoreView extends BorderPane {
 
@@ -26,9 +28,9 @@ public class RisposteGestoreView extends BorderPane {
         // ============================
         // TITOLO
         // ============================
-        Label titolo = new Label("Risposte alle Recensioni");
+        Label titolo = new Label("Recensioni ricevute");
         titolo.setFont(new Font(26));
-        titolo.setPadding(new Insets(20, 0, 20, 0));
+        titolo.setPadding(new Insets(20, 0, 10, 0));
 
         HBox topBox = new HBox(titolo);
         topBox.setAlignment(Pos.CENTER);
@@ -38,27 +40,31 @@ public class RisposteGestoreView extends BorderPane {
         // TABELLA
         // ============================
         tabella = new TableView<>();
+        tabella.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
+        // UTENTE
         TableColumn<RispostaRow, String> colUtente = new TableColumn<>("Utente");
         colUtente.setCellValueFactory(c -> c.getValue().utenteProperty());
-        colUtente.setPrefWidth(150);
+        colUtente.setMinWidth(100);
 
+        // VOTO
         TableColumn<RispostaRow, Integer> colVoto = new TableColumn<>("Voto");
         colVoto.setCellValueFactory(c -> c.getValue().votoProperty().asObject());
-        colVoto.setPrefWidth(60);
+        colVoto.setMinWidth(60);
 
+        // COMMENTO (con wrapping)
         TableColumn<RispostaRow, String> colCommento = new TableColumn<>("Commento");
         colCommento.setCellValueFactory(c -> c.getValue().commentoProperty());
-        colCommento.setPrefWidth(250);
+        colCommento.setMinWidth(250);
+        colCommento.setCellFactory(getWrappingCellFactory());
 
-        TableColumn<RispostaRow, String> colRisposta = new TableColumn<>("Risposta Gestore");
+        // RISPOSTA (con wrapping)
+        TableColumn<RispostaRow, String> colRisposta = new TableColumn<>("Risposta del Gestore");
         colRisposta.setCellValueFactory(c -> c.getValue().rispostaProperty());
-        colRisposta.setPrefWidth(250);
+        colRisposta.setMinWidth(250);
+        colRisposta.setCellFactory(getWrappingCellFactory());
 
-        tabella.getColumns().add(colUtente);
-        tabella.getColumns().add(colVoto);
-        tabella.getColumns().add(colCommento);
-        tabella.getColumns().add(colRisposta);
+        tabella.getColumns().addAll(colUtente, colVoto, colCommento, colRisposta);
 
         this.setCenter(tabella);
 
@@ -82,6 +88,32 @@ public class RisposteGestoreView extends BorderPane {
         // ============================
         this.setPadding(new Insets(15));
         this.setStyle("-fx-background-color: #f8f8f8;");
+    }
+
+    /**
+     * Crea celle che fanno wrapping del testo
+     */
+    private Callback<TableColumn<RispostaRow, String>, TableCell<RispostaRow, String>> getWrappingCellFactory() {
+        return col -> new TableCell<>() {
+            private final Label label = new Label();
+
+            {
+                label.setWrapText(true);
+                label.setPadding(new Insets(5));
+            }
+
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+
+                if (empty || item == null) {
+                    setGraphic(null);
+                } else {
+                    label.setText(item);
+                    setGraphic(label);
+                }
+            }
+        };
     }
 
     // ============================
