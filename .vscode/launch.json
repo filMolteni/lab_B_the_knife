@@ -3,6 +3,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "DatabasePopulator",
+            "request": "launch",
+            "mainClass": "server.utils.DatabasePopulator",
+            "projectName": "lab_B_35d6ae79"
+        },
+        {
+            "type": "java",
             "name": "ServerMain",
             "request": "launch",
             "mainClass": "server.ServerMain",
