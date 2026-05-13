@@ -5,17 +5,25 @@ import com.google.gson.JsonObject;
 import common.Request;
 import common.Response;
 import server.dao.RistoranteDAO;
+import server.dao.PreferitiDAO;
 import server.model.Ristorante;
 
 import java.util.List;
 
 public class RistoranteService {
 
+    // ============================
+    //  CERCA RISTORANTI
+    // ============================
     public static Response cerca(Request req) {
         try {
             String query = req.payload.get("query").getAsString();
 
-            List<Ristorante> lista = RistoranteDAO.cerca(query);
+            String categoria = req.payload.has("categoria")
+                    ? req.payload.get("categoria").getAsString()
+                    : "Tutte";
+
+            List<Ristorante> lista = RistoranteDAO.cerca(query, categoria);
 
             JsonArray arr = new JsonArray();
             for (Ristorante r : lista) {
@@ -37,6 +45,9 @@ public class RistoranteService {
         }
     }
 
+    // ============================
+    //  VISUALIZZA DETTAGLI
+    // ============================
     public static Response visualizza(Request req) {
         try {
             int id = req.payload.get("id").getAsInt();
@@ -57,6 +68,29 @@ public class RistoranteService {
 
         } catch (Exception e) {
             return Response.error("Errore visualizzazione ristorante: " + e.getMessage());
+        }
+    }
+
+    // ============================
+    //  AGGIUNGI AI PREFERITI
+    // ============================
+    public static Response aggiungiPreferito(Request req) {
+        try {
+            int idRistorante = req.payload.get("id").getAsInt();
+            int idUtente = req.payload.get("utente").getAsInt();
+
+            boolean ok = PreferitiDAO.aggiungi(idUtente, idRistorante);
+
+            if (ok) {
+                JsonObject payload = new JsonObject();
+                payload.addProperty("status", "ok");
+                return Response.ok(payload);
+            } else {
+                return Response.error("Impossibile aggiungere ai preferiti");
+            }
+
+        } catch (Exception e) {
+            return Response.error("Errore aggiunta preferito: " + e.getMessage());
         }
     }
 }

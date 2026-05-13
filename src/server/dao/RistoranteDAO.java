@@ -1,25 +1,34 @@
 package server.dao;
 
-import server.model.Ristorante;
-import server.utils.DBConnectionPool;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
+import server.model.Ristorante;
+import server.utils.DBConnectionPool;
 
 public class RistoranteDAO {
 
-    public static List<Ristorante> cerca(String query) {
+    public static List<Ristorante> cerca(String query, String categoria) {
         List<Ristorante> lista = new ArrayList<>();
 
         try {
             Connection conn = DBConnectionPool.get();
 
             String sql = "SELECT * FROM ristoranti WHERE LOWER(nome) LIKE LOWER(?)";
+
+            // Se la categoria NON è "Tutte", aggiungiamo il filtro
+            if (!categoria.equalsIgnoreCase("Tutte")) {
+                sql += " AND LOWER(categoria) = LOWER(?)";
+            }
+
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setString(1, "%" + query + "%");
+
+            if (!categoria.equalsIgnoreCase("Tutte")) {
+                ps.setString(2, categoria);
+            }
 
             ResultSet rs = ps.executeQuery();
 
@@ -33,16 +42,20 @@ public class RistoranteDAO {
                 ));
             }
 
+            rs.close();
+            ps.close();
             DBConnectionPool.release(conn);
-            return lista;
 
         } catch (Exception e) {
             e.printStackTrace();
-            return lista;
         }
+
+        return lista;
     }
 
     public static Ristorante getById(int id) {
+        Ristorante r = null;
+
         try {
             Connection conn = DBConnectionPool.get();
 
@@ -52,7 +65,6 @@ public class RistoranteDAO {
 
             ResultSet rs = ps.executeQuery();
 
-            Ristorante r = null;
             if (rs.next()) {
                 r = new Ristorante(
                         rs.getInt("id"),
@@ -63,12 +75,14 @@ public class RistoranteDAO {
                 );
             }
 
+            rs.close();
+            ps.close();
             DBConnectionPool.release(conn);
-            return r;
 
         } catch (Exception e) {
             e.printStackTrace();
-            return null;
         }
+
+        return r;
     }
 }

@@ -44,21 +44,23 @@ public class HomeController {
         // CERCA RISTORANTI
         view.getBtnCerca().setOnAction(e -> onGoSearch.run());
 
-        // PREFERITI
+        // PREFERITI (QUESTO È GIUSTO)
         view.getBtnPreferiti().setOnAction(e -> {
             sendSimple(MessageType.VISUALIZZA_PREFERITI);
             onGoPreferiti.run();
         });
 
         // RECENSIONI UTENTE
+        // Il server NON ha VISUALIZZA_RECENSIONI_GESTORE
+        // quindi NON inviamo nulla al server
         view.getBtnRecensioni().setOnAction(e -> {
-            sendSimple(MessageType.VISUALIZZA_RECENSIONI_GESTORE);
             onGoRecensioni.run();
         });
 
-        // GESTIONE RISTORANTI (solo gestori)
+        // GESTIONE RISTORANTI
+        // Il server NON ha VISUALIZZA_RIEPILOGO_GESTORE
+        // quindi NON inviamo nulla al server
         view.getBtnGestione().setOnAction(e -> {
-            sendSimple(MessageType.VISUALIZZA_RIEPILOGO_GESTORE);
             onGoGestione.run();
         });
 

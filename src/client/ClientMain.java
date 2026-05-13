@@ -1,7 +1,9 @@
 package client;
 
 import client.controller.HomeController;
+import client.controller.RicercaRistorantiController;
 import client.gui.HomeView;
+import client.gui.RicercaRistorantiView;
 import client.net.ClientConnection;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -31,30 +33,43 @@ public class ClientMain extends Application {
                 this::logout
         );
 
-        // SCENA
+        // SCENA PRINCIPALE
         Scene scene = new Scene(homeView, 800, 600);
-
         stage.setTitle("TheKnife - Client");
         stage.setScene(scene);
         stage.show();
     }
 
+    // 🔹 Schermata di ricerca ristoranti
     private void vaiACerca() {
         System.out.println("Apro la schermata di ricerca ristoranti");
+
+        RicercaRistorantiView view = new RicercaRistorantiView();
+        RicercaRistorantiController controller = new RicercaRistorantiController(view, connection);
+
+        Scene scene = new Scene(view, 800, 600);
+        Stage stage = new Stage();
+        stage.setTitle("Ricerca Ristoranti");
+        stage.setScene(scene);
+        stage.show();
     }
 
+    // 🔹 Schermata preferiti
     private void vaiAPreferiti() {
         System.out.println("Apro la schermata dei preferiti");
     }
 
+    // 🔹 Schermata recensioni
     private void vaiARecensioni() {
         System.out.println("Apro la schermata delle recensioni");
     }
 
+    // 🔹 Schermata gestione ristoranti
     private void vaiAGestione() {
         System.out.println("Apro la gestione ristoranti");
     }
 
+    // 🔹 Logout
     private void logout() {
         System.out.println("Logout effettuato");
         System.exit(0);

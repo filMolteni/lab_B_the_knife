@@ -45,7 +45,7 @@ public class GestoreRistorantiView extends BorderPane {
         tabella = new TableView<>();
 
         TableColumn<RistoranteRow, Integer> colId = new TableColumn<>("ID");
-        colId.setCellValueFactory(c -> c.getValue().idProperty().asObject());
+        colId.setCellValueFactory(c -> new javafx.beans.property.ReadOnlyObjectWrapper<>(c.getValue().getId()));
         colId.setPrefWidth(60);
 
         TableColumn<RistoranteRow, String> colNome = new TableColumn<>("Nome");
