@@ -12,11 +12,12 @@ public class HomeController {
     private final HomeView view;
     private final ClientConnection connection;
 
-    // callback per cambiare schermata
+    // Callback per cambiare schermata
     private final Runnable onGoSearch;
     private final Runnable onGoPreferiti;
     private final Runnable onGoRecensioni;
     private final Runnable onGoGestione;
+    private final Runnable onGoLogin;
     private final Runnable onLogout;
 
     public HomeController(HomeView view,
@@ -25,6 +26,7 @@ public class HomeController {
                           Runnable onGoPreferiti,
                           Runnable onGoRecensioni,
                           Runnable onGoGestione,
+                          Runnable onGoLogin,
                           Runnable onLogout) {
 
         this.view = view;
@@ -34,6 +36,7 @@ public class HomeController {
         this.onGoPreferiti = onGoPreferiti;
         this.onGoRecensioni = onGoRecensioni;
         this.onGoGestione = onGoGestione;
+        this.onGoLogin = onGoLogin;
         this.onLogout = onLogout;
 
         initHandlers();
@@ -44,32 +47,27 @@ public class HomeController {
         // CERCA RISTORANTI
         view.getBtnCerca().setOnAction(e -> onGoSearch.run());
 
-        // PREFERITI (QUESTO È GIUSTO)
+        // PREFERITI
         view.getBtnPreferiti().setOnAction(e -> {
             sendSimple(MessageType.VISUALIZZA_PREFERITI);
             onGoPreferiti.run();
         });
 
         // RECENSIONI UTENTE
-        // Il server NON ha VISUALIZZA_RECENSIONI_GESTORE
-        // quindi NON inviamo nulla al server
-        view.getBtnRecensioni().setOnAction(e -> {
-            onGoRecensioni.run();
-        });
+        view.getBtnRecensioni().setOnAction(e -> onGoRecensioni.run());
 
         // GESTIONE RISTORANTI
-        // Il server NON ha VISUALIZZA_RIEPILOGO_GESTORE
-        // quindi NON inviamo nulla al server
-        view.getBtnGestione().setOnAction(e -> {
-            onGoGestione.run();
-        });
+        view.getBtnGestione().setOnAction(e -> onGoGestione.run());
+
+        // LOGIN
+        view.getBtnLogin().setOnAction(e -> onGoLogin.run());
 
         // LOGOUT
         view.getBtnLogout().setOnAction(e -> onLogout.run());
     }
 
     /**
-     * Invia una richiesta senza parametri
+     * Invia una richiesta semplice al server (senza parametri)
      */
     private void sendSimple(MessageType type) {
         try {
@@ -85,3 +83,4 @@ public class HomeController {
         }
     }
 }
+

@@ -2,7 +2,6 @@ package server.dao;
 
 import server.model.Utente;
 import server.utils.DBConnectionPool;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -10,6 +9,7 @@ import java.sql.ResultSet;
 public class UtenteDAO {
 
     public static Utente login(String email, String password) {
+        Utente u = null;
         try {
             Connection conn = DBConnectionPool.get();
 
@@ -20,7 +20,6 @@ public class UtenteDAO {
 
             ResultSet rs = ps.executeQuery();
 
-            Utente u = null;
             if (rs.next()) {
                 u = new Utente(
                         rs.getInt("id"),
@@ -31,16 +30,18 @@ public class UtenteDAO {
                 );
             }
 
+            rs.close();
+            ps.close();
             DBConnectionPool.release(conn);
-            return u;
 
         } catch (Exception e) {
             e.printStackTrace();
-            return null;
         }
+
+        return u;
     }
 
-    public static boolean registra(String nome, String email, String password, String ruolo) {
+    public static boolean registrati(String nome, String email, String password, String ruolo) {
         try {
             Connection conn = DBConnectionPool.get();
 
@@ -53,7 +54,9 @@ public class UtenteDAO {
 
             int rows = ps.executeUpdate();
 
+            ps.close();
             DBConnectionPool.release(conn);
+
             return rows > 0;
 
         } catch (Exception e) {

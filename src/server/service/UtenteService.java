@@ -10,10 +10,8 @@ public class UtenteService {
 
     public static Response login(Request req) {
         try {
-            JsonObject p = req.payload;
-
-            String email = p.get("email").getAsString();
-            String password = p.get("password").getAsString();
+            String email = req.payload.get("email").getAsString();
+            String password = req.payload.get("password").getAsString();
 
             Utente u = UtenteDAO.login(email, password);
 
@@ -33,21 +31,19 @@ public class UtenteService {
         }
     }
 
-    public static Response registra(Request req) {
+    public static Response registrati(Request req) {
         try {
-            JsonObject p = req.payload;
+            String nome = req.payload.get("nome").getAsString();
+            String email = req.payload.get("email").getAsString();
+            String password = req.payload.get("password").getAsString();
+            String ruolo = req.payload.get("ruolo").getAsString();
 
-            String nome = p.get("nome").getAsString();
-            String email = p.get("email").getAsString();
-            String password = p.get("password").getAsString();
-            String ruolo = p.get("ruolo").getAsString();
+            boolean ok = UtenteDAO.registrati(nome, email, password, ruolo);
 
-            boolean ok = UtenteDAO.registra(nome, email, password, ruolo);
-
-            if (!ok)
+            if (ok)
+                return Response.ok(new JsonObject());
+            else
                 return Response.error("Registrazione fallita");
-
-            return Response.ok();
 
         } catch (Exception e) {
             return Response.error("Errore registrazione: " + e.getMessage());

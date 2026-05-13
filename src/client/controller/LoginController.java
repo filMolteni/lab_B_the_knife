@@ -44,16 +44,16 @@ public class LoginController {
 
     private void doLogin() {
 
-        String username = view.getTxtUsername().getText().trim();
+        String email = view.getTxtEmail().getText().trim();
         String password = view.getTxtPassword().getText().trim();
 
-        if (username.isEmpty() || password.isEmpty()) {
+        if (email.isEmpty() || password.isEmpty()) {
             System.out.println("Campi vuoti");
             return;
         }
 
         JsonObject params = new JsonObject();
-        params.addProperty("username", username);
+        params.addProperty("email", email);
         params.addProperty("password", password);
 
         Request req = new Request(MessageType.LOGIN, params);

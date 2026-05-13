@@ -13,7 +13,7 @@ import javafx.scene.text.Font;
 
 public class LoginView extends BorderPane {
 
-    private TextField txtUsername;
+    private TextField txtEmail;
     private PasswordField txtPassword;
 
     private Button btnAccedi;
@@ -26,9 +26,6 @@ public class LoginView extends BorderPane {
 
     private void creaLayout() {
 
-        // ============================
-        // TITOLO
-        // ============================
         Label titolo = new Label("Accesso Utente");
         titolo.setFont(new Font(26));
         titolo.setPadding(new Insets(20, 0, 20, 0));
@@ -37,28 +34,22 @@ public class LoginView extends BorderPane {
         topBox.setAlignment(Pos.CENTER);
         this.setTop(topBox);
 
-        // ============================
-        // FORM LOGIN
-        // ============================
         GridPane form = new GridPane();
         form.setPadding(new Insets(20));
         form.setHgap(10);
         form.setVgap(15);
 
-        txtUsername = new TextField();
+        txtEmail = new TextField();
         txtPassword = new PasswordField();
 
-        form.add(new Label("Username:"), 0, 0);
-        form.add(txtUsername, 1, 0);
+        form.add(new Label("Email:"), 0, 0);
+        form.add(txtEmail, 1, 0);
 
         form.add(new Label("Password:"), 0, 1);
         form.add(txtPassword, 1, 1);
 
         this.setCenter(form);
 
-        // ============================
-        // BOTTONI
-        // ============================
         btnIndietro = new Button("Indietro");
         btnIndietro.setPrefWidth(120);
 
@@ -74,22 +65,14 @@ public class LoginView extends BorderPane {
 
         this.setBottom(bottomBox);
 
-        // ============================
-        // STILE GENERALE
-        // ============================
         this.setPadding(new Insets(15));
         this.setStyle("-fx-background-color: #f8f8f8;");
     }
 
-    // ============================
-    // GETTER PER IL CONTROLLER
-    // ============================
-
-    public TextField getTxtUsername() { return txtUsername; }
+    public TextField getTxtEmail() { return txtEmail; }
     public PasswordField getTxtPassword() { return txtPassword; }
 
     public Button getBtnAccedi() { return btnAccedi; }
     public Button getBtnRegistrati() { return btnRegistrati; }
     public Button getBtnIndietro() { return btnIndietro; }
 }
-

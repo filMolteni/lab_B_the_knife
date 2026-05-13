@@ -1,8 +1,10 @@
 package client;
 
 import client.controller.HomeController;
+import client.controller.LoginController;
 import client.controller.RicercaRistorantiController;
 import client.gui.HomeView;
+import client.gui.LoginView;
 import client.gui.RicercaRistorantiView;
 import client.net.ClientConnection;
 import javafx.application.Application;
@@ -12,17 +14,26 @@ import javafx.stage.Stage;
 public class ClientMain extends Application {
 
     private ClientConnection connection;
+    private Stage primaryStage;
 
     @Override
     public void start(Stage stage) {
 
+        this.primaryStage = stage;
+
         // Connessione al server
         connection = new ClientConnection("localhost", 5555);
 
-        // VIEW
+        // Mostra la Home all'avvio
+        mostraHome();
+    }
+
+    // ============================
+    // HOME
+    // ============================
+    private void mostraHome() {
         HomeView homeView = new HomeView();
 
-        // CONTROLLER con callback
         HomeController homeController = new HomeController(
                 homeView,
                 connection,
@@ -30,49 +41,73 @@ public class ClientMain extends Application {
                 this::vaiAPreferiti,
                 this::vaiARecensioni,
                 this::vaiAGestione,
+                this::vaiALogin,   // <-- AGGIUNTO
                 this::logout
         );
 
-        // SCENA PRINCIPALE
-        Scene scene = new Scene(homeView, 800, 600);
-        stage.setTitle("TheKnife - Client");
-        stage.setScene(scene);
-        stage.show();
+        primaryStage.setScene(new Scene(homeView, 800, 600));
+        primaryStage.setTitle("TheKnife - Home");
+        primaryStage.show();
     }
 
-    // 🔹 Schermata di ricerca ristoranti
+    // ============================
+    // LOGIN
+    // ============================
+    private void vaiALogin() {
+        LoginView loginView = new LoginView();
+
+        LoginController loginController = new LoginController(
+                loginView,
+                connection,
+                this::mostraHome,      // dopo login → torna alla Home
+                () -> System.out.println("TODO: Registrazione"), // registrazione
+                this::mostraHome       // indietro → torna alla Home
+        );
+
+        primaryStage.setScene(new Scene(loginView, 600, 400));
+        primaryStage.setTitle("TheKnife - Login");
+    }
+
+    // ============================
+    // CERCA RISTORANTI
+    // ============================
     private void vaiACerca() {
-        System.out.println("Apro la schermata di ricerca ristoranti");
-
         RicercaRistorantiView view = new RicercaRistorantiView();
-        RicercaRistorantiController controller = new RicercaRistorantiController(view, connection);
+        new RicercaRistorantiController(view, connection);
 
-        Scene scene = new Scene(view, 800, 600);
         Stage stage = new Stage();
+        stage.setScene(new Scene(view, 800, 600));
         stage.setTitle("Ricerca Ristoranti");
-        stage.setScene(scene);
         stage.show();
     }
 
-    // 🔹 Schermata preferiti
+    // ============================
+    // PREFERITI
+    // ============================
     private void vaiAPreferiti() {
         System.out.println("Apro la schermata dei preferiti");
     }
 
-    // 🔹 Schermata recensioni
+    // ============================
+    // RECENSIONI
+    // ============================
     private void vaiARecensioni() {
         System.out.println("Apro la schermata delle recensioni");
     }
 
-    // 🔹 Schermata gestione ristoranti
+    // ============================
+    // GESTIONE RISTORANTI
+    // ============================
     private void vaiAGestione() {
         System.out.println("Apro la gestione ristoranti");
     }
 
-    // 🔹 Logout
+    // ============================
+    // LOGOUT
+    // ============================
     private void logout() {
         System.out.println("Logout effettuato");
-        System.exit(0);
+        mostraHome();
     }
 
     public static void main(String[] args) {
