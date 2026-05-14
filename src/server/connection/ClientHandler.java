@@ -3,7 +3,6 @@ package server.connection;
 import com.google.gson.Gson;
 import common.Request;
 import common.Response;
-import common.MessageType;
 
 import server.service.UtenteService;
 import server.service.RistoranteService;
@@ -62,14 +61,11 @@ public class ClientHandler implements Runnable {
             // ============================
             case CERCA_RISTORANTI -> RistoranteService.cerca(req);
             case VISUALIZZA_RISTORANTE -> RistoranteService.visualizza(req);
-
+            case VISUALIZZA_RISTORANTE_UTENTE -> RistoranteService.visualizzaUtente(req);
             case AGGIUNGI_RISTORANTE -> RistoranteService.aggiungi(req);
             case MODIFICA_RISTORANTE -> RistoranteService.modifica(req);
             case ELIMINA_RISTORANTE -> RistoranteService.elimina(req);
-
             case VISUALIZZA_RIEPILOGO_GESTORE -> RistoranteService.riepilogoGestore(req);
-            case VISUALIZZA_RECENSIONI_GESTORE -> RistoranteService.recensioniGestore(req);
-            case RISPONDI_RECENSIONE -> RistoranteService.rispondi(req);
 
             // ============================
             // RECENSIONI
@@ -77,6 +73,18 @@ public class ClientHandler implements Runnable {
             case AGGIUNGI_RECENSIONE -> RecensioneService.aggiungi(req);
             case MODIFICA_RECENSIONE -> RecensioneService.modifica(req);
             case ELIMINA_RECENSIONE -> RecensioneService.elimina(req);
+
+            case VISUALIZZA_RECENSIONI_RISTORANTE_UTENTE ->
+                    RecensioneService.getByRistorante(req);
+
+            case VISUALIZZA_RECENSIONI_RISTORANTE ->
+                    RecensioneService.getByRistorante(req);
+
+            case VISUALIZZA_RECENSIONI_GESTORE ->
+                    RecensioneService.getByGestore(req);
+
+            case RISPONDI_RECENSIONE ->
+                    RecensioneService.rispondi(req);
 
             // ============================
             // PREFERITI

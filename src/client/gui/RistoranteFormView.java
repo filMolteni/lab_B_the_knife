@@ -11,8 +11,15 @@ public class RistoranteFormView extends BorderPane {
 
     private TextField txtNome;
     private TextField txtIndirizzo;
-    private TextField txtCategoria;
-    private TextArea txtDescrizione;
+    private TextField txtTipoCucina;
+    private TextField txtCitta;
+    private TextField txtNazione;
+    private TextField txtLatitudine;
+    private TextField txtLongitudine;
+    private Spinner<Integer> spFasciaPrezzo;
+
+    private CheckBox chkDelivery;
+    private CheckBox chkPrenotazione;
 
     private Button btnSalva;
     private Button btnAnnulla;
@@ -36,9 +43,16 @@ public class RistoranteFormView extends BorderPane {
 
         txtNome = new TextField();
         txtIndirizzo = new TextField();
-        txtCategoria = new TextField();
-        txtDescrizione = new TextArea();
-        txtDescrizione.setPrefRowCount(4);
+        txtTipoCucina = new TextField();
+        txtCitta = new TextField();
+        txtNazione = new TextField();
+        txtLatitudine = new TextField();
+        txtLongitudine = new TextField();
+
+        spFasciaPrezzo = new Spinner<>(1, 5, 1);
+
+        chkDelivery = new CheckBox("Delivery disponibile");
+        chkPrenotazione = new CheckBox("Prenotazione disponibile");
 
         form.add(new Label("Nome:"), 0, 0);
         form.add(txtNome, 1, 0);
@@ -46,11 +60,26 @@ public class RistoranteFormView extends BorderPane {
         form.add(new Label("Indirizzo:"), 0, 1);
         form.add(txtIndirizzo, 1, 1);
 
-        form.add(new Label("Categoria:"), 0, 2);
-        form.add(txtCategoria, 1, 2);
+        form.add(new Label("Tipo cucina:"), 0, 2);
+        form.add(txtTipoCucina, 1, 2);
 
-        form.add(new Label("Descrizione:"), 0, 3);
-        form.add(txtDescrizione, 1, 3);
+        form.add(new Label("Fascia prezzo (1-5):"), 0, 3);
+        form.add(spFasciaPrezzo, 1, 3);
+
+        form.add(new Label("Città:"), 0, 4);
+        form.add(txtCitta, 1, 4);
+
+        form.add(new Label("Nazione:"), 0, 5);
+        form.add(txtNazione, 1, 5);
+
+        form.add(new Label("Latitudine:"), 0, 6);
+        form.add(txtLatitudine, 1, 6);
+
+        form.add(new Label("Longitudine:"), 0, 7);
+        form.add(txtLongitudine, 1, 7);
+
+        form.add(chkDelivery, 1, 8);
+        form.add(chkPrenotazione, 1, 9);
 
         this.setCenter(form);
 
@@ -67,17 +96,43 @@ public class RistoranteFormView extends BorderPane {
     // GETTER
     public TextField getTxtNome() { return txtNome; }
     public TextField getTxtIndirizzo() { return txtIndirizzo; }
-    public TextField getTxtCategoria() { return txtCategoria; }
-    public TextArea getTxtDescrizione() { return txtDescrizione; }
+    public TextField getTxtTipoCucina() { return txtTipoCucina; }
+    public Spinner<Integer> getSpFasciaPrezzo() { return spFasciaPrezzo; }
+    public TextField getTxtCitta() { return txtCitta; }
+    public TextField getTxtNazione() { return txtNazione; }
+    public TextField getTxtLatitudine() { return txtLatitudine; }
+    public TextField getTxtLongitudine() { return txtLongitudine; }
+    public boolean isDelivery() { return chkDelivery.isSelected(); }
+    public boolean isPrenotazione() { return chkPrenotazione.isSelected(); }
 
     public Button getBtnSalva() { return btnSalva; }
     public Button getBtnAnnulla() { return btnAnnulla; }
 
     // Precompila i campi in caso di modifica
-    public void setValues(String nome, String indirizzo, String categoria, String descrizione) {
+    public void setValues(String nome, String indirizzo, String tipoCucina,
+                          int fasciaPrezzo, String citta, String nazione,
+                          double lat, double lon, boolean delivery, boolean prenotazione) {
+
         txtNome.setText(nome);
         txtIndirizzo.setText(indirizzo);
-        txtCategoria.setText(categoria);
-        txtDescrizione.setText(descrizione);
+        txtTipoCucina.setText(tipoCucina);
+        spFasciaPrezzo.getValueFactory().setValue(fasciaPrezzo);
+        txtCitta.setText(citta);
+        txtNazione.setText(nazione);
+        txtLatitudine.setText(String.valueOf(lat));
+        txtLongitudine.setText(String.valueOf(lon));
+        chkDelivery.setSelected(delivery);
+        chkPrenotazione.setSelected(prenotazione);
     }
+
+    // Metodi helper per controller
+    public int getFasciaPrezzo() { return spFasciaPrezzo.getValue(); }
+    public double getLatitudine() {
+        return Double.parseDouble(txtLatitudine.getText().trim());
+    }
+
+    public double getLongitudine() {
+        return Double.parseDouble(txtLongitudine.getText().trim());
+    }
+
 }

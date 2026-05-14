@@ -7,47 +7,58 @@ import client.net.Response;
 import com.google.gson.JsonObject;
 import common.MessageType;
 
+import java.util.function.Consumer;
+
 public class RistoranteDetailController {
 
     private final RistoranteDetailView view;
     private final ClientConnection connection;
     private final Runnable onGoBack;
-    private final java.util.function.Consumer<Integer> onShowRecensioni;
+    private final Consumer<Integer> onShowRecensioni;
+    private final Runnable onScriviRecensione;   // <-- NUOVO
 
     private int ristoranteId;
 
     public RistoranteDetailController(RistoranteDetailView view,
                                       ClientConnection connection,
                                       Runnable onGoBack,
-                                      java.util.function.Consumer<Integer> onShowRecensioni) {
+                                      Consumer<Integer> onShowRecensioni,
+                                      Runnable onScriviRecensione) {   // <-- NUOVO
 
         this.view = view;
         this.connection = connection;
         this.onGoBack = onGoBack;
         this.onShowRecensioni = onShowRecensioni;
+        this.onScriviRecensione = onScriviRecensione;   // <-- NUOVO
 
         initHandlers();
     }
 
     private void initHandlers() {
 
-        // TORNA INDIETRO
         view.getBtnIndietro().setOnAction(e -> onGoBack.run());
 
-        // MOSTRA RECENSIONI
         view.getBtnRecensioni().setOnAction(e -> onShowRecensioni.accept(ristoranteId));
+
+        //  NUOVO: apre la finestra per scrivere una recensione
+        view.getBtnScriviRecensione().setOnAction(e -> onScriviRecensione.run());
     }
 
     /**
      * Carica i dettagli del ristorante dal server
      */
-    public void loadRistorante(int id) {
+    public void loadRistorante(int id, boolean isUtente) {
+
         this.ristoranteId = id;
 
         JsonObject params = new JsonObject();
         params.addProperty("id", id);
 
-        Request req = new Request(MessageType.VISUALIZZA_RISTORANTE, params);
+        MessageType type = isUtente
+                ? MessageType.VISUALIZZA_RISTORANTE_UTENTE
+                : MessageType.VISUALIZZA_RISTORANTE;
+
+        Request req = new Request(type, params);
 
         try {
             Response res = connection.sendRequest(req);
@@ -61,8 +72,15 @@ public class RistoranteDetailController {
 
             view.getTxtNome().setText(data.get("nome").getAsString());
             view.getTxtIndirizzo().setText(data.get("indirizzo").getAsString());
-            view.getTxtCategoria().setText(data.get("categoria").getAsString());
-            view.getTxtDescrizione().setText(data.get("descrizione").getAsString());
+            view.getTxtCitta().setText(data.get("citta").getAsString());
+            view.getTxtNazione().setText(data.get("nazione").getAsString());
+            view.getTxtTipoCucina().setText(data.get("tipo_cucina").getAsString());
+            view.getTxtFasciaPrezzo().setText(String.valueOf(data.get("fascia_prezzo").getAsInt()));
+            view.getTxtLatitudine().setText(String.valueOf(data.get("latitudine").getAsDouble()));
+            view.getTxtLongitudine().setText(String.valueOf(data.get("longitudine").getAsDouble()));
+
+            view.getChkDelivery().setSelected(data.get("delivery").getAsBoolean());
+            view.getChkPrenotazione().setSelected(data.get("prenotazione").getAsBoolean());
 
         } catch (Exception ex) {
             ex.printStackTrace();

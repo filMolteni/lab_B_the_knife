@@ -12,13 +12,44 @@ import java.util.List;
 public class RecensioneDAO {
 
     // ============================
+    // VERIFICA SE L’UTENTE HA GIÀ RECENSITO IL RISTORANTE
+    // ============================
+    public static boolean recensioneEsiste(int idUtente, int idRistorante) {
+        try {
+            Connection conn = DBConnectionPool.get();
+
+            String sql = "SELECT 1 FROM recensioni WHERE id_utente = ? AND id_ristorante = ? LIMIT 1";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setInt(1, idUtente);
+            ps.setInt(2, idRistorante);
+
+            ResultSet rs = ps.executeQuery();
+            boolean exists = rs.next();
+
+            rs.close();
+            ps.close();
+            DBConnectionPool.release(conn);
+
+            return exists;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // ============================
     // AGGIUNGI RECENSIONE
     // ============================
     public static boolean aggiungi(int idUtente, int idRistorante, int voto, String testo) {
         try {
             Connection conn = DBConnectionPool.get();
 
-            String sql = "INSERT INTO recensioni(id_utente, id_ristorante, voto, testo) VALUES (?, ?, ?, ?)";
+            String sql = """
+                INSERT INTO recensioni(id_utente, id_ristorante, voto, testo, data)
+                VALUES (?, ?, ?, ?, NOW())
+            """;
+
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setInt(1, idUtente);
             ps.setInt(2, idRistorante);
@@ -27,7 +58,9 @@ public class RecensioneDAO {
 
             int rows = ps.executeUpdate();
 
+            ps.close();
             DBConnectionPool.release(conn);
+
             return rows > 0;
 
         } catch (Exception e) {
@@ -51,7 +84,9 @@ public class RecensioneDAO {
 
             int rows = ps.executeUpdate();
 
+            ps.close();
             DBConnectionPool.release(conn);
+
             return rows > 0;
 
         } catch (Exception e) {
@@ -73,13 +108,58 @@ public class RecensioneDAO {
 
             int rows = ps.executeUpdate();
 
+            ps.close();
             DBConnectionPool.release(conn);
+
             return rows > 0;
 
         } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
+    }
+
+    // ============================
+    // RECENSIONI DI UN RISTORANTE
+    // ============================
+    public static List<Recensione> getByRistorante(int idRistorante) {
+        List<Recensione> lista = new ArrayList<>();
+
+        try {
+            Connection conn = DBConnectionPool.get();
+
+            String sql = """
+                SELECT id, id_utente, id_ristorante, voto, testo, data
+                FROM recensioni
+                WHERE id_ristorante = ?
+                ORDER BY data DESC
+            """;
+
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setInt(1, idRistorante);
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                lista.add(new Recensione(
+                        rs.getInt("id"),
+                        rs.getInt("id_utente"),
+                        rs.getInt("id_ristorante"),
+                        rs.getInt("voto"),
+                        rs.getString("testo"),
+                        rs.getString("data")
+                ));
+            }
+
+            rs.close();
+            ps.close();
+            DBConnectionPool.release(conn);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return lista;
     }
 
     // ============================
@@ -92,10 +172,11 @@ public class RecensioneDAO {
             Connection conn = DBConnectionPool.get();
 
             String sql = """
-                SELECT r.*
+                SELECT r.id, r.id_utente, r.id_ristorante, r.voto, r.testo, r.data
                 FROM recensioni r
                 JOIN ristoranti t ON r.id_ristorante = t.id
                 WHERE t.id_gestore = ?
+                ORDER BY r.data DESC
             """;
 
             PreparedStatement ps = conn.prepareStatement(sql);
@@ -109,7 +190,8 @@ public class RecensioneDAO {
                         rs.getInt("id_utente"),
                         rs.getInt("id_ristorante"),
                         rs.getInt("voto"),
-                        rs.getString("testo")
+                        rs.getString("testo"),
+                        rs.getString("data")
                 ));
             }
 
@@ -138,7 +220,9 @@ public class RecensioneDAO {
 
             int rows = ps.executeUpdate();
 
+            ps.close();
             DBConnectionPool.release(conn);
+
             return rows > 0;
 
         } catch (Exception e) {

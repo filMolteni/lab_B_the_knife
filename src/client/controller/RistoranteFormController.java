@@ -13,8 +13,7 @@ public class RistoranteFormController {
     private final RistoranteFormView view;
     private final ClientConnection connection;
     private final Runnable onSuccess;
-
-    private final Integer idRistorante; // null = aggiunta
+    private final Integer idRistorante;
 
     public RistoranteFormController(RistoranteFormView view,
                                     ClientConnection connection,
@@ -42,29 +41,43 @@ public class RistoranteFormController {
 
         String nome = view.getTxtNome().getText().trim();
         String indirizzo = view.getTxtIndirizzo().getText().trim();
-        String categoria = view.getTxtCategoria().getText().trim();
-        String descrizione = view.getTxtDescrizione().getText().trim();
+        String tipoCucina = view.getTxtTipoCucina().getText().trim();
+        String citta = view.getTxtCitta().getText().trim();
+        String nazione = view.getTxtNazione().getText().trim();
 
-        if (nome.isEmpty() || indirizzo.isEmpty() || categoria.isEmpty()) {
+        if (nome.isEmpty() || indirizzo.isEmpty() || tipoCucina.isEmpty()) {
             System.out.println("Campi obbligatori mancanti");
+            return;
+        }
+
+        double lat, lon;
+
+        try {
+            lat = view.getLatitudine();
+            lon = view.getLongitudine();
+        } catch (Exception ex) {
+            System.out.println("Latitudine/Longitudine non valide");
             return;
         }
 
         JsonObject params = new JsonObject();
         params.addProperty("nome", nome);
         params.addProperty("indirizzo", indirizzo);
-        params.addProperty("categoria", categoria);
-        params.addProperty("descrizione", descrizione);
+        params.addProperty("tipo_cucina", tipoCucina);
+        params.addProperty("fascia_prezzo", view.getFasciaPrezzo());
+        params.addProperty("citta", citta);
+        params.addProperty("nazione", nazione);
+        params.addProperty("latitudine", lat);
+        params.addProperty("longitudine", lon);
+        params.addProperty("delivery", view.isDelivery());
+        params.addProperty("prenotazione", view.isPrenotazione());
 
         Request req;
 
         if (idRistorante == null) {
-           
             params.addProperty("idGestore", UtenteDTO.getUtenteLoggato().getId());
-
             req = new Request(MessageType.AGGIUNGI_RISTORANTE, params);
         } else {
-            // Modifica
             params.addProperty("id", idRistorante);
             req = new Request(MessageType.MODIFICA_RISTORANTE, params);
         }

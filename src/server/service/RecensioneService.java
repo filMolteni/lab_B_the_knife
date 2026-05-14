@@ -1,12 +1,19 @@
 package server.service;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import common.Request;
 import common.Response;
 import server.dao.RecensioneDAO;
+import server.model.Recensione;
+
+import java.util.List;
 
 public class RecensioneService {
 
+    // ============================
+    // AGGIUNGI RECENSIONE
+    // ============================
     public static Response aggiungi(Request req) {
         try {
             JsonObject p = req.payload;
@@ -16,6 +23,12 @@ public class RecensioneService {
             int voto = p.get("voto").getAsInt();
             String testo = p.get("testo").getAsString();
 
+            // 1) Controllo se esiste già una recensione
+            if (RecensioneDAO.recensioneEsiste(idUtente, idRistorante)) {
+                return Response.error("Hai già recensito questo ristorante.");
+            }
+
+            // 2) Inserimento recensione
             boolean ok = RecensioneDAO.aggiungi(idUtente, idRistorante, voto, testo);
 
             if (!ok)
@@ -28,6 +41,9 @@ public class RecensioneService {
         }
     }
 
+    // ============================
+    // MODIFICA RECENSIONE
+    // ============================
     public static Response modifica(Request req) {
         try {
             JsonObject p = req.payload;
@@ -48,6 +64,9 @@ public class RecensioneService {
         }
     }
 
+    // ============================
+    // ELIMINA RECENSIONE
+    // ============================
     public static Response elimina(Request req) {
         try {
             int idRecensione = req.payload.get("idRecensione").getAsInt();
@@ -61,6 +80,89 @@ public class RecensioneService {
 
         } catch (Exception e) {
             return Response.error("Errore eliminazione recensione: " + e.getMessage());
+        }
+    }
+
+    // ============================
+    // RECENSIONI DI UN RISTORANTE (UTENTE)
+    // ============================
+    public static Response getByRistorante(Request req) {
+        try {
+            int idRistorante = req.payload.get("idRistorante").getAsInt();
+
+            List<Recensione> lista = RecensioneDAO.getByRistorante(idRistorante);
+
+            JsonArray arr = new JsonArray();
+
+            for (Recensione r : lista) {
+                JsonObject o = new JsonObject();
+                o.addProperty("id", r.getId());
+                o.addProperty("idUtente", r.getIdUtente());
+                o.addProperty("voto", r.getVoto());
+                o.addProperty("testo", r.getTesto());
+                o.addProperty("data", r.getData());
+                arr.add(o);
+            }
+
+            JsonObject res = new JsonObject();
+            res.add("recensioni", arr);
+
+            return Response.ok(res);
+
+        } catch (Exception e) {
+            return Response.error("Errore caricamento recensioni: " + e.getMessage());
+        }
+    }
+
+    // ============================
+    // RECENSIONI DEI RISTORANTI DI UN GESTORE
+    // ============================
+    public static Response getByGestore(Request req) {
+        try {
+            int idGestore = req.payload.get("idGestore").getAsInt();
+
+            List<Recensione> lista = RecensioneDAO.getByGestore(idGestore);
+
+            JsonArray arr = new JsonArray();
+
+            for (Recensione r : lista) {
+                JsonObject o = new JsonObject();
+                o.addProperty("id", r.getId());
+                o.addProperty("idUtente", r.getIdUtente());
+                o.addProperty("idRistorante", r.getIdRistorante());
+                o.addProperty("voto", r.getVoto());
+                o.addProperty("testo", r.getTesto());
+                o.addProperty("data", r.getData());
+                arr.add(o);
+            }
+
+            JsonObject res = new JsonObject();
+            res.add("recensioni", arr);
+
+            return Response.ok(res);
+
+        } catch (Exception e) {
+            return Response.error("Errore caricamento recensioni gestore: " + e.getMessage());
+        }
+    }
+
+    // ============================
+    // RISPONDI A RECENSIONE
+    // ============================
+    public static Response rispondi(Request req) {
+        try {
+            int idRecensione = req.payload.get("idRecensione").getAsInt();
+            String risposta = req.payload.get("risposta").getAsString();
+
+            boolean ok = RecensioneDAO.rispondi(idRecensione, risposta);
+
+            if (!ok)
+                return Response.error("Impossibile inviare risposta");
+
+            return Response.ok();
+
+        } catch (Exception e) {
+            return Response.error("Errore risposta recensione: " + e.getMessage());
         }
     }
 }

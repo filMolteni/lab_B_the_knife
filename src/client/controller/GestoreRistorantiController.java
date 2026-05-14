@@ -19,35 +19,41 @@ public class GestoreRistorantiController {
     private final GestoreRistorantiView view;
     private final ClientConnection connection;
     private final Runnable onGoBack;
+    private final java.util.function.Consumer<Integer> onOpenRistorante;
 
     public GestoreRistorantiController(GestoreRistorantiView view,
                                        ClientConnection connection,
-                                       Runnable onGoBack) {
+                                       Runnable onGoBack,
+                                       java.util.function.Consumer<Integer> onOpenRistorante) {
 
         this.view = view;
         this.connection = connection;
         this.onGoBack = onGoBack;
+        this.onOpenRistorante = onOpenRistorante;
 
         initHandlers();
     }
 
     private void initHandlers() {
 
-        // AGGIUNGI → apre form vuota
         view.getBtnAggiungi().setOnAction(e -> apriFormAggiunta());
-
-        // MODIFICA → apre form con dati selezionati
         view.getBtnModifica().setOnAction(e -> apriFormModifica());
-
-        // ELIMINA
         view.getBtnElimina().setOnAction(e -> eliminaRistorante());
-
-        // TORNA INDIETRO
         view.getBtnIndietro().setOnAction(e -> onGoBack.run());
+
+        // DOPPIO CLICK → APRI DETTAGLI RISTORANTE UTENTE
+        view.getTabella().setOnMouseClicked(e -> {
+            if (e.getClickCount() == 2) {
+                RistoranteRow r = view.getTabella().getSelectionModel().getSelectedItem();
+                if (r != null) {
+                    onOpenRistorante.accept(r.getId());   // <-- APRE DETTAGLI
+                }
+            }
+        });
     }
 
     // ============================
-    // CARICA LISTA RISTORANTI
+    // CARICA LISTA RISTORANTI UTENTE
     // ============================
     public void loadRiepilogo() {
 
@@ -75,8 +81,8 @@ public class GestoreRistorantiController {
                     RistoranteRow row = new RistoranteRow(
                             r.get("id").getAsInt(),
                             r.get("nome").getAsString(),
-                            r.get("categoria").getAsString(),
-                            "" // indirizzo non presente nel riepilogo
+                            r.get("tipo_cucina").getAsString(),
+                            r.get("indirizzo").getAsString()
                     );
 
                     view.getTabella().getItems().add(row);
@@ -99,12 +105,12 @@ public class GestoreRistorantiController {
                 formView,
                 connection,
                 this::loadRiepilogo,
-                null // idRistorante = null → aggiunta
+                null
         );
 
         Stage stage = new Stage();
         stage.setTitle("Aggiungi Ristorante");
-        stage.setScene(new Scene(formView, 500, 400));
+        stage.setScene(new Scene(formView, 600, 600));
         stage.show();
     }
 
@@ -120,31 +126,49 @@ public class GestoreRistorantiController {
             return;
         }
 
+        JsonObject params = new JsonObject();
+        params.addProperty("id", selected.getId());
+
+        Request req = new Request(MessageType.VISUALIZZA_RISTORANTE_UTENTE, params);
+        Response res = connection.sendRequest(req);
+
+        if (!res.isSuccess()) {
+            System.out.println("Errore caricamento dettagli: " + res.getMessage());
+            return;
+        }
+
+        JsonObject r = res.getData();
+
         RistoranteFormView formView = new RistoranteFormView();
 
-        // Precompila i campi
         formView.setValues(
-                selected.getNome(),
-                selected.getIndirizzo(),
-                selected.getCategoria(),
-                "" // descrizione non presente nel riepilogo
+                r.get("nome").getAsString(),
+                r.get("indirizzo").getAsString(),
+                r.get("tipo_cucina").getAsString(),
+                r.get("fascia_prezzo").getAsInt(),
+                r.get("citta").getAsString(),
+                r.get("nazione").getAsString(),
+                r.get("latitudine").getAsDouble(),
+                r.get("longitudine").getAsDouble(),
+                r.get("delivery").getAsBoolean(),
+                r.get("prenotazione").getAsBoolean()
         );
 
         new RistoranteFormController(
                 formView,
                 connection,
                 this::loadRiepilogo,
-                selected.getId() // idRistorante → modifica
+                selected.getId()
         );
 
         Stage stage = new Stage();
         stage.setTitle("Modifica Ristorante");
-        stage.setScene(new Scene(formView, 500, 400));
+        stage.setScene(new Scene(formView, 600, 600));
         stage.show();
     }
 
     // ============================
-    // ELIMINA RISTORANTE
+    // ELIMINA RISTORANTE UTENTE
     // ============================
     private void eliminaRistorante() {
 

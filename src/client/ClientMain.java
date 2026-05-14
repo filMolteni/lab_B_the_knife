@@ -76,14 +76,20 @@ public class ClientMain extends Application {
     // ============================
     private void vaiACerca() {
 
-        RicercaRistorantiView view = new RicercaRistorantiView();
-        new RicercaRistorantiController(view, connection);
+    SearchView view = new SearchView();
 
-        Stage stage = new Stage();
-        stage.setScene(new Scene(view, 800, 600));
-        stage.setTitle("Ricerca Ristoranti");
-        stage.show();
+        new SearchController(
+                view,
+                connection,
+                this::mostraHome,
+                id -> openRistoranteDetail(id, false)
+        );
+
+        primaryStage.setScene(new Scene(view, 800, 600));
+        primaryStage.setTitle("TheKnife - Cerca Ristoranti");
     }
+
+
 
     // ============================
     // PREFERITI
@@ -120,14 +126,86 @@ public class ClientMain extends Application {
     // ============================
     private void vaiAGestioneRistoranti() {
 
-        GestoreRistorantiView view = new GestoreRistorantiView();
+    GestoreRistorantiView view = new GestoreRistorantiView();
+
         GestoreRistorantiController controller =
-                new GestoreRistorantiController(view, connection, this::mostraHome);
+                new GestoreRistorantiController(
+                        view,
+                        connection,
+                        this::mostraHome,
+                        id -> openRistoranteDetail(id, true)
+                );
 
         controller.loadRiepilogo();
 
         primaryStage.setScene(new Scene(view, 900, 650));
         primaryStage.setTitle("TheKnife - Gestione Ristoranti");
+    }
+
+
+
+    // ============================
+        // DETTAGLI RISTORANTE
+        // ============================
+      private void openRistoranteDetail(int id, boolean isUtente) {
+
+            RistoranteDetailView view = new RistoranteDetailView();
+
+            RistoranteDetailController controller =
+                    new RistoranteDetailController(
+                            view,
+                            connection,
+                            this::mostraHome,
+                            rid -> openRecensioniRistorante(rid),   // Mostra recensioni
+                            () -> openScriviRecensione(id)          // Scrivi recensione
+                    );
+
+            controller.loadRistorante(id, isUtente);
+
+            Stage stage = new Stage();
+            stage.setScene(new Scene(view, 600, 600));
+            stage.setTitle("Dettagli Ristorante");
+            stage.show();
+        }
+
+
+    private void openScriviRecensione(int idRistorante) {
+
+        ScriviRecensioneView view = new ScriviRecensioneView();
+
+        ScriviRecensioneController controller =
+                new ScriviRecensioneController(
+                        view,
+                        connection,
+                        idRistorante,
+                        () -> openRecensioniRistorante(idRistorante) // refresh automatico
+                );
+
+        Stage stage = new Stage();
+        stage.setScene(new Scene(view, 450, 400));
+        stage.setTitle("Scrivi Recensione");
+        stage.show();
+    }
+
+
+    private void openRecensioniRistorante(int idRistorante) {
+
+        RecensioniRistoranteView view = new RecensioniRistoranteView();
+
+        RecensioniRistoranteController controller =
+                new RecensioniRistoranteController(
+                        view,
+                        connection,
+                        idRistorante,
+                        () -> {}   // nessuna callback necessaria
+                );
+
+        controller.loadRecensioni();
+
+        Stage stage = new Stage();
+        stage.setScene(new Scene(view, 700, 600));
+        stage.setTitle("Recensioni Ristorante");
+        stage.show();
     }
 
     // ============================

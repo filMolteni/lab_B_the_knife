@@ -2,20 +2,16 @@ package client.gui;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
-import java.util.Arrays;
 
 public class SearchView extends BorderPane {
 
     private TextField txtSearch;
+    private ComboBox<String> filtroTipoCucina;
     private Button btnCerca;
     private Button btnIndietro;
 
@@ -41,12 +37,24 @@ public class SearchView extends BorderPane {
         // BARRA DI RICERCA
         // ============================
         txtSearch = new TextField();
-        txtSearch.setPromptText("Inserisci nome, categoria o indirizzo...");
+        txtSearch.setPromptText("Inserisci nome o indirizzo...");
+
+        filtroTipoCucina = new ComboBox<>();
+        filtroTipoCucina.getItems().addAll(
+                "Tutte",
+                "Italiano",
+                "Pizza",
+                "Giapponese",
+                "Burger",
+                "Cinese",
+                "Messicano"
+        );
+        filtroTipoCucina.setValue("Tutte");
 
         btnCerca = new Button("Cerca");
         btnCerca.setPrefWidth(100);
 
-        HBox searchBox = new HBox(10, txtSearch, btnCerca);
+        HBox searchBox = new HBox(10, txtSearch, filtroTipoCucina, btnCerca);
         searchBox.setAlignment(Pos.CENTER);
         searchBox.setPadding(new Insets(10));
 
@@ -68,11 +76,11 @@ public class SearchView extends BorderPane {
         colIndirizzo.setCellValueFactory(c -> c.getValue().indirizzoProperty());
         colIndirizzo.setPrefWidth(200);
 
-        TableColumn<RistoranteRow, String> colCategoria = new TableColumn<>("Categoria");
-        colCategoria.setCellValueFactory(c -> c.getValue().categoriaProperty());
-        colCategoria.setPrefWidth(120);
+        TableColumn<RistoranteRow, String> colTipoCucina = new TableColumn<>("Tipo Cucina");
+        colTipoCucina.setCellValueFactory(c -> c.getValue().categoriaProperty()); // alias di tipoCucina
+        colTipoCucina.setPrefWidth(150);
 
-        tabella.getColumns().addAll(colNome, colIndirizzo, colCategoria);
+        tabella.getColumns().addAll(colNome, colIndirizzo, colTipoCucina);
 
         this.setCenter(tabella);
 
@@ -100,8 +108,8 @@ public class SearchView extends BorderPane {
     // ============================
 
     public TextField getTxtSearch() { return txtSearch; }
+    public ComboBox<String> getFiltroTipoCucina() { return filtroTipoCucina; }
     public Button getBtnCerca() { return btnCerca; }
     public Button getBtnIndietro() { return btnIndietro; }
     public TableView<RistoranteRow> getTabella() { return tabella; }
 }
-

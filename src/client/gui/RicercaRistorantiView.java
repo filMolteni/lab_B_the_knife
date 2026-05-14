@@ -6,7 +6,7 @@ import javafx.scene.layout.*;
 public class RicercaRistorantiView extends VBox {
 
     private final TextField txtRicerca = new TextField();
-    private final ComboBox<String> filtroCategoria = new ComboBox<>();
+    private final ComboBox<String> filtroTipoCucina = new ComboBox<>();
     private final Button btnCerca = new Button("Cerca");
 
     private final TableView<RistoranteRow> tabella = new TableView<>();
@@ -15,28 +15,43 @@ public class RicercaRistorantiView extends VBox {
 
         txtRicerca.setPromptText("Cerca per nome, indirizzo...");
 
-        filtroCategoria.getItems().addAll("Tutte", "Pizza", "Giapponese", "Italiano", "Burger");
-        filtroCategoria.setValue("Tutte");
+        filtroTipoCucina.getItems().addAll(
+                "Tutte",
+                "Italiano",
+                "Pizza",
+                "Giapponese",
+                "Burger",
+                "Cinese",
+                "Messicano"
+        );
+        filtroTipoCucina.setValue("Tutte");
 
-        HBox barra = new HBox(10, txtRicerca, filtroCategoria, btnCerca);
+        HBox barra = new HBox(10, txtRicerca, filtroTipoCucina, btnCerca);
+
+        // ============================
+        // COLONNE TABELLA
+        // ============================
 
         TableColumn<RistoranteRow, String> colNome = new TableColumn<>("Nome");
         colNome.setCellValueFactory(c -> c.getValue().nomeProperty());
+        colNome.setPrefWidth(180);
 
         TableColumn<RistoranteRow, String> colIndirizzo = new TableColumn<>("Indirizzo");
         colIndirizzo.setCellValueFactory(c -> c.getValue().indirizzoProperty());
+        colIndirizzo.setPrefWidth(220);
 
-        TableColumn<RistoranteRow, String> colCategoria = new TableColumn<>("Categoria");
-        colCategoria.setCellValueFactory(c -> c.getValue().categoriaProperty());
+        TableColumn<RistoranteRow, String> colTipoCucina = new TableColumn<>("Tipo Cucina");
+        colTipoCucina.setCellValueFactory(c -> c.getValue().categoriaProperty()); // alias di tipoCucina
+        colTipoCucina.setPrefWidth(150);
 
-        tabella.getColumns().addAll(colNome, colIndirizzo, colCategoria);
+        tabella.getColumns().addAll(colNome, colIndirizzo, colTipoCucina);
 
         setSpacing(10);
         getChildren().addAll(barra, tabella);
     }
 
     public TextField getTxtRicerca() { return txtRicerca; }
-    public ComboBox<String> getFiltroCategoria() { return filtroCategoria; }
+    public ComboBox<String> getFiltroCategoria() { return filtroTipoCucina; }
     public Button getBtnCerca() { return btnCerca; }
     public TableView<RistoranteRow> getTabella() { return tabella; }
 }

@@ -12,25 +12,24 @@ import java.util.List;
 public class RistoranteDAO {
 
     // ============================
-    // CERCA RISTORANTI
+    // CERCA RISTORANTI MICHELIN
     // ============================
-    public static List<Ristorante> cerca(String query, String categoria) {
+    public static List<Ristorante> cerca(String query, String tipoCucina) {
         List<Ristorante> lista = new ArrayList<>();
 
-        try {
-            Connection conn = DBConnectionPool.get();
+        try (Connection conn = DBConnectionPool.get()) {
 
-            String sql = "SELECT * FROM ristoranti WHERE LOWER(nome) LIKE LOWER(?)";
+            String sql = "SELECT * FROM RistorantiTheKnife WHERE LOWER(nome) LIKE LOWER(?)";
 
-            if (!categoria.equalsIgnoreCase("Tutte")) {
-                sql += " AND LOWER(categoria) = LOWER(?)";
+            if (!tipoCucina.equalsIgnoreCase("Tutte")) {
+                sql += " AND LOWER(tipo_cucina) LIKE LOWER(?)";
             }
 
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setString(1, "%" + query + "%");
 
-            if (!categoria.equalsIgnoreCase("Tutte")) {
-                ps.setString(2, categoria);
+            if (!tipoCucina.equalsIgnoreCase("Tutte")) {
+                ps.setString(2, "%" + tipoCucina + "%");
             }
 
             ResultSet rs = ps.executeQuery();
@@ -40,14 +39,19 @@ public class RistoranteDAO {
                         rs.getInt("id"),
                         rs.getString("nome"),
                         rs.getString("indirizzo"),
-                        rs.getString("categoria"),
-                        rs.getString("descrizione")
+                        rs.getString("tipo_cucina"),
+                        rs.getInt("fascia_prezzo"),
+                        rs.getDouble("latitudine"),
+                        rs.getDouble("longitudine"),
+                        rs.getString("citta"),
+                        rs.getString("nazione"),
+                        rs.getBoolean("delivery"),
+                        rs.getBoolean("prenotazione")
                 ));
             }
 
             rs.close();
             ps.close();
-            DBConnectionPool.release(conn);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -57,15 +61,14 @@ public class RistoranteDAO {
     }
 
     // ============================
-    // GET BY ID
+    // GET BY ID (MICHELIN)
     // ============================
     public static Ristorante getById(int id) {
         Ristorante r = null;
 
-        try {
-            Connection conn = DBConnectionPool.get();
+        try (Connection conn = DBConnectionPool.get()) {
 
-            String sql = "SELECT * FROM ristoranti WHERE id = ?";
+            String sql = "SELECT * FROM RistorantiTheKnife WHERE id = ?";
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setInt(1, id);
 
@@ -76,149 +79,24 @@ public class RistoranteDAO {
                         rs.getInt("id"),
                         rs.getString("nome"),
                         rs.getString("indirizzo"),
-                        rs.getString("categoria"),
-                        rs.getString("descrizione")
+                        rs.getString("tipo_cucina"),
+                        rs.getInt("fascia_prezzo"),
+                        rs.getDouble("latitudine"),
+                        rs.getDouble("longitudine"),
+                        rs.getString("citta"),
+                        rs.getString("nazione"),
+                        rs.getBoolean("delivery"),
+                        rs.getBoolean("prenotazione")
                 );
             }
 
             rs.close();
             ps.close();
-            DBConnectionPool.release(conn);
 
         } catch (Exception e) {
             e.printStackTrace();
         }
 
         return r;
-    }
-
-    // ============================
-    // AGGIUNGI RISTORANTE
-    // ============================
-    public static boolean aggiungi(String nome, String indirizzo, String categoria,
-                                   String descrizione, int idGestore) {
-
-        try {
-            Connection conn = DBConnectionPool.get();
-
-            String sql = """
-                INSERT INTO ristoranti (nome, indirizzo, categoria, descrizione, id_gestore)
-                VALUES (?, ?, ?, ?, ?)
-            """;
-
-            PreparedStatement ps = conn.prepareStatement(sql);
-            ps.setString(1, nome);
-            ps.setString(2, indirizzo);
-            ps.setString(3, categoria);
-            ps.setString(4, descrizione);
-            ps.setInt(5, idGestore);
-
-            int rows = ps.executeUpdate();
-
-            ps.close();
-            DBConnectionPool.release(conn);
-
-            return rows > 0;
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    // ============================
-    // MODIFICA RISTORANTE
-    // ============================
-    public static boolean modifica(int id, String nome, String indirizzo,
-                                   String categoria, String descrizione) {
-
-        try {
-            Connection conn = DBConnectionPool.get();
-
-            String sql = """
-                UPDATE ristoranti
-                SET nome = ?, indirizzo = ?, categoria = ?, descrizione = ?
-                WHERE id = ?
-            """;
-
-            PreparedStatement ps = conn.prepareStatement(sql);
-            ps.setString(1, nome);
-            ps.setString(2, indirizzo);
-            ps.setString(3, categoria);
-            ps.setString(4, descrizione);
-            ps.setInt(5, id);
-
-            int rows = ps.executeUpdate();
-
-            ps.close();
-            DBConnectionPool.release(conn);
-
-            return rows > 0;
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    // ============================
-    // ELIMINA RISTORANTE
-    // ============================
-    public static boolean elimina(int id) {
-
-        try {
-            Connection conn = DBConnectionPool.get();
-
-            String sql = "DELETE FROM ristoranti WHERE id = ?";
-            PreparedStatement ps = conn.prepareStatement(sql);
-            ps.setInt(1, id);
-
-            int rows = ps.executeUpdate();
-
-            ps.close();
-            DBConnectionPool.release(conn);
-
-            return rows > 0;
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    // ============================
-    // RISTORANTI DI UN GESTORE
-    // ============================
-    public static List<Ristorante> getByGestore(int idGestore) {
-        List<Ristorante> lista = new ArrayList<>();
-
-        try {
-            Connection conn = DBConnectionPool.get();
-
-            String sql = "SELECT * FROM ristoranti WHERE id_gestore = ?";
-            PreparedStatement ps = conn.prepareStatement(sql);
-            ps.setInt(1, idGestore);
-
-            ResultSet rs = ps.executeQuery();
-
-            while (rs.next()) {
-                lista.add(new Ristorante(
-                        rs.getInt("id"),
-                        rs.getString("nome"),
-                        rs.getString("indirizzo"),
-                        rs.getString("categoria"),
-                        rs.getString("descrizione")
-                ));
-            }
-
-            rs.close();
-            ps.close();
-            DBConnectionPool.release(conn);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return lista;
     }
 }

@@ -43,7 +43,7 @@ public class SearchController {
             if (event.getClickCount() == 2) {
                 RistoranteRow row = view.getTabella().getSelectionModel().getSelectedItem();
                 if (row != null) {
-                    onOpenRistorante.accept(row.getId());
+                    onOpenRistorante.accept(row.getId());   // <-- APRE DETTAGLI
                 }
             }
         });
@@ -52,9 +52,11 @@ public class SearchController {
     private void doSearch() {
 
         String query = view.getTxtSearch().getText().trim();
+        String tipoCucina = view.getFiltroTipoCucina().getValue();
 
         JsonObject params = new JsonObject();
         params.addProperty("query", query);
+        params.addProperty("tipoCucina", tipoCucina);
 
         Request req = new Request(MessageType.CERCA_RISTORANTI, params);
 
@@ -77,8 +79,8 @@ public class SearchController {
                     RistoranteRow row = new RistoranteRow(
                             r.get("id").getAsInt(),
                             r.get("nome").getAsString(),
-                            r.get("indirizzo").getAsString(),
-                            r.get("categoria").getAsString()
+                            r.get("tipo_cucina").getAsString(),
+                            r.get("indirizzo").getAsString()
                     );
 
                     view.getTabella().getItems().add(row);
