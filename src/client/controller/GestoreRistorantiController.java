@@ -130,10 +130,17 @@ public class GestoreRistorantiController {
         params.addProperty("id", selected.getId());
 
         Request req = new Request(MessageType.VISUALIZZA_RISTORANTE_UTENTE, params);
-        Response res = connection.sendRequest(req);
+        
+        Response res;
+        try {
+            res = connection.sendRequest(req);
 
-        if (!res.isSuccess()) {
-            System.out.println("Errore caricamento dettagli: " + res.getMessage());
+            if (!res.isSuccess()) {
+                System.out.println("Errore caricamento dettagli: " + res.getMessage());
+                return;
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
             return;
         }
 

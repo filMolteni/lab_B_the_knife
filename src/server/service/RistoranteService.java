@@ -15,7 +15,7 @@ import java.util.List;
 public class RistoranteService {
 
     // ============================
-    // CERCA RISTORANTI (MICHELIN)
+    // CERCA RISTORANTI
     // ============================
     public static Response cerca(Request req) {
         try {
@@ -51,7 +51,7 @@ public class RistoranteService {
     }
 
     // ============================
-    // VISUALIZZA DETTAGLI (MICHELIN)
+    // VISUALIZZA DETTAGLI RISTORANTE (USATO DAL CLIENT)
     // ============================
     public static Response visualizza(Request req) {
         try {
@@ -83,7 +83,7 @@ public class RistoranteService {
     }
 
     // ============================
-    // VISUALIZZA DETTAGLI (UTENTE)
+    // VISUALIZZA DETTAGLI (UTENTE LOGGATO)
     // ============================
     public static Response visualizzaUtente(Request req) {
         try {
@@ -115,7 +115,7 @@ public class RistoranteService {
     }
 
     // ============================
-    // AGGIUNGI RISTORANTE (GESTORE)
+    // AGGIUNGI RISTORANTE
     // ============================
     public static Response aggiungi(Request req) {
         try {
@@ -147,7 +147,7 @@ public class RistoranteService {
     }
 
     // ============================
-    // MODIFICA RISTORANTE (GESTORE)
+    // MODIFICA RISTORANTE
     // ============================
     public static Response modifica(Request req) {
         try {
@@ -174,7 +174,7 @@ public class RistoranteService {
     }
 
     // ============================
-    // ELIMINA RISTORANTE (GESTORE)
+    // ELIMINA RISTORANTE
     // ============================
     public static Response elimina(Request req) {
         try {
@@ -218,6 +218,32 @@ public class RistoranteService {
 
         } catch (Exception e) {
             return Response.error("Errore riepilogo gestore: " + e.getMessage());
+        }
+    }
+
+    // ============================
+    // RECENSIONI ANONIME
+    // ============================
+    public static Response visualizzaRecensioniAnonime(Request req) {
+        try {
+            int idRistorante = req.payload.get("idRistorante").getAsInt();
+            List<Recensione> lista = RecensioneDAO.getByRistorante(idRistorante);
+
+            JsonArray arr = new JsonArray();
+            for (Recensione r : lista) {
+                JsonObject o = new JsonObject();
+                o.addProperty("voto", r.getVoto());
+                o.addProperty("testo", r.getTesto());
+                arr.add(o);
+            }
+
+            JsonObject data = new JsonObject();
+            data.add("recensioni", arr);
+
+            return Response.ok(data);
+
+        } catch (Exception e) {
+            return Response.error("Errore caricamento recensioni anonime: " + e.getMessage());
         }
     }
 }

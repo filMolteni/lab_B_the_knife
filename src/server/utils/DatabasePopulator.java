@@ -10,8 +10,10 @@ import java.util.List;
 
 public class DatabasePopulator {
 
+    // 🔥 METTI QUI IL PERCORSO DEL FILE CSV (NON DELLA CARTELLA!)
     private static final String CSV_PATH =
-            "C:\\Users\\Fil\\Desktop\\UNI\\lab_B\\database\\michelin_my_maps.csv";
+    "C:\\Users\\User\\OneDrive\\Desktop\\labb\\lab_B_the_knife\\database\\michelin_my_maps.csv";
+
 
     private static final String DB_URL = "jdbc:mysql://localhost:3306/theknife";
     private static final String DB_USER = "root";
@@ -33,15 +35,22 @@ public class DatabasePopulator {
              PreparedStatement ps = conn.prepareStatement(sql);
              BufferedReader br = new BufferedReader(new FileReader(CSV_PATH))) {
 
-            String line;
-            br.readLine(); // salta intestazione
+            System.out.println("Leggo CSV da: " + CSV_PATH);
+
+            String line = br.readLine(); // salta intestazione
+            if (line == null) {
+                System.out.println("❌ CSV vuoto o non leggibile");
+                return;
+            }
 
             while ((line = br.readLine()) != null) {
 
                 List<String> fields = parseCSVLine(line);
 
-                if (fields.size() < 12)
+                if (fields.size() < 12) {
+                    System.out.println("⚠️ Riga ignorata (colonne insufficienti): " + fields.size());
                     continue;
+                }
 
                 // --- CAMPI BASE ---
                 String nome = fields.get(0);
@@ -49,7 +58,7 @@ public class DatabasePopulator {
                 String citta = fields.get(2);
                 String nazione = fields.get(4);
 
-                // --- TROVA COORDINATE AUTOMATICAMENTE ---
+                // --- COORDINATE ---
                 double lat = 0;
                 double lon = 0;
                 int found = 0;
@@ -58,18 +67,20 @@ public class DatabasePopulator {
                     try {
                         double val = Double.parseDouble(f);
                         if (found == 0) {
-                            lon = val; // primo numero = longitudine
+                            lon = val;
                             found++;
                         } else if (found == 1) {
-                            lat = val; // secondo numero = latitudine
+                            lat = val;
                             found++;
                             break;
                         }
                     } catch (Exception ignored) {}
                 }
 
-                if (found < 2)
-                    continue; // riga senza coordinate valide
+                if (found < 2) {
+                    System.out.println("⚠️ Riga ignorata (coordinate mancanti)");
+                    continue;
+                }
 
                 // --- TIPO CUCINA ---
                 String tipoCucina = fields.get(8);
@@ -98,9 +109,10 @@ public class DatabasePopulator {
                 count++;
             }
 
-            System.out.println("Importazione completata. Ristoranti inseriti: " + count);
+            System.out.println("✅ Importazione completata. Ristoranti inseriti: " + count);
 
         } catch (Exception e) {
+            System.out.println("❌ ERRORE IMPORTAZIONE CSV");
             e.printStackTrace();
         }
     }

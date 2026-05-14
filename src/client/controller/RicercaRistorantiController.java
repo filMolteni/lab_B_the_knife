@@ -45,18 +45,31 @@ public class RicercaRistorantiController {
         String query = view.getTxtRicerca().getText().trim();
         String tipoCucina = view.getFiltroCategoria().getValue();
 
-        JsonObject params = new JsonObject();
-        params.addProperty("query", query);
-        params.addProperty("tipoCucina", tipoCucina);
+        JsonObject payload = new JsonObject();
+        payload.addProperty("query", query);
+        payload.addProperty("tipoCucina", tipoCucina);
 
-        Request req = new Request(MessageType.CERCA_RISTORANTI, params);
-        Response res = connection.sendRequest(req);
+        try {
+            Request req = new Request(MessageType.CERCA_RISTORANTI, payload);
+            Response res = connection.sendRequest(req);
 
-        view.getTabella().getItems().clear();
+            view.getTabella().getItems().clear();
 
-        if (res.isOk()) {
+            // ❌ Se il server risponde errore → esci
+            if (!res.isOk()) {
+                System.out.println("Errore: " + res.getMessage());
+                return;
+            }
 
-            JsonArray arr = res.getPayload().getAsJsonArray("ristoranti");
+            // ❌ Se il server non manda data → esci
+            JsonObject data = res.getData();
+            if (data == null) {
+                System.out.println("❌ ERRORE: il server non ha inviato 'data'");
+                return;
+            }
+
+            // 🔥 Ora è sicuro leggere l’array
+            JsonArray arr = data.getAsJsonArray("ristoranti");
 
             arr.forEach(el -> {
                 JsonObject o = el.getAsJsonObject();
@@ -71,9 +84,9 @@ public class RicercaRistorantiController {
                 );
             });
 
-        } else {
-            System.out.println("Errore: " + res.getMessage());
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            System.out.println("Errore durante la comunicazione col server");
         }
     }
 }
-

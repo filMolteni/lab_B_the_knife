@@ -57,11 +57,12 @@ public class ClientHandler implements Runnable {
             case REGISTRAZIONE -> UtenteService.registrati(req);
 
             // ============================
-            // RISTORANTI
+            // RISTORANTI (MICHELIN + UTENTE)
             // ============================
             case CERCA_RISTORANTI -> RistoranteService.cerca(req);
-            case VISUALIZZA_RISTORANTE -> RistoranteService.visualizza(req);
-            case VISUALIZZA_RISTORANTE_UTENTE -> RistoranteService.visualizzaUtente(req);
+            case VISUALIZZA -> RistoranteService.visualizza(req);          // 🔥 DETTAGLI RISTORANTE
+            case VISUALIZZA_UTENTE -> RistoranteService.visualizzaUtente(req);
+
             case AGGIUNGI_RISTORANTE -> RistoranteService.aggiungi(req);
             case MODIFICA_RISTORANTE -> RistoranteService.modifica(req);
             case ELIMINA_RISTORANTE -> RistoranteService.elimina(req);
@@ -74,11 +75,8 @@ public class ClientHandler implements Runnable {
             case MODIFICA_RECENSIONE -> RecensioneService.modifica(req);
             case ELIMINA_RECENSIONE -> RecensioneService.elimina(req);
 
-            case VISUALIZZA_RECENSIONI_RISTORANTE_UTENTE ->
-                    RecensioneService.getByRistorante(req);
-
-            case VISUALIZZA_RECENSIONI_RISTORANTE ->
-                    RecensioneService.getByRistorante(req);
+            case VISUALIZZA_RECENSIONI_ANONIME ->
+                    RistoranteService.visualizzaRecensioniAnonime(req);     // 🔥 RECENSIONI ANONIME
 
             case VISUALIZZA_RECENSIONI_GESTORE ->
                     RecensioneService.getByGestore(req);

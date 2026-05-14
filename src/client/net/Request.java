@@ -1,29 +1,22 @@
 package client.net;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import common.MessageType;
 
 public class Request {
 
     private MessageType type;
-    private JsonObject params;
+    private JsonObject payload;
 
-    public Request(MessageType type, JsonObject params) {
+    public Request(MessageType type, JsonObject payload) {
         this.type = type;
-        this.params = params;
+        this.payload = payload;
     }
-
-    public MessageType getType() { return type; }
-    public void setType(MessageType type) { this.type = type; }
-
-    public JsonObject getParams() { return params; }
-    public void setParams(JsonObject params) { this.params = params; }
 
     public String toJson() {
         JsonObject obj = new JsonObject();
         obj.addProperty("type", type.toString());
-        obj.add("params", params);
+        obj.add("payload", payload);
         return obj.toString();
     }
 }

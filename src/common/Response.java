@@ -4,25 +4,32 @@ import com.google.gson.JsonObject;
 
 public class Response {
 
+    public String type;
     public boolean success;
     public String message;
-    public JsonObject payload;
-
-    private Response(boolean success, String message, JsonObject payload) {
-        this.success = success;
-        this.message = message;
-        this.payload = payload;
-    }
-
-    public static Response ok(JsonObject payload) {
-        return new Response(true, null, payload);
-    }
+    public JsonObject data;
 
     public static Response ok() {
-        return new Response(true, null, null);
+        Response r = new Response();
+        r.success = true;
+        r.message = "";
+        r.data = new JsonObject();
+        return r;
     }
 
-    public static Response error(String message) {
-        return new Response(false, message, null);
+    public static Response ok(JsonObject data) {
+        Response r = new Response();
+        r.success = true;
+        r.message = "";
+        r.data = data;
+        return r;
+    }
+
+    public static Response error(String msg) {
+        Response r = new Response();
+        r.success = false;
+        r.message = msg;
+        r.data = null;
+        return r;
     }
 }

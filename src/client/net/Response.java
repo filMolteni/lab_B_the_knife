@@ -1,16 +1,17 @@
 package client.net;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import common.MessageType;
 
 public class Response {
 
     private MessageType type;
-    private JsonObject data;
+    private JsonObject data;   // <-- corrisponde a "payload" del server
     private boolean success;
     private String message;
 
-    // === GETTER ORIGINALI ===
+    // === GETTER ===
     public MessageType getType() {
         return type;
     }
@@ -27,15 +28,17 @@ public class Response {
         return message;
     }
 
-    // === METODI AGGIUNTIVI PER COMPATIBILITÀ ===
-
-    // Il controller usa isOk(), quindi lo aggiungiamo
+    // === COMPATIBILITÀ ===
     public boolean isOk() {
         return success;
     }
 
-    // Il controller usa getPayload(), quindi lo aggiungiamo
     public JsonObject getPayload() {
         return data;
+    }
+
+    // === PARSING JSON ===
+    public static Response fromJson(String json) {
+        return new Gson().fromJson(json, Response.class);
     }
 }
