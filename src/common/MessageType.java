@@ -8,20 +8,24 @@ public enum MessageType {
 
     // RISTORANTI MICHELIN (sola lettura)
     CERCA_RISTORANTI,
-    VISUALIZZA,                     // 🔥 usato per i dettagli ristorante
+    VISUALIZZA,                     // usato per i dettagli ristorante
 
     // RISTORANTI UTENTE (CRUD)
     AGGIUNGI_RISTORANTE,
     MODIFICA_RISTORANTE,
     ELIMINA_RISTORANTE,
     VISUALIZZA_RIEPILOGO_GESTORE,
-    VISUALIZZA_UTENTE,              // 🔥 usato per i dettagli lato utente loggato
+    VISUALIZZA_UTENTE,              // usato per i dettagli lato utente loggato
+    
+    VISUALIZZA_RISTORANTE_UTENTE,
+    VISUALIZZA_RECENSIONI_RISTORANTE,
+    VISUALIZZA_RISTORANTE,
 
     // RECENSIONI
     AGGIUNGI_RECENSIONE,
     MODIFICA_RECENSIONE,
     ELIMINA_RECENSIONE,
-    VISUALIZZA_RECENSIONI_ANONIME,  // 🔥 usato dal tuo controller
+    VISUALIZZA_RECENSIONI_ANONIME,  // usato dal tuo controller
     VISUALIZZA_RECENSIONI_GESTORE,
     RISPONDI_RECENSIONE,
 

@@ -1,11 +1,7 @@
 package client;
 
-import client.controller.HomeController;
-import client.controller.RicercaRistorantiController;
-import client.controller.RistoranteDettagliController;
-import client.gui.HomeView;
-import client.gui.RicercaRistorantiView;
-import client.gui.RistoranteDettagliView;
+import client.controller.*;
+import client.gui.*;
 import client.net.ClientConnection;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -23,36 +19,77 @@ public class ClientMain extends Application {
         try {
             connection = new ClientConnection("localhost", 5555);
             System.out.println("Connessione stabilita con il server");
-
         } catch (Exception e) {
             System.out.println("❌ Errore di connessione al server: " + e.getMessage());
-            e.printStackTrace();
             return;
         }
 
-        mostraHome();
+        mostraLogin();   // LOGIN
     }
 
+    // ============================
+    // LOGIN
+    // ============================
+    private void mostraLogin() {
+        LoginView view = new LoginView();
+
+        new LoginController(
+                view,
+                connection,
+                this::mostraHome,          // dopo login OK
+                this::mostraRegistrazione, // vai a registrazione
+                this::mostraHome           // torna indietro
+        );
+
+        primaryStage.setScene(new Scene(view, 500, 400));
+        primaryStage.setTitle("Login");
+        primaryStage.show();
+    }
+
+    // ============================
+    // REGISTRAZIONE
+    // ============================
+    private void mostraRegistrazione() {
+        RegisterView view = new RegisterView();
+
+        new RegisterController(
+                view,
+                connection,
+                this::mostraLogin,   // dopo registrazione OK → torna al login
+                this::mostraLogin    // indietro → login
+        );
+
+        primaryStage.setScene(new Scene(view, 500, 450));
+        primaryStage.setTitle("Registrazione");
+        primaryStage.show();
+    }
+
+    // ============================
+    // HOME
+    // ============================
     private void mostraHome() {
-        HomeView homeView = new HomeView();
+        HomeView view = new HomeView();
 
         new HomeController(
-                homeView,
+                view,
                 connection,
                 this::mostraRicercaRistoranti,
                 () -> System.out.println("Vai ai preferiti"),
                 () -> System.out.println("Vai alle recensioni"),
                 () -> System.out.println("Vai alla gestione"),
                 () -> System.out.println("Vai alle recensioni ricevute"),
-                () -> System.out.println("Vai al login"),
+                this::mostraLogin,     // LOGIN 
                 () -> System.out.println("Logout eseguito")
         );
 
-        primaryStage.setScene(new Scene(homeView, 600, 500));
-        primaryStage.setTitle("The Knife - Home");
+        primaryStage.setScene(new Scene(view, 600, 500));
+        primaryStage.setTitle("Home");
         primaryStage.show();
     }
 
+    // ============================
+    // RICERCA RISTORANTI
+    // ============================
     private void mostraRicercaRistoranti() {
         RicercaRistorantiView view = new RicercaRistorantiView();
 
@@ -67,6 +104,9 @@ public class ClientMain extends Application {
         primaryStage.show();
     }
 
+    // ============================
+    // DETTAGLI RISTORANTE
+    // ============================
     private void mostraDettagliRistorante(int id) {
         RistoranteDettagliView view = new RistoranteDettagliView();
 

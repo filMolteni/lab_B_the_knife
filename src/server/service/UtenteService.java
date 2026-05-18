@@ -8,6 +8,9 @@ import server.model.Utente;
 
 public class UtenteService {
 
+    // ============================
+    // LOGIN
+    // ============================
     public static Response login(Request req) {
         try {
             String email = req.payload.get("email").getAsString();
@@ -20,7 +23,7 @@ public class UtenteService {
 
             JsonObject payload = new JsonObject();
             payload.addProperty("id", u.getId());
-            payload.addProperty("nome", u.getNome());
+            payload.addProperty("username", u.getNome());   // 🔥 il client vuole "username"
             payload.addProperty("email", u.getEmail());
             payload.addProperty("ruolo", u.getRuolo());
 
@@ -31,19 +34,37 @@ public class UtenteService {
         }
     }
 
+    // ============================
+    // REGISTRAZIONE
+    // ============================
     public static Response registrati(Request req) {
         try {
-            String nome = req.payload.get("nome").getAsString();
+            // 🔥 Il client invia "username", NON "nome"
+            String username = req.payload.get("username").getAsString();
             String email = req.payload.get("email").getAsString();
             String password = req.payload.get("password").getAsString();
-            String ruolo = req.payload.get("ruolo").getAsString();
 
-            boolean ok = UtenteDAO.registrati(nome, email, password, ruolo);
+            // 🔥 Il ruolo non viene inviato dal client → impostiamo "utente"
+            String ruolo = "utente";
 
-            if (ok)
-                return Response.ok(new JsonObject());
-            else
+            boolean ok = UtenteDAO.registrati(username, email, password, ruolo);
+
+            if (!ok)
                 return Response.error("Registrazione fallita");
+
+            // Recupera l'utente appena registrato
+            Utente u = UtenteDAO.getByEmail(email);
+
+            if (u == null)
+                return Response.error("Errore: utente non trovato dopo registrazione");
+
+            JsonObject payload = new JsonObject();
+            payload.addProperty("id", u.getId());
+            payload.addProperty("username", u.getNome());   // 🔥 coerente con il client
+            payload.addProperty("email", u.getEmail());
+            payload.addProperty("ruolo", u.getRuolo());
+
+            return Response.ok(payload);
 
         } catch (Exception e) {
             return Response.error("Errore registrazione: " + e.getMessage());
