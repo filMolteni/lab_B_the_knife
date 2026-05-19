@@ -56,9 +56,7 @@ public class UtenteDTO {
         return ruolo != null && ruolo.equalsIgnoreCase("CLIENTE");
     }
 
-    public boolean isAdmin() {
-        return ruolo != null && ruolo.equalsIgnoreCase("ADMIN");
-    }
+    
 
     // ===== SETTER =====
 

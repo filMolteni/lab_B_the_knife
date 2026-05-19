@@ -84,18 +84,30 @@ public class HomeController {
      * Invia una richiesta semplice al server (senza parametri)
      */
     private void sendSimple(MessageType type) {
-        try {
-            JsonObject params = new JsonObject();
-            Request req = new Request(type, params);
-            Response res = connection.sendRequest(req);
+    try {
+        JsonObject params = new JsonObject();
 
-            System.out.println("Risposta server: " + res.getMessage());
-
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            System.out.println("Errore di connessione al server");
+        // Aggiungo automaticamente l'utente loggato
+        if (UtenteDTO.getUtenteLoggato() != null) {
+            params.addProperty("idUtente", UtenteDTO.getUtenteLoggato().getId());
         }
+
+        Request req = new Request(type, params);
+        Response res = connection.sendRequest(req);
+
+        if (res == null) {
+            System.out.println("❌ Nessuna risposta dal server");
+            return;
+        }
+
+        System.out.println("Risposta server: " + res.getMessage());
+
+    } catch (Exception ex) {
+        ex.printStackTrace();
+        System.out.println("Errore di connessione al server");
     }
+}
+
 
     /**
      * Metodo da chiamare quando si torna alla Home

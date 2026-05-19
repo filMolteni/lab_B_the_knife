@@ -1,6 +1,7 @@
 package client.controller;
 
 import client.gui.RistoranteDettagliView;
+import client.model.UtenteDTO;
 import client.net.ClientConnection;
 import client.net.Request;
 import client.net.Response;
@@ -13,6 +14,7 @@ public class RistoranteDettagliController {
     private final RistoranteDettagliView view;
     private final ClientConnection connection;
     private final Runnable onBack;
+    private final int idRistorante;
 
     public RistoranteDettagliController(RistoranteDettagliView view,
                                         ClientConnection connection,
@@ -22,47 +24,130 @@ public class RistoranteDettagliController {
         this.view = view;
         this.connection = connection;
         this.onBack = onBack;
+        this.idRistorante = idRistorante;
 
         caricaDettagli(idRistorante);
         initHandlers();
     }
 
     private void initHandlers() {
+
         view.getBtnIndietro().setOnAction(e -> onBack.run());
+
+        view.getBtnPreferiti().setOnAction(e -> aggiungiPreferito());
+
+        view.getBtnScriviRecensione().setOnAction(e -> inviaRecensione());
     }
 
+    // ============================================================
+    // ⭐ AGGIUNGI AI PREFERITI
+    // ============================================================
+    private void aggiungiPreferito() {
+        try {
+            int idUtente = UtenteDTO.getUtenteLoggato().getId();
+
+            JsonObject payload = new JsonObject();
+            payload.addProperty("idUtente", idUtente);
+            payload.addProperty("idRistorante", idRistorante);
+
+            Request req = new Request(MessageType.AGGIUNGI_PREFERITO, payload);
+            Response res = connection.sendRequest(req);
+
+            if (res == null) {
+                System.out.println("❌ Nessuna risposta dal server");
+                return;
+            }
+
+            if (res.isOk()) {
+                System.out.println("⭐ Aggiunto ai preferiti!");
+            } else {
+                System.out.println("Errore: " + res.getMessage());
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    // ============================================================
+    // 📝 INVIA RECENSIONE
+    // ============================================================
+    private void inviaRecensione() {
+        try {
+            int idUtente = UtenteDTO.getUtenteLoggato().getId();
+            String testo = view.getTxtRecensione().getText().trim();
+            int voto = view.getVotoSpinner().getValue();
+
+            if (testo.isEmpty()) {
+                System.out.println("Scrivi una recensione prima di inviare.");
+                return;
+            }
+
+            JsonObject payload = new JsonObject();
+            payload.addProperty("idUtente", idUtente);
+            payload.addProperty("idRistorante", idRistorante);
+            payload.addProperty("voto", voto);
+            payload.addProperty("testo", testo);
+
+            Request req = new Request(MessageType.AGGIUNGI_RECENSIONE, payload);
+            Response res = connection.sendRequest(req);
+
+            if (res == null) {
+                System.out.println("❌ Nessuna risposta dal server");
+                return;
+            }
+
+            if (res.isOk()) {
+                System.out.println("Recensione inviata!");
+                caricaRecensioni(idRistorante);
+            } else {
+                System.out.println("Errore: " + res.getMessage());
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    // ============================================================
+    // 🔍 CARICA DETTAGLI
+    // ============================================================
     private void caricaDettagli(int idRistorante) {
         try {
             JsonObject payload = new JsonObject();
             payload.addProperty("id", idRistorante);
 
-            // 🔥 usa VISUALIZZA (non VISUALIZZA_RISTORANTE)
             Request req = new Request(MessageType.VISUALIZZA, payload);
             Response res = connection.sendRequest(req);
 
-            if (!res.isOk()) {
-                view.getAreaRecensioni().setText("Errore: " + res.getMessage());
+            if (res == null || !res.isOk()) {
+                view.getAreaRecensioni().setText("Errore: " + (res != null ? res.getMessage() : "nessuna risposta"));
                 return;
             }
 
             JsonObject data = res.getData();
-            if (data == null) {
-                view.getAreaRecensioni().setText("Nessun dato ricevuto dal server.");
-                return;
-            }
 
             view.getLblNome().setText(data.get("nome").getAsString());
-            view.getLblIndirizzo().setText(data.get("indirizzo").getAsString());
+            view.getLblIndirizzo().setText("Indirizzo: " + data.get("indirizzo").getAsString());
+            view.getLblCitta().setText("Città: " + data.get("citta").getAsString());
+            view.getLblNazione().setText("Nazione: " + data.get("nazione").getAsString());
             view.getLblTipoCucina().setText("Tipo cucina: " + data.get("tipo_cucina").getAsString());
+            view.getLblFasciaPrezzo().setText("Fascia prezzo: " + data.get("fascia_prezzo").getAsInt());
+            view.getLblLatitudine().setText("Latitudine: " + data.get("latitudine").getAsDouble());
+            view.getLblLongitudine().setText("Longitudine: " + data.get("longitudine").getAsDouble());
+            view.getLblDelivery().setText("Delivery: " + (data.get("delivery").getAsBoolean() ? "Sì" : "No"));
+            view.getLblPrenotazione().setText("Prenotazione: " + (data.get("prenotazione").getAsBoolean() ? "Sì" : "No"));
 
             caricaRecensioni(idRistorante);
 
         } catch (Exception e) {
             e.printStackTrace();
-            view.getAreaRecensioni().setText("Errore durante il caricamento dei dettagli.");
         }
     }
 
+    // ============================================================
+    // 📜 CARICA RECENSIONI
+    // ============================================================
     private void caricaRecensioni(int idRistorante) {
         try {
             JsonObject payload = new JsonObject();
@@ -71,18 +156,12 @@ public class RistoranteDettagliController {
             Request req = new Request(MessageType.VISUALIZZA_RECENSIONI_ANONIME, payload);
             Response res = connection.sendRequest(req);
 
-            if (!res.isOk()) {
-                view.getAreaRecensioni().setText("Errore: " + res.getMessage());
+            if (res == null || !res.isOk()) {
+                view.getAreaRecensioni().setText("Errore caricamento recensioni.");
                 return;
             }
 
-            JsonObject data = res.getData();
-            if (data == null) {
-                view.getAreaRecensioni().setText("Nessuna recensione disponibile.");
-                return;
-            }
-
-            JsonArray arr = data.getAsJsonArray("recensioni");
+            JsonArray arr = res.getData().getAsJsonArray("recensioni");
             StringBuilder sb = new StringBuilder();
 
             arr.forEach(el -> {
@@ -95,7 +174,6 @@ public class RistoranteDettagliController {
 
         } catch (Exception e) {
             e.printStackTrace();
-            view.getAreaRecensioni().setText("Errore durante il caricamento delle recensioni.");
         }
     }
 }

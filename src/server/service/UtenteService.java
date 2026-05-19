@@ -39,13 +39,13 @@ public class UtenteService {
     // ============================
     public static Response registrati(Request req) {
         try {
-            // 🔥 Il client invia "username", NON "nome"
+            //  Il client invia "username", NON "nome"
             String username = req.payload.get("username").getAsString();
             String email = req.payload.get("email").getAsString();
             String password = req.payload.get("password").getAsString();
 
-            // 🔥 Il ruolo non viene inviato dal client → impostiamo "utente"
-            String ruolo = "utente";
+            // Il ruolo non viene inviato dal client → impostiamo "utente"
+            String ruolo = "CLIENTE";
 
             boolean ok = UtenteDAO.registrati(username, email, password, ruolo);
 

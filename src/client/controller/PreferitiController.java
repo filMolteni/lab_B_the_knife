@@ -1,111 +1,56 @@
 package client.controller;
 
 import client.gui.PreferitiView;
-import client.gui.RistoranteRow;
+import client.model.UtenteDTO;
 import client.net.ClientConnection;
 import client.net.Request;
 import client.net.Response;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import common.MessageType;
-import javafx.application.Platform;
 
 public class PreferitiController {
 
     private final PreferitiView view;
     private final ClientConnection connection;
-    private final Runnable onGoBack;
+    private final Runnable onBack;
 
     public PreferitiController(PreferitiView view,
                                ClientConnection connection,
-                               Runnable onGoBack) {
+                               Runnable onBack) {
 
         this.view = view;
         this.connection = connection;
-        this.onGoBack = onGoBack;
+        this.onBack = onBack;
 
+        caricaPreferiti();
         initHandlers();
     }
 
     private void initHandlers() {
-
-        // TORNA INDIETRO
-        view.getBtnIndietro().setOnAction(e -> onGoBack.run());
-
-        // RIMUOVI DAI PREFERITI
-        view.getBtnRimuovi().setOnAction(e -> removeSelected());
+        view.getBtnIndietro().setOnAction(e -> onBack.run());
     }
 
-    /**
-     * Carica i preferiti dal server
-     */
-    public void loadPreferiti() {
-
-        Request req = new Request(MessageType.VISUALIZZA_PREFERITI, new JsonObject());
-
+    private void caricaPreferiti() {
         try {
+            JsonObject payload = new JsonObject();
+            payload.addProperty("idUtente", UtenteDTO.getUtenteLoggato().getId());
+
+            Request req = new Request(MessageType.VISUALIZZA_PREFERITI, payload);
             Response res = connection.sendRequest(req);
 
-            if (!res.isSuccess()) {
-                System.out.println("Errore caricamento preferiti: " + res.getMessage());
+            if (res == null || !res.isOk()) {
+                System.out.println("Errore caricamento preferiti");
                 return;
             }
 
-            JsonArray arr = res.getData().getAsJsonArray("ristoranti");
+            JsonArray arr = res.getData().getAsJsonArray("preferiti");
 
-            Platform.runLater(() -> {
-                view.getTabella().getItems().clear();
+            view.getTabella().getItems().clear();
+            arr.forEach(el -> view.getTabella().getItems().add(el.getAsInt()));
 
-                for (int i = 0; i < arr.size(); i++) {
-                    JsonObject r = arr.get(i).getAsJsonObject();
-
-                    RistoranteRow row = new RistoranteRow(
-                            r.get("id").getAsInt(),
-                            r.get("nome").getAsString(),
-                            r.get("indirizzo").getAsString(),
-                            r.get("categoria").getAsString()
-                    );
-
-                    view.getTabella().getItems().add(row);
-                }
-            });
-
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            System.out.println("Errore di connessione al server");
-        }
-    }
-
-    /**
-     * Rimuove il ristorante selezionato dai preferiti
-     */
-    private void removeSelected() {
-
-        RistoranteRow selected = view.getTabella().getSelectionModel().getSelectedItem();
-
-        if (selected == null) {
-            System.out.println("Nessun ristorante selezionato");
-            return;
-        }
-
-        JsonObject params = new JsonObject();
-        params.addProperty("id", selected.getId());
-
-        Request req = new Request(MessageType.RIMUOVI_PREFERITO, params);
-
-        try {
-            Response res = connection.sendRequest(req);
-
-            if (res.isSuccess()) {
-                System.out.println("Ristorante rimosso dai preferiti");
-                loadPreferiti(); // aggiorna tabella
-            } else {
-                System.out.println("Errore rimozione: " + res.getMessage());
-            }
-
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            System.out.println("Errore di connessione al server");
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

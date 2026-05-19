@@ -4,6 +4,7 @@ import client.gui.RecensioniRistoranteView;
 import client.gui.RecensioneRistoranteRow;
 import client.net.ClientConnection;
 import client.net.Request;
+import client.model.UtenteDTO;
 import client.net.Response;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -14,17 +15,14 @@ public class RecensioniRistoranteController {
 
     private final RecensioniRistoranteView view;
     private final ClientConnection connection;
-    private final int idRistorante;
     private final Runnable onClose;
 
     public RecensioniRistoranteController(RecensioniRistoranteView view,
                                           ClientConnection connection,
-                                          int idRistorante,
                                           Runnable onClose) {
 
         this.view = view;
         this.connection = connection;
-        this.idRistorante = idRistorante;
         this.onClose = onClose;
 
         initHandlers();
@@ -37,9 +35,9 @@ public class RecensioniRistoranteController {
     public void loadRecensioni() {
 
         JsonObject params = new JsonObject();
-        params.addProperty("idRistorante", idRistorante);
+        params.addProperty("idGestore", UtenteDTO.getUtenteLoggato().getId());
 
-        Request req = new Request(MessageType.VISUALIZZA_RECENSIONI_RISTORANTE, params);
+        Request req = new Request(MessageType.VISUALIZZA_RECENSIONI_GESTORE, params);
 
         try {
             Response res = connection.sendRequest(req);
@@ -73,3 +71,4 @@ public class RecensioniRistoranteController {
         }
     }
 }
+

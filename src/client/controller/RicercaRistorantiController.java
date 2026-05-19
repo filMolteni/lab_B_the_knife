@@ -13,14 +13,17 @@ public class RicercaRistorantiController {
 
     private final RicercaRistorantiView view;
     private final ClientConnection connection;
+    private final Runnable onBack;
     private final java.util.function.Consumer<Integer> onOpenRistorante;
 
     public RicercaRistorantiController(RicercaRistorantiView view,
                                        ClientConnection connection,
+                                       Runnable onBack,
                                        java.util.function.Consumer<Integer> onOpenRistorante) {
 
         this.view = view;
         this.connection = connection;
+        this.onBack = onBack;
         this.onOpenRistorante = onOpenRistorante;
 
         initHandlers();
@@ -28,8 +31,13 @@ public class RicercaRistorantiController {
 
     private void initHandlers() {
 
+        // 🔙 Bottone indietro
+        view.getBtnIndietro().setOnAction(e -> onBack.run());
+
+        // 🔍 Cerca
         view.getBtnCerca().setOnAction(e -> cerca());
 
+        // 👆 Doppio click sulla tabella → apri dettagli
         view.getTabella().setOnMouseClicked(e -> {
             if (e.getClickCount() == 2) {
                 RistoranteRow r = view.getTabella().getSelectionModel().getSelectedItem();
@@ -55,20 +63,17 @@ public class RicercaRistorantiController {
 
             view.getTabella().getItems().clear();
 
-            // ❌ Se il server risponde errore → esci
             if (!res.isOk()) {
                 System.out.println("Errore: " + res.getMessage());
                 return;
             }
 
-            // ❌ Se il server non manda data → esci
             JsonObject data = res.getData();
             if (data == null) {
                 System.out.println("❌ ERRORE: il server non ha inviato 'data'");
                 return;
             }
 
-            // 🔥 Ora è sicuro leggere l’array
             JsonArray arr = data.getAsJsonArray("ristoranti");
 
             arr.forEach(el -> {

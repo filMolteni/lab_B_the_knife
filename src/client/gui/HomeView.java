@@ -76,41 +76,47 @@ public class HomeView extends BorderPane {
 
     public void refreshVisibility() {
 
-        UtenteDTO u = UtenteDTO.getUtenteLoggato();
+    UtenteDTO u = UtenteDTO.getUtenteLoggato();
 
-        if (u == null) {
-            btnCerca.setVisible(true);
-            btnPreferiti.setVisible(false);
-            btnRecensioni.setVisible(false);
-            btnGestione.setVisible(false);
-            btnRecensioniRicevute.setVisible(false);
+    boolean logged = (u != null && u.getUsername() != null);
 
-            btnLogin.setVisible(true);
-            btnLogout.setVisible(false);
-            return;
-        }
+    // LOGIN / LOGOUT
+    btnLogin.setVisible(!logged);
+    btnLogout.setVisible(logged);
 
-        btnLogin.setVisible(false);
-        btnLogout.setVisible(true);
-
-        if (u.isCliente()) {
-            btnCerca.setVisible(true);
-            btnPreferiti.setVisible(true);
-            btnRecensioni.setVisible(true);
-
-            btnGestione.setVisible(false);
-            btnRecensioniRicevute.setVisible(false);
-        }
-
-        if (u.isGestore()) {
-            btnCerca.setVisible(false);
-            btnPreferiti.setVisible(false);
-            btnRecensioni.setVisible(false);
-
-            btnGestione.setVisible(true);
-            btnRecensioniRicevute.setVisible(true);
-        }
+    // Se non loggato → può solo cercare
+    if (!logged) {
+        btnCerca.setVisible(true);
+        btnPreferiti.setVisible(false);
+        btnRecensioni.setVisible(false);
+        btnGestione.setVisible(false);
+        btnRecensioniRicevute.setVisible(false);
+        return;
     }
+
+    // ============================
+    // CLIENTE
+    // ============================
+    if (u.isCliente()) {
+        btnCerca.setVisible(true);
+        btnPreferiti.setVisible(true);       // preferiti del cliente
+        btnRecensioni.setVisible(true);      // recensioni dell’utente
+        btnGestione.setVisible(false);
+        btnRecensioniRicevute.setVisible(false);
+    }
+
+    // ============================
+    // GESTORE
+    // ============================
+    if (u.isGestore()) {
+        btnCerca.setVisible(true);
+        btnPreferiti.setVisible(false);
+        btnRecensioni.setVisible(false);
+        btnGestione.setVisible(true);        // gestione ristoranti
+        btnRecensioniRicevute.setVisible(true); // recensioni ricevute
+    }
+}
+
 
     // === GETTER ===
     public Button getBtnCerca() { return btnCerca; }

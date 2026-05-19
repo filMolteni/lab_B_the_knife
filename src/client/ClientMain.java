@@ -20,11 +20,11 @@ public class ClientMain extends Application {
             connection = new ClientConnection("localhost", 5555);
             System.out.println("Connessione stabilita con il server");
         } catch (Exception e) {
-            System.out.println("❌ Errore di connessione al server: " + e.getMessage());
+            System.out.println("Errore di connessione al server: " + e.getMessage());
             return;
         }
 
-        mostraLogin();   // LOGIN
+        mostraHome();
     }
 
     // ============================
@@ -36,9 +36,9 @@ public class ClientMain extends Application {
         new LoginController(
                 view,
                 connection,
-                this::mostraHome,          // dopo login OK
-                this::mostraRegistrazione, // vai a registrazione
-                this::mostraHome           // torna indietro
+                this::mostraHome,
+                this::mostraRegistrazione,
+                this::mostraHome
         );
 
         primaryStage.setScene(new Scene(view, 500, 400));
@@ -55,8 +55,8 @@ public class ClientMain extends Application {
         new RegisterController(
                 view,
                 connection,
-                this::mostraLogin,   // dopo registrazione OK → torna al login
-                this::mostraLogin    // indietro → login
+                this::mostraLogin,
+                this::mostraLogin
         );
 
         primaryStage.setScene(new Scene(view, 500, 450));
@@ -73,13 +73,16 @@ public class ClientMain extends Application {
         new HomeController(
                 view,
                 connection,
-                this::mostraRicercaRistoranti,
-                () -> System.out.println("Vai ai preferiti"),
-                () -> System.out.println("Vai alle recensioni"),
-                () -> System.out.println("Vai alla gestione"),
-                () -> System.out.println("Vai alle recensioni ricevute"),
-                this::mostraLogin,     // LOGIN 
-                () -> System.out.println("Logout eseguito")
+                this::mostraRicercaRistoranti,   // CERCA
+                this::mostraPreferiti,           // PREFERITI
+                this::mostraRecensioniUtente,    // RECENSIONI UTENTE
+                this::mostraGestioneRistoranti,  // GESTIONE (GESTORE)
+                this::mostraRecensioniRicevute,  // RECENSIONI RICEVUTE (GESTORE)
+                this::mostraLogin,               // LOGIN
+                () -> {                          // LOGOUT
+                    System.out.println("Logout eseguito");
+                    mostraHome();
+                }
         );
 
         primaryStage.setScene(new Scene(view, 600, 500));
@@ -96,6 +99,7 @@ public class ClientMain extends Application {
         new RicercaRistorantiController(
                 view,
                 connection,
+                this::mostraHome,
                 this::mostraDettagliRistorante
         );
 
@@ -119,6 +123,81 @@ public class ClientMain extends Application {
 
         primaryStage.setScene(new Scene(view, 700, 500));
         primaryStage.setTitle("Dettagli Ristorante");
+        primaryStage.show();
+    }
+
+    // ============================
+    // PREFERITI
+    // ============================
+    private void mostraPreferiti() {
+        PreferitiView view = new PreferitiView();
+
+        new PreferitiController(
+                view,
+                connection,
+                this::mostraHome
+        );
+
+        primaryStage.setScene(new Scene(view, 600, 500));
+        primaryStage.setTitle("Preferiti");
+        primaryStage.show();
+    }
+
+    // ============================
+    // RECENSIONI UTENTE
+    // ============================
+    private void mostraRecensioniUtente() {
+        RecensioniUtenteView view = new RecensioniUtenteView();
+
+        new RecensioniUtenteController(
+                view,
+                connection,
+                this::mostraHome
+        );
+
+        primaryStage.setScene(new Scene(view, 700, 500));
+        primaryStage.setTitle("Le mie recensioni");
+        primaryStage.show();
+    }
+
+    // ============================
+    // RECENSIONI RICEVUTE (GESTORE)
+    // ============================
+    private void mostraRecensioniRicevute() {
+        RecensioniRistoranteView view = new RecensioniRistoranteView();
+
+        RecensioniRistoranteController controller =
+                new RecensioniRistoranteController(
+                        view,
+                        connection,
+                        this::mostraHome
+                );
+
+        controller.loadRecensioni();
+
+        primaryStage.setScene(new Scene(view, 700, 500));
+        primaryStage.setTitle("Recensioni ricevute");
+        primaryStage.show();
+    }
+
+
+
+
+    // ============================
+    // GESTIONE RISTORANTI (GESTORE)
+    // ============================
+    private void mostraGestioneRistoranti() {
+        GestoreRistorantiView view = new GestoreRistorantiView();
+
+        new GestoreRistorantiController(
+                view,
+                connection,
+                this::mostraHome,
+                this::mostraDettagliRistorante
+        );
+
+        primaryStage.setScene(new Scene(view, 800, 600));
+        primaryStage.setTitle("Gestione Ristoranti");
         primaryStage.show();
     }
 

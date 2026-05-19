@@ -2,9 +2,7 @@ package client.gui;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 
@@ -12,28 +10,79 @@ public class RistoranteDettagliView extends BorderPane {
 
     private Label lblNome;
     private Label lblIndirizzo;
+    private Label lblCitta;
+    private Label lblNazione;
     private Label lblTipoCucina;
+    private Label lblFasciaPrezzo;
+    private Label lblLatitudine;
+    private Label lblLongitudine;
+    private Label lblDelivery;
+    private Label lblPrenotazione;
+
     private TextArea areaRecensioni;
+
     private Button btnIndietro;
+    private Button btnPreferiti;
+    private Button btnScriviRecensione;
+
+    private TextArea txtRecensione;
+    private Spinner<Integer> votoSpinner;
 
     public RistoranteDettagliView() {
         creaLayout();
     }
 
     private void creaLayout() {
+
         lblNome = new Label();
         lblNome.setStyle("-fx-font-size: 22px; -fx-font-weight: bold;");
 
         lblIndirizzo = new Label();
+        lblCitta = new Label();
+        lblNazione = new Label();
         lblTipoCucina = new Label();
+        lblFasciaPrezzo = new Label();
+        lblLatitudine = new Label();
+        lblLongitudine = new Label();
+        lblDelivery = new Label();
+        lblPrenotazione = new Label();
 
         areaRecensioni = new TextArea();
         areaRecensioni.setEditable(false);
         areaRecensioni.setPrefHeight(250);
 
         btnIndietro = new Button("← Torna alla ricerca");
+        btnPreferiti = new Button("⭐ Aggiungi ai preferiti");
+        btnScriviRecensione = new Button("📝 Invia recensione");
 
-        VBox box = new VBox(10, lblNome, lblIndirizzo, lblTipoCucina, areaRecensioni, btnIndietro);
+        txtRecensione = new TextArea();
+        txtRecensione.setPromptText("Scrivi qui la tua recensione...");
+        txtRecensione.setPrefHeight(80);
+
+        votoSpinner = new Spinner<>(1, 5, 5);
+
+        VBox box = new VBox(
+                10,
+                lblNome,
+                lblIndirizzo,
+                lblCitta,
+                lblNazione,
+                lblTipoCucina,
+                lblFasciaPrezzo,
+                lblLatitudine,
+                lblLongitudine,
+                lblDelivery,
+                lblPrenotazione,
+                new Label("Recensioni:"),
+                areaRecensioni,
+                new Label("Scrivi una recensione:"),
+                votoSpinner,
+                txtRecensione,
+                btnScriviRecensione,
+                btnPreferiti,
+                btnIndietro
+        );
+
         box.setAlignment(Pos.TOP_LEFT);
         box.setPadding(new Insets(20));
 
@@ -42,7 +91,21 @@ public class RistoranteDettagliView extends BorderPane {
 
     public Label getLblNome() { return lblNome; }
     public Label getLblIndirizzo() { return lblIndirizzo; }
+    public Label getLblCitta() { return lblCitta; }
+    public Label getLblNazione() { return lblNazione; }
     public Label getLblTipoCucina() { return lblTipoCucina; }
+    public Label getLblFasciaPrezzo() { return lblFasciaPrezzo; }
+    public Label getLblLatitudine() { return lblLatitudine; }
+    public Label getLblLongitudine() { return lblLongitudine; }
+    public Label getLblDelivery() { return lblDelivery; }
+    public Label getLblPrenotazione() { return lblPrenotazione; }
+
     public TextArea getAreaRecensioni() { return areaRecensioni; }
+
     public Button getBtnIndietro() { return btnIndietro; }
+    public Button getBtnPreferiti() { return btnPreferiti; }
+    public Button getBtnScriviRecensione() { return btnScriviRecensione; }
+
+    public TextArea getTxtRecensione() { return txtRecensione; }
+    public Spinner<Integer> getVotoSpinner() { return votoSpinner; }
 }

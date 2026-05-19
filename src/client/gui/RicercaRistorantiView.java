@@ -8,6 +8,7 @@ public class RicercaRistorantiView extends VBox {
     private final TextField txtRicerca = new TextField();
     private final ComboBox<String> filtroTipoCucina = new ComboBox<>();
     private final Button btnCerca = new Button("Cerca");
+    private final Button btnIndietro = new Button("← Indietro");
 
     private final TableView<RistoranteRow> tabella = new TableView<>();
 
@@ -26,7 +27,8 @@ public class RicercaRistorantiView extends VBox {
         );
         filtroTipoCucina.setValue("Tutte");
 
-        HBox barra = new HBox(10, txtRicerca, filtroTipoCucina, btnCerca);
+        // Barra superiore con bottone indietro
+        HBox barra = new HBox(10, btnIndietro, txtRicerca, filtroTipoCucina, btnCerca);
 
         // ============================
         // COLONNE TABELLA
@@ -41,7 +43,7 @@ public class RicercaRistorantiView extends VBox {
         colIndirizzo.setPrefWidth(220);
 
         TableColumn<RistoranteRow, String> colTipoCucina = new TableColumn<>("Tipo Cucina");
-        colTipoCucina.setCellValueFactory(c -> c.getValue().categoriaProperty()); // alias di tipoCucina
+        colTipoCucina.setCellValueFactory(c -> c.getValue().categoriaProperty());
         colTipoCucina.setPrefWidth(150);
 
         tabella.getColumns().addAll(colNome, colIndirizzo, colTipoCucina);
@@ -53,5 +55,6 @@ public class RicercaRistorantiView extends VBox {
     public TextField getTxtRicerca() { return txtRicerca; }
     public ComboBox<String> getFiltroCategoria() { return filtroTipoCucina; }
     public Button getBtnCerca() { return btnCerca; }
+    public Button getBtnIndietro() { return btnIndietro; }
     public TableView<RistoranteRow> getTabella() { return tabella; }
 }
