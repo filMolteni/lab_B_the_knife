@@ -24,9 +24,6 @@ public class RecensioniUtenteView extends BorderPane {
 
     private void creaLayout() {
 
-        // ============================
-        // TITOLO
-        // ============================
         Label titolo = new Label("Le Tue Recensioni");
         titolo.setFont(new Font(26));
         titolo.setPadding(new Insets(20, 0, 20, 0));
@@ -35,13 +32,10 @@ public class RecensioniUtenteView extends BorderPane {
         topBox.setAlignment(Pos.CENTER);
         this.setTop(topBox);
 
-        // ============================
-        // TABELLA
-        // ============================
         tabella = new TableView<>();
 
         TableColumn<RecensioneRow, String> colRistorante = new TableColumn<>("Ristorante");
-        colRistorante.setCellValueFactory(c -> c.getValue().ristoranteProperty());
+        colRistorante.setCellValueFactory(c -> c.getValue().nomeRistoranteProperty());
         colRistorante.setPrefWidth(180);
 
         TableColumn<RecensioneRow, Integer> colVoto = new TableColumn<>("Voto");
@@ -63,9 +57,6 @@ public class RecensioniUtenteView extends BorderPane {
 
         this.setCenter(tabella);
 
-        // ============================
-        // BOTTONI
-        // ============================
         btnIndietro = new Button("Indietro");
         btnIndietro.setPrefWidth(120);
 
@@ -81,16 +72,9 @@ public class RecensioniUtenteView extends BorderPane {
 
         this.setBottom(bottomBox);
 
-        // ============================
-        // STILE GENERALE
-        // ============================
         this.setPadding(new Insets(15));
         this.setStyle("-fx-background-color: #f8f8f8;");
     }
-
-    // ============================
-    // GETTER PER IL CONTROLLER
-    // ============================
 
     public TableView<RecensioneRow> getTabella() { return tabella; }
 

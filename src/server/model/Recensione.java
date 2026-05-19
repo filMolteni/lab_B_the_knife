@@ -8,10 +8,13 @@ public class Recensione {
     private int voto;
     private String testo;
     private String data;
-    private String fonte; // ⭐ NUOVO: THEKNIFE o UTENTE
+    private String fonte;            // ⭐ THEKNIFE o UTENTE
+    private String nomeRistorante;   // ⭐ NUOVO
 
     public Recensione(int id, int idUtente, int idRistorante,
-                      int voto, String testo, String data, String fonte) {
+                      int voto, String testo, String data,
+                      String fonte, String nomeRistorante) {
+
         this.id = id;
         this.idUtente = idUtente;
         this.idRistorante = idRistorante;
@@ -19,18 +22,23 @@ public class Recensione {
         this.testo = testo;
         this.data = data;
         this.fonte = fonte;
+        this.nomeRistorante = nomeRistorante; // ⭐ NUOVO
     }
 
+    // ===== GETTER =====
     public int getId() { return id; }
     public int getIdUtente() { return idUtente; }
     public int getIdRistorante() { return idRistorante; }
     public int getVoto() { return voto; }
     public String getTesto() { return testo; }
     public String getData() { return data; }
-    public String getFonte() { return fonte; } // ⭐ NUOVO
+    public String getFonte() { return fonte; }
+    public String getNomeRistorante() { return nomeRistorante; } // ⭐ NUOVO
 
+    // ===== SETTER =====
     public void setVoto(int voto) { this.voto = voto; }
     public void setTesto(String testo) { this.testo = testo; }
     public void setData(String data) { this.data = data; }
-    public void setFonte(String fonte) { this.fonte = fonte; } // ⭐ NUOVO
+    public void setFonte(String fonte) { this.fonte = fonte; }
+    public void setNomeRistorante(String nomeRistorante) { this.nomeRistorante = nomeRistorante; } // ⭐ NUOVO
 }

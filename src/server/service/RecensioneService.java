@@ -22,14 +22,12 @@ public class RecensioneService {
             int idRistorante = p.get("idRistorante").getAsInt();
             int voto = p.get("voto").getAsInt();
             String testo = p.get("testo").getAsString();
-            String fonte = p.get("fonte").getAsString(); // ⭐ NUOVO
+            String fonte = p.get("fonte").getAsString();
 
-            // 1) Controllo se esiste già una recensione
             if (RecensioneDAO.recensioneEsiste(idUtente, idRistorante)) {
                 return Response.error("Hai già recensito questo ristorante.");
             }
 
-            // 2) Inserimento recensione
             boolean ok = RecensioneDAO.aggiungi(idUtente, idRistorante, voto, testo, fonte);
 
             if (!ok)
@@ -99,10 +97,12 @@ public class RecensioneService {
                 JsonObject o = new JsonObject();
                 o.addProperty("id", r.getId());
                 o.addProperty("idUtente", r.getIdUtente());
+                o.addProperty("idRistorante", r.getIdRistorante());
+                o.addProperty("nomeRistorante", r.getNomeRistorante()); // ⭐ NUOVO
                 o.addProperty("voto", r.getVoto());
                 o.addProperty("testo", r.getTesto());
                 o.addProperty("data", r.getData());
-                o.addProperty("fonte", r.getFonte()); // ⭐ NUOVO
+                o.addProperty("fonte", r.getFonte());
                 arr.add(o);
             }
 
@@ -113,6 +113,39 @@ public class RecensioneService {
 
         } catch (Exception e) {
             return Response.error("Errore caricamento recensioni: " + e.getMessage());
+        }
+    }
+
+    // ============================
+    // RECENSIONI SCRITTE DA UN UTENTE
+    // ============================
+    public static Response getByUtente(Request req) {
+        try {
+            int idUtente = req.payload.get("idUtente").getAsInt();
+
+            List<Recensione> lista = RecensioneDAO.getByUtente(idUtente);
+
+            JsonArray arr = new JsonArray();
+
+            for (Recensione r : lista) {
+                JsonObject o = new JsonObject();
+                o.addProperty("id", r.getId());
+                o.addProperty("idRistorante", r.getIdRistorante());
+                o.addProperty("nomeRistorante", r.getNomeRistorante()); // ⭐ NUOVO
+                o.addProperty("voto", r.getVoto());
+                o.addProperty("testo", r.getTesto());
+                o.addProperty("data", r.getData());
+                o.addProperty("fonte", r.getFonte());
+                arr.add(o);
+            }
+
+            JsonObject res = new JsonObject();
+            res.add("recensioni", arr);
+
+            return Response.ok(res);
+
+        } catch (Exception e) {
+            return Response.error("Errore caricamento recensioni utente: " + e.getMessage());
         }
     }
 
@@ -132,10 +165,11 @@ public class RecensioneService {
                 o.addProperty("id", r.getId());
                 o.addProperty("idUtente", r.getIdUtente());
                 o.addProperty("idRistorante", r.getIdRistorante());
+                o.addProperty("nomeRistorante", r.getNomeRistorante()); // ⭐ NUOVO
                 o.addProperty("voto", r.getVoto());
                 o.addProperty("testo", r.getTesto());
                 o.addProperty("data", r.getData());
-                o.addProperty("fonte", r.getFonte()); // ⭐ NUOVO
+                o.addProperty("fonte", r.getFonte());
                 arr.add(o);
             }
 

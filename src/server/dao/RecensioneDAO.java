@@ -39,7 +39,7 @@ public class RecensioneDAO {
     }
 
     // ============================
-    // AGGIUNGI RECENSIONE (CON FONTE)
+    // AGGIUNGI RECENSIONE
     // ============================
     public static boolean aggiungi(int idUtente, int idRistorante, int voto, String testo, String fonte) {
         try {
@@ -55,7 +55,7 @@ public class RecensioneDAO {
             ps.setInt(2, idRistorante);
             ps.setInt(3, voto);
             ps.setString(4, testo);
-            ps.setString(5, fonte); // ⭐ NUOVO
+            ps.setString(5, fonte);
 
             int rows = ps.executeUpdate();
 
@@ -121,19 +121,64 @@ public class RecensioneDAO {
     }
 
     // ============================
+    // RECENSIONI SCRITTE DA UN UTENTE
+    // ============================
+    public static List<Recensione> getByUtente(int idUtente) {
+        List<Recensione> lista = new ArrayList<>();
+
+        try (Connection conn = DBConnectionPool.get()) {
+
+            String sql = """
+                SELECT r.id, r.id_utente, r.id_ristorante, r.voto, r.testo, r.data, r.fonte,
+                       COALESCE(ru.nome, rt.nome) AS nome_ristorante
+                FROM recensioni r
+                LEFT JOIN ristorantiutente ru ON r.id_ristorante = ru.id AND r.fonte = 'UTENTE'
+                LEFT JOIN ristorantitheknife rt ON r.id_ristorante = rt.id AND r.fonte = 'THEKNIFE'
+                WHERE r.id_utente = ?
+                ORDER BY r.data DESC
+            """;
+
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setInt(1, idUtente);
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                lista.add(new Recensione(
+                        rs.getInt("id"),
+                        rs.getInt("id_utente"),
+                        rs.getInt("id_ristorante"),
+                        rs.getInt("voto"),
+                        rs.getString("testo"),
+                        rs.getString("data"),
+                        rs.getString("fonte"),
+                        rs.getString("nome_ristorante")
+                ));
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return lista;
+    }
+
+    // ============================
     // RECENSIONI DI UN RISTORANTE
     // ============================
     public static List<Recensione> getByRistorante(int idRistorante) {
         List<Recensione> lista = new ArrayList<>();
 
-        try {
-            Connection conn = DBConnectionPool.get();
+        try (Connection conn = DBConnectionPool.get()) {
 
             String sql = """
-                SELECT id, id_utente, id_ristorante, voto, testo, data, fonte
-                FROM recensioni
-                WHERE id_ristorante = ?
-                ORDER BY data DESC
+                SELECT r.id, r.id_utente, r.id_ristorante, r.voto, r.testo, r.data, r.fonte,
+                       COALESCE(ru.nome, rt.nome) AS nome_ristorante
+                FROM recensioni r
+                LEFT JOIN ristorantiutente ru ON r.id_ristorante = ru.id AND r.fonte = 'UTENTE'
+                LEFT JOIN ristorantitheknife rt ON r.id_ristorante = rt.id AND r.fonte = 'THEKNIFE'
+                WHERE r.id_ristorante = ?
+                ORDER BY r.data DESC
             """;
 
             PreparedStatement ps = conn.prepareStatement(sql);
@@ -149,13 +194,10 @@ public class RecensioneDAO {
                         rs.getInt("voto"),
                         rs.getString("testo"),
                         rs.getString("data"),
-                        rs.getString("fonte") // ⭐ NUOVO
+                        rs.getString("fonte"),
+                        rs.getString("nome_ristorante")
                 ));
             }
-
-            rs.close();
-            ps.close();
-            DBConnectionPool.release(conn);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -172,45 +214,32 @@ public class RecensioneDAO {
 
         try (Connection conn = DBConnectionPool.get()) {
 
-            String sqlR = "SELECT id FROM ristorantiutente WHERE id_gestore = ?";
-            PreparedStatement psR = conn.prepareStatement(sqlR);
-            psR.setInt(1, idGestore);
+            String sql = """
+                SELECT r.id, r.id_utente, r.id_ristorante, r.voto, r.testo, r.data, r.fonte,
+                       ru.nome AS nome_ristorante
+                FROM recensioni r
+                JOIN ristorantiutente ru ON r.id_ristorante = ru.id
+                WHERE ru.id_gestore = ? AND r.fonte = 'UTENTE'
+                ORDER BY r.data DESC
+            """;
 
-            ResultSet rsR = psR.executeQuery();
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setInt(1, idGestore);
 
-            while (rsR.next()) {
-                int idRistorante = rsR.getInt("id");
+            ResultSet rs = ps.executeQuery();
 
-                String sqlRec = """
-                    SELECT id, id_utente, id_ristorante, voto, testo, data, fonte
-                    FROM recensioni
-                    WHERE id_ristorante = ? AND fonte = 'UTENTE'
-                    ORDER BY data DESC
-                """;
-
-                PreparedStatement psRec = conn.prepareStatement(sqlRec);
-                psRec.setInt(1, idRistorante);
-
-                ResultSet rsRec = psRec.executeQuery();
-
-                while (rsRec.next()) {
-                    lista.add(new Recensione(
-                            rsRec.getInt("id"),
-                            rsRec.getInt("id_utente"),
-                            rsRec.getInt("id_ristorante"),
-                            rsRec.getInt("voto"),
-                            rsRec.getString("testo"),
-                            rsRec.getString("data"),
-                            rsRec.getString("fonte")
-                    ));
-                }
-
-                rsRec.close();
-                psRec.close();
+            while (rs.next()) {
+                lista.add(new Recensione(
+                        rs.getInt("id"),
+                        rs.getInt("id_utente"),
+                        rs.getInt("id_ristorante"),
+                        rs.getInt("voto"),
+                        rs.getString("testo"),
+                        rs.getString("data"),
+                        rs.getString("fonte"),
+                        rs.getString("nome_ristorante")
+                ));
             }
-
-            rsR.close();
-            psR.close();
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -219,28 +248,26 @@ public class RecensioneDAO {
         return lista;
     }
 
-    // ============================
-    // RISPONDI A RECENSIONE
-    // ============================
     public static boolean rispondi(int idRecensione, String risposta) {
-        try {
-            Connection conn = DBConnectionPool.get();
+    try {
+        Connection conn = DBConnectionPool.get();
 
-            String sql = "UPDATE recensioni SET risposta = ? WHERE id = ?";
-            PreparedStatement ps = conn.prepareStatement(sql);
-            ps.setString(1, risposta);
-            ps.setInt(2, idRecensione);
+        String sql = "UPDATE recensioni SET risposta = ? WHERE id = ?";
+        PreparedStatement ps = conn.prepareStatement(sql);
+        ps.setString(1, risposta);
+        ps.setInt(2, idRecensione);
 
-            int rows = ps.executeUpdate();
+        int rows = ps.executeUpdate();
 
-            ps.close();
-            DBConnectionPool.release(conn);
+        ps.close();
+        DBConnectionPool.release(conn);
 
-            return rows > 0;
+        return rows > 0;
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
+    } catch (Exception e) {
+        e.printStackTrace();
+        return false;
     }
+}
+
 }

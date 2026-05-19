@@ -1,6 +1,7 @@
 package client.controller;
 
 import client.gui.RecensioniUtenteView;
+import client.model.UtenteDTO;
 import client.gui.RecensioneRow;
 import client.net.ClientConnection;
 import client.net.Request;
@@ -29,24 +30,21 @@ public class RecensioniUtenteController {
 
     private void initHandlers() {
 
-        // TORNA INDIETRO
         view.getBtnIndietro().setOnAction(e -> onGoBack.run());
 
-        // MODIFICA (non implementato perché la view non ha campi di modifica)
         view.getBtnModifica().setOnAction(e -> {
             System.out.println("Funzione modifica non implementata nella view");
         });
 
-        // ELIMINA RECENSIONE
         view.getBtnElimina().setOnAction(e -> eliminaRecensione());
     }
 
-    /**
-     * Carica le recensioni dell’utente dal server
-     */
     public void loadRecensioni() {
 
-        Request req = new Request(MessageType.VISUALIZZA_RECENSIONI_GESTORE, new JsonObject());
+        JsonObject params = new JsonObject();
+        params.addProperty("idUtente", UtenteDTO.getUtenteLoggato().getId());
+
+        Request req = new Request(MessageType.VISUALIZZA_RECENSIONI_UTENTE, params);
 
         try {
             Response res = connection.sendRequest(req);
@@ -66,10 +64,12 @@ public class RecensioniUtenteController {
 
                     RecensioneRow row = new RecensioneRow(
                             r.get("id").getAsInt(),
-                            r.get("ristorante").getAsString(),
+                            r.get("idRistorante").getAsInt(),
+                            r.get("nomeRistorante").getAsString(),   // ⭐ LETTO DAL SERVER
                             r.get("voto").getAsInt(),
-                            r.get("commento").getAsString(),
-                            r.get("data").getAsString()
+                            r.get("testo").getAsString(),
+                            r.get("data").getAsString(),
+                            r.get("fonte").getAsString()
                     );
 
                     view.getTabella().getItems().add(row);
@@ -82,9 +82,6 @@ public class RecensioniUtenteController {
         }
     }
 
-    /**
-     * Elimina la recensione selezionata
-     */
     private void eliminaRecensione() {
 
         RecensioneRow selected = view.getTabella().getSelectionModel().getSelectedItem();
@@ -95,7 +92,7 @@ public class RecensioniUtenteController {
         }
 
         JsonObject params = new JsonObject();
-        params.addProperty("id", selected.getId());
+        params.addProperty("idRecensione", selected.getId());
 
         Request req = new Request(MessageType.ELIMINA_RECENSIONE, params);
 
@@ -104,7 +101,7 @@ public class RecensioniUtenteController {
 
             if (res.isSuccess()) {
                 System.out.println("Recensione eliminata");
-                loadRecensioni(); // aggiorna tabella
+                loadRecensioni();
             } else {
                 System.out.println("Errore eliminazione: " + res.getMessage());
             }

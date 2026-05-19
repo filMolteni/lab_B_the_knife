@@ -35,7 +35,7 @@ public class RecensioniRistoranteController {
     public void loadRecensioni() {
 
         JsonObject params = new JsonObject();
-        params.addProperty("idGestore", UtenteDTO.getUtenteLoggato().getId());
+        params.addProperty("idGestore", UtenteDTO.getUtenteLoggato().getId()); // ⭐ singleton
 
         Request req = new Request(MessageType.VISUALIZZA_RECENSIONI_GESTORE, params);
 
@@ -55,14 +55,17 @@ public class RecensioniRistoranteController {
                 arr.forEach(el -> {
                     JsonObject o = el.getAsJsonObject();
 
-                    view.getTabella().getItems().add(
-                            new RecensioneRistoranteRow(
-                                    o.get("utente").getAsString(),
-                                    o.get("voto").getAsInt(),
-                                    o.get("commento").getAsString(),
-                                    o.get("data").getAsString()
-                            )
+                    RecensioneRistoranteRow row = new RecensioneRistoranteRow(
+                            o.get("id").getAsInt(),               // ⭐ id recensione
+                            o.get("idRistorante").getAsInt(),     // ⭐ serve per sapere quale ristorante
+                            o.get("idUtente").getAsInt() + "",    // ⭐ utente come stringa (o puoi fare lookup)
+                            o.get("voto").getAsInt(),
+                            o.get("testo").getAsString(),
+                            o.get("data").getAsString(),
+                            o.get("fonte").getAsString()          // ⭐ fondamentale
                     );
+
+                    view.getTabella().getItems().add(row);
                 });
             });
 
@@ -71,4 +74,3 @@ public class RecensioniRistoranteController {
         }
     }
 }
-
