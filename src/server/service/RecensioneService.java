@@ -22,6 +22,7 @@ public class RecensioneService {
             int idRistorante = p.get("idRistorante").getAsInt();
             int voto = p.get("voto").getAsInt();
             String testo = p.get("testo").getAsString();
+            String fonte = p.get("fonte").getAsString(); // ⭐ NUOVO
 
             // 1) Controllo se esiste già una recensione
             if (RecensioneDAO.recensioneEsiste(idUtente, idRistorante)) {
@@ -29,7 +30,7 @@ public class RecensioneService {
             }
 
             // 2) Inserimento recensione
-            boolean ok = RecensioneDAO.aggiungi(idUtente, idRistorante, voto, testo);
+            boolean ok = RecensioneDAO.aggiungi(idUtente, idRistorante, voto, testo, fonte);
 
             if (!ok)
                 return Response.error("Impossibile aggiungere recensione");
@@ -84,7 +85,7 @@ public class RecensioneService {
     }
 
     // ============================
-    // RECENSIONI DI UN RISTORANTE (UTENTE)
+    // RECENSIONI DI UN RISTORANTE (UTENTE + THEKNIFE)
     // ============================
     public static Response getByRistorante(Request req) {
         try {
@@ -101,6 +102,7 @@ public class RecensioneService {
                 o.addProperty("voto", r.getVoto());
                 o.addProperty("testo", r.getTesto());
                 o.addProperty("data", r.getData());
+                o.addProperty("fonte", r.getFonte()); // ⭐ NUOVO
                 arr.add(o);
             }
 
@@ -133,6 +135,7 @@ public class RecensioneService {
                 o.addProperty("voto", r.getVoto());
                 o.addProperty("testo", r.getTesto());
                 o.addProperty("data", r.getData());
+                o.addProperty("fonte", r.getFonte()); // ⭐ NUOVO
                 arr.add(o);
             }
 

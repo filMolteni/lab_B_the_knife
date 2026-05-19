@@ -39,15 +39,15 @@ public class RecensioneDAO {
     }
 
     // ============================
-    // AGGIUNGI RECENSIONE
+    // AGGIUNGI RECENSIONE (CON FONTE)
     // ============================
-    public static boolean aggiungi(int idUtente, int idRistorante, int voto, String testo) {
+    public static boolean aggiungi(int idUtente, int idRistorante, int voto, String testo, String fonte) {
         try {
             Connection conn = DBConnectionPool.get();
 
             String sql = """
-                INSERT INTO recensioni(id_utente, id_ristorante, voto, testo, data)
-                VALUES (?, ?, ?, ?, NOW())
+                INSERT INTO recensioni(id_utente, id_ristorante, voto, testo, data, fonte)
+                VALUES (?, ?, ?, ?, NOW(), ?)
             """;
 
             PreparedStatement ps = conn.prepareStatement(sql);
@@ -55,6 +55,7 @@ public class RecensioneDAO {
             ps.setInt(2, idRistorante);
             ps.setInt(3, voto);
             ps.setString(4, testo);
+            ps.setString(5, fonte); // ⭐ NUOVO
 
             int rows = ps.executeUpdate();
 
@@ -129,7 +130,7 @@ public class RecensioneDAO {
             Connection conn = DBConnectionPool.get();
 
             String sql = """
-                SELECT id, id_utente, id_ristorante, voto, testo, data
+                SELECT id, id_utente, id_ristorante, voto, testo, data, fonte
                 FROM recensioni
                 WHERE id_ristorante = ?
                 ORDER BY data DESC
@@ -147,7 +148,8 @@ public class RecensioneDAO {
                         rs.getInt("id_ristorante"),
                         rs.getInt("voto"),
                         rs.getString("testo"),
-                        rs.getString("data")
+                        rs.getString("data"),
+                        rs.getString("fonte") // ⭐ NUOVO
                 ));
             }
 
@@ -168,36 +170,47 @@ public class RecensioneDAO {
     public static List<Recensione> getByGestore(int idGestore) {
         List<Recensione> lista = new ArrayList<>();
 
-        try {
-            Connection conn = DBConnectionPool.get();
+        try (Connection conn = DBConnectionPool.get()) {
 
-            String sql = """
-                SELECT r.id, r.id_utente, r.id_ristorante, r.voto, r.testo, r.data
-                FROM recensioni r
-                JOIN ristoranti t ON r.id_ristorante = t.id
-                WHERE t.id_gestore = ?
-                ORDER BY r.data DESC
-            """;
+            String sqlR = "SELECT id FROM ristorantiutente WHERE id_gestore = ?";
+            PreparedStatement psR = conn.prepareStatement(sqlR);
+            psR.setInt(1, idGestore);
 
-            PreparedStatement ps = conn.prepareStatement(sql);
-            ps.setInt(1, idGestore);
+            ResultSet rsR = psR.executeQuery();
 
-            ResultSet rs = ps.executeQuery();
+            while (rsR.next()) {
+                int idRistorante = rsR.getInt("id");
 
-            while (rs.next()) {
-                lista.add(new Recensione(
-                        rs.getInt("id"),
-                        rs.getInt("id_utente"),
-                        rs.getInt("id_ristorante"),
-                        rs.getInt("voto"),
-                        rs.getString("testo"),
-                        rs.getString("data")
-                ));
+                String sqlRec = """
+                    SELECT id, id_utente, id_ristorante, voto, testo, data, fonte
+                    FROM recensioni
+                    WHERE id_ristorante = ? AND fonte = 'UTENTE'
+                    ORDER BY data DESC
+                """;
+
+                PreparedStatement psRec = conn.prepareStatement(sqlRec);
+                psRec.setInt(1, idRistorante);
+
+                ResultSet rsRec = psRec.executeQuery();
+
+                while (rsRec.next()) {
+                    lista.add(new Recensione(
+                            rsRec.getInt("id"),
+                            rsRec.getInt("id_utente"),
+                            rsRec.getInt("id_ristorante"),
+                            rsRec.getInt("voto"),
+                            rsRec.getString("testo"),
+                            rsRec.getString("data"),
+                            rsRec.getString("fonte")
+                    ));
+                }
+
+                rsRec.close();
+                psRec.close();
             }
 
-            rs.close();
-            ps.close();
-            DBConnectionPool.release(conn);
+            rsR.close();
+            psR.close();
 
         } catch (Exception e) {
             e.printStackTrace();
