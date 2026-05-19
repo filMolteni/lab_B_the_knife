@@ -14,13 +14,16 @@ public class Ristorante {
     private boolean delivery;
     private boolean prenotazione;
 
+    private String fonte; // ⭐ "THEKNIFE" o "UTENTE"
+
     // ============================
     // COSTRUTTORE COMPLETO
     // ============================
     public Ristorante(int id, String nome, String indirizzo, String tipoCucina,
                       int fasciaPrezzo, double latitudine, double longitudine,
                       String citta, String nazione,
-                      boolean delivery, boolean prenotazione) {
+                      boolean delivery, boolean prenotazione,
+                      String fonte) { // ⭐ NUOVO
 
         this.id = id;
         this.nome = nome;
@@ -33,6 +36,8 @@ public class Ristorante {
         this.nazione = nazione;
         this.delivery = delivery;
         this.prenotazione = prenotazione;
+
+        this.fonte = fonte; // ⭐ NUOVO
     }
 
     // ============================
@@ -50,6 +55,13 @@ public class Ristorante {
     public boolean isDelivery() { return delivery; }
     public boolean isPrenotazione() { return prenotazione; }
 
+    public String getFonte() { return fonte; } // ⭐ NUOVO
+
+    // ⭐ METODO RICHIESTO
+    public boolean isTheKnife() {
+        return "THEKNIFE".equalsIgnoreCase(fonte);
+    }
+
     // ============================
     // SETTER
     // ============================
@@ -63,4 +75,6 @@ public class Ristorante {
     public void setTipoCucina(String tipoCucina) { this.tipoCucina = tipoCucina; }
     public void setDelivery(boolean delivery) { this.delivery = delivery; }
     public void setPrenotazione(boolean prenotazione) { this.prenotazione = prenotazione; }
+
+    public void setFonte(String fonte) { this.fonte = fonte; } // ⭐ NUOVO
 }

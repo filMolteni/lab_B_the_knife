@@ -14,17 +14,19 @@ import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+import java.util.function.BiConsumer;
+
 public class GestoreRistorantiController {
 
     private final GestoreRistorantiView view;
     private final ClientConnection connection;
     private final Runnable onGoBack;
-    private final java.util.function.Consumer<Integer> onOpenRistorante;
+    private final BiConsumer<Integer, String> onOpenRistorante; // ⭐ AGGIORNATO
 
     public GestoreRistorantiController(GestoreRistorantiView view,
                                        ClientConnection connection,
                                        Runnable onGoBack,
-                                       java.util.function.Consumer<Integer> onOpenRistorante) {
+                                       BiConsumer<Integer, String> onOpenRistorante) { // ⭐ AGGIORNATO
 
         this.view = view;
         this.connection = connection;
@@ -41,12 +43,12 @@ public class GestoreRistorantiController {
         view.getBtnElimina().setOnAction(e -> eliminaRistorante());
         view.getBtnIndietro().setOnAction(e -> onGoBack.run());
 
-        // DOPPIO CLICK → APRI DETTAGLI RISTORANTE UTENTE
+        // ⭐ DOPPIO CLICK → APRI DETTAGLI RISTORANTE UTENTE
         view.getTabella().setOnMouseClicked(e -> {
             if (e.getClickCount() == 2) {
                 RistoranteRow r = view.getTabella().getSelectionModel().getSelectedItem();
                 if (r != null) {
-                    onOpenRistorante.accept(r.getId());   // <-- APRE DETTAGLI
+                    onOpenRistorante.accept(r.getId(), "UTENTE"); // ⭐ SEMPRE UTENTE
                 }
             }
         });
@@ -82,7 +84,8 @@ public class GestoreRistorantiController {
                             r.get("id").getAsInt(),
                             r.get("nome").getAsString(),
                             r.get("tipo_cucina").getAsString(),
-                            r.get("indirizzo").getAsString()
+                            r.get("indirizzo").getAsString(),
+                            "UTENTE" // ⭐ SEMPRE UTENTE
                     );
 
                     view.getTabella().getItems().add(row);
@@ -130,7 +133,7 @@ public class GestoreRistorantiController {
         params.addProperty("id", selected.getId());
 
         Request req = new Request(MessageType.VISUALIZZA_RISTORANTE_UTENTE, params);
-        
+
         Response res;
         try {
             res = connection.sendRequest(req);

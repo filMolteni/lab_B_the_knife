@@ -10,17 +10,19 @@ import com.google.gson.JsonObject;
 import common.MessageType;
 import javafx.application.Platform;
 
+import java.util.function.BiConsumer;
+
 public class SearchController {
 
     private final SearchView view;
     private final ClientConnection connection;
     private final Runnable onGoBack;
-    private final java.util.function.Consumer<Integer> onOpenRistorante;
+    private final BiConsumer<Integer, String> onOpenRistorante; // ⭐ AGGIORNATO
 
     public SearchController(SearchView view,
                             ClientConnection connection,
                             Runnable onGoBack,
-                            java.util.function.Consumer<Integer> onOpenRistorante) {
+                            BiConsumer<Integer, String> onOpenRistorante) { // ⭐ AGGIORNATO
 
         this.view = view;
         this.connection = connection;
@@ -38,12 +40,12 @@ public class SearchController {
         // INDIETRO
         view.getBtnIndietro().setOnAction(e -> onGoBack.run());
 
-        // DOPPIO CLICK SU RIGA → APRI DETTAGLIO
+        // ⭐ DOPPIO CLICK SU RIGA → APRI DETTAGLIO (ID + FONTE)
         view.getTabella().setOnMouseClicked(event -> {
             if (event.getClickCount() == 2) {
                 RistoranteRow row = view.getTabella().getSelectionModel().getSelectedItem();
                 if (row != null) {
-                    onOpenRistorante.accept(row.getId());   // <-- APRE DETTAGLI
+                    onOpenRistorante.accept(row.getId(), row.getFonte()); // ⭐ AGGIORNATO
                 }
             }
         });
@@ -76,11 +78,13 @@ public class SearchController {
                 for (int i = 0; i < arr.size(); i++) {
                     JsonObject r = arr.get(i).getAsJsonObject();
 
+                    // ⭐ ORA LEGGIAMO ANCHE LA FONTE DAL SERVER
                     RistoranteRow row = new RistoranteRow(
                             r.get("id").getAsInt(),
                             r.get("nome").getAsString(),
                             r.get("tipo_cucina").getAsString(),
-                            r.get("indirizzo").getAsString()
+                            r.get("indirizzo").getAsString(),
+                            r.get("fonte").getAsString() // ⭐ NUOVO
                     );
 
                     view.getTabella().getItems().add(row);

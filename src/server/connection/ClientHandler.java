@@ -6,6 +6,7 @@ import common.Response;
 
 import server.service.UtenteService;
 import server.service.RistoranteService;
+import server.service.PreferitiService;
 import server.service.RecensioneService;
 import server.dao.PreferitiDAO;
 
@@ -76,7 +77,7 @@ public class ClientHandler implements Runnable {
             case ELIMINA_RECENSIONE -> RecensioneService.elimina(req);
 
             case VISUALIZZA_RECENSIONI_ANONIME ->
-                    RistoranteService.visualizzaRecensioniAnonime(req);     // 🔥 RECENSIONI ANONIME
+                    RistoranteService.visualizzaRecensioniAnonime(req);     // RECENSIONI ANONIME
 
             case VISUALIZZA_RECENSIONI_GESTORE ->
                     RecensioneService.getByGestore(req);
@@ -87,38 +88,38 @@ public class ClientHandler implements Runnable {
             // ============================
             // PREFERITI
             // ============================
-            case AGGIUNGI_PREFERITO -> {
+           case AGGIUNGI_PREFERITO -> {
                 int idUtente = req.payload.get("idUtente").getAsInt();
                 int idRistorante = req.payload.get("idRistorante").getAsInt();
+                String fonte = req.payload.get("fonte").getAsString(); // THEKNIFE o UTENTE
 
-                boolean ok = PreferitiDAO.aggiungi(idUtente, idRistorante);
-                if (!ok) yield Response.error("Impossibile aggiungere ai preferiti");
+                boolean ok = PreferitiDAO.aggiungi(idUtente, idRistorante, fonte);
+
+                if (!ok)
+                    yield Response.error("Impossibile aggiungere ai preferiti");
+
                 yield Response.ok();
             }
+
+
 
             case RIMUOVI_PREFERITO -> {
                 int idUtente = req.payload.get("idUtente").getAsInt();
                 int idRistorante = req.payload.get("idRistorante").getAsInt();
 
                 boolean ok = PreferitiDAO.rimuovi(idUtente, idRistorante);
-                if (!ok) yield Response.error("Impossibile rimuovere dai preferiti");
+
+                if (!ok)
+                    yield Response.error("Impossibile rimuovere dai preferiti");
+
                 yield Response.ok();
             }
 
+
             case VISUALIZZA_PREFERITI -> {
-                int idUtente = req.payload.get("idUtente").getAsInt();
+            yield PreferitiService.visualizzaPreferiti(req);
+        }
 
-                var lista = PreferitiDAO.getPreferiti(idUtente);
-
-                var payload = new com.google.gson.JsonObject();
-                var arr = new com.google.gson.JsonArray();
-
-                for (Integer id : lista) arr.add(id);
-
-                payload.add("preferiti", arr);
-
-                yield Response.ok(payload);
-            }
 
             // ============================
             // DEFAULT

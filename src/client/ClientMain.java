@@ -94,30 +94,32 @@ public class ClientMain extends Application {
     // RICERCA RISTORANTI
     // ============================
     private void mostraRicercaRistoranti() {
-        RicercaRistorantiView view = new RicercaRistorantiView();
+            RicercaRistorantiView view = new RicercaRistorantiView();
 
-        new RicercaRistorantiController(
-                view,
-                connection,
-                this::mostraHome,
-                this::mostraDettagliRistorante
-        );
+            new RicercaRistorantiController(
+                    view,
+                    connection,
+                    this::mostraHome,
+                    (id, fonte) -> mostraDettagliRistorante(id, fonte)   // ⭐ AGGIORNATO
+            );
 
-        primaryStage.setScene(new Scene(view, 800, 600));
-        primaryStage.setTitle("Cerca Ristoranti");
-        primaryStage.show();
-    }
+            primaryStage.setScene(new Scene(view, 800, 600));
+            primaryStage.setTitle("Cerca Ristoranti");
+            primaryStage.show();
+        }
+
 
     // ============================
     // DETTAGLI RISTORANTE
     // ============================
-    private void mostraDettagliRistorante(int id) {
+   private void mostraDettagliRistorante(int id, String fonte) {
         RistoranteDettagliView view = new RistoranteDettagliView();
 
         new RistoranteDettagliController(
                 view,
                 connection,
                 id,
+                fonte, // ⭐ PASSIAMO LA FONTE
                 this::mostraRicercaRistoranti
         );
 
@@ -125,6 +127,7 @@ public class ClientMain extends Application {
         primaryStage.setTitle("Dettagli Ristorante");
         primaryStage.show();
     }
+
 
     // ============================
     // PREFERITI
@@ -135,13 +138,15 @@ public class ClientMain extends Application {
         new PreferitiController(
                 view,
                 connection,
-                this::mostraHome
+                this::mostraHome,
+                (id, fonte) -> mostraDettagliRistorante(id, fonte)   // ⭐ AGGIUNTO
         );
 
         primaryStage.setScene(new Scene(view, 600, 500));
         primaryStage.setTitle("Preferiti");
         primaryStage.show();
     }
+
 
     // ============================
     // RECENSIONI UTENTE

@@ -12,7 +12,7 @@ import java.util.List;
 public class RistoranteDAO {
 
     // ============================
-    // CERCA RISTORANTI MICHELIN
+    // CERCA RISTORANTI THEKNIFE
     // ============================
     public static List<Ristorante> cerca(String query, String tipoCucina) {
         List<Ristorante> lista = new ArrayList<>();
@@ -46,7 +46,8 @@ public class RistoranteDAO {
                         rs.getString("citta"),
                         rs.getString("nazione"),
                         rs.getBoolean("delivery"),
-                        rs.getBoolean("prenotazione")
+                        rs.getBoolean("prenotazione"),
+                        "THEKNIFE"   // ⭐ FONTE AGGIUNTA
                 ));
             }
 
@@ -61,7 +62,7 @@ public class RistoranteDAO {
     }
 
     // ============================
-    // GET BY ID (MICHELIN)
+    // GET BY ID (THEKNIFE)
     // ============================
     public static Ristorante getById(int id) {
         Ristorante r = null;
@@ -86,7 +87,8 @@ public class RistoranteDAO {
                         rs.getString("citta"),
                         rs.getString("nazione"),
                         rs.getBoolean("delivery"),
-                        rs.getBoolean("prenotazione")
+                        rs.getBoolean("prenotazione"),
+                        "THEKNIFE"   // ⭐ FONTE AGGIUNTA
                 );
             }
 

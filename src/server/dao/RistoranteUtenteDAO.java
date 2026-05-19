@@ -129,7 +129,8 @@ public class RistoranteUtenteDAO {
                         rs.getString("citta"),
                         rs.getString("nazione"),
                         rs.getBoolean("delivery"),
-                        rs.getBoolean("prenotazione")
+                        rs.getBoolean("prenotazione"),
+                        "UTENTE"   // ⭐ FONTE AGGIUNTA
                 ));
             }
 
@@ -167,7 +168,8 @@ public class RistoranteUtenteDAO {
                         rs.getString("citta"),
                         rs.getString("nazione"),
                         rs.getBoolean("delivery"),
-                        rs.getBoolean("prenotazione")
+                        rs.getBoolean("prenotazione"),
+                        "UTENTE"   // ⭐ FONTE AGGIUNTA
                 );
             }
 

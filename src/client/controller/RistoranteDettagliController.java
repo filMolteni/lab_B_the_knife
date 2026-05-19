@@ -15,16 +15,19 @@ public class RistoranteDettagliController {
     private final ClientConnection connection;
     private final Runnable onBack;
     private final int idRistorante;
+    private final String fonte; // ⭐ NUOVO
 
     public RistoranteDettagliController(RistoranteDettagliView view,
                                         ClientConnection connection,
                                         int idRistorante,
+                                        String fonte,          // ⭐ NUOVO
                                         Runnable onBack) {
 
         this.view = view;
         this.connection = connection;
         this.onBack = onBack;
         this.idRistorante = idRistorante;
+        this.fonte = fonte; // ⭐ NUOVO
 
         caricaDettagli(idRistorante);
         initHandlers();
@@ -40,7 +43,7 @@ public class RistoranteDettagliController {
     }
 
     // ============================================================
-    // ⭐ AGGIUNGI AI PREFERITI
+    // ⭐ AGGIUNGI AI PREFERITI (con fonte)
     // ============================================================
     private void aggiungiPreferito() {
         try {
@@ -49,6 +52,7 @@ public class RistoranteDettagliController {
             JsonObject payload = new JsonObject();
             payload.addProperty("idUtente", idUtente);
             payload.addProperty("idRistorante", idRistorante);
+            payload.addProperty("fonte", fonte); // ⭐ AUTOMATICO
 
             Request req = new Request(MessageType.AGGIUNGI_PREFERITO, payload);
             Response res = connection.sendRequest(req);

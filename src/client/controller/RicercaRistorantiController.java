@@ -9,17 +9,19 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import common.MessageType;
 
+import java.util.function.BiConsumer;
+
 public class RicercaRistorantiController {
 
     private final RicercaRistorantiView view;
     private final ClientConnection connection;
     private final Runnable onBack;
-    private final java.util.function.Consumer<Integer> onOpenRistorante;
+    private final BiConsumer<Integer, String> onOpenRistorante; // ⭐ AGGIORNATO
 
     public RicercaRistorantiController(RicercaRistorantiView view,
                                        ClientConnection connection,
                                        Runnable onBack,
-                                       java.util.function.Consumer<Integer> onOpenRistorante) {
+                                       BiConsumer<Integer, String> onOpenRistorante) { // ⭐ AGGIORNATO
 
         this.view = view;
         this.connection = connection;
@@ -42,7 +44,7 @@ public class RicercaRistorantiController {
             if (e.getClickCount() == 2) {
                 RistoranteRow r = view.getTabella().getSelectionModel().getSelectedItem();
                 if (r != null) {
-                    onOpenRistorante.accept(r.getId());
+                    onOpenRistorante.accept(r.getId(), r.getFonte()); // ⭐ PASSIAMO ID + FONTE
                 }
             }
         });
@@ -84,7 +86,8 @@ public class RicercaRistorantiController {
                                 o.get("id").getAsInt(),
                                 o.get("nome").getAsString(),
                                 o.get("tipo_cucina").getAsString(),
-                                o.get("indirizzo").getAsString()
+                                o.get("indirizzo").getAsString(),
+                                o.get("fonte").getAsString() // ⭐ NUOVO
                         )
                 );
             });

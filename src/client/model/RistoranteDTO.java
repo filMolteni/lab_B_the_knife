@@ -14,6 +14,9 @@ public class RistoranteDTO {
     private boolean delivery;
     private boolean prenotazione;
 
+    // NUOVO CAMPO: indica la provenienza del ristorante
+    private String fonte; // "THEKNIFE" oppure "UTENTE"
+
     public RistoranteDTO() {
         // necessario per Gson
     }
@@ -21,7 +24,8 @@ public class RistoranteDTO {
     public RistoranteDTO(int id, String nome, String indirizzo, String tipoCucina,
                          int fasciaPrezzo, double latitudine, double longitudine,
                          String citta, String nazione,
-                         boolean delivery, boolean prenotazione) {
+                         boolean delivery, boolean prenotazione,
+                         String fonte) {
 
         this.id = id;
         this.nome = nome;
@@ -34,6 +38,7 @@ public class RistoranteDTO {
         this.nazione = nazione;
         this.delivery = delivery;
         this.prenotazione = prenotazione;
+        this.fonte = fonte;
     }
 
     // ===== GETTER =====
@@ -50,6 +55,10 @@ public class RistoranteDTO {
     public boolean isDelivery() { return delivery; }
     public boolean isPrenotazione() { return prenotazione; }
 
+    public String getFonte() { return fonte; }
+    public boolean isTheKnife() { return "THEKNIFE".equalsIgnoreCase(fonte); }
+    public boolean isUtente() { return "UTENTE".equalsIgnoreCase(fonte); }
+
     // ===== SETTER =====
 
     public void setId(int id) { this.id = id; }
@@ -63,4 +72,6 @@ public class RistoranteDTO {
     public void setTipoCucina(String tipoCucina) { this.tipoCucina = tipoCucina; }
     public void setDelivery(boolean delivery) { this.delivery = delivery; }
     public void setPrenotazione(boolean prenotazione) { this.prenotazione = prenotazione; }
+
+    public void setFonte(String fonte) { this.fonte = fonte; }
 }
