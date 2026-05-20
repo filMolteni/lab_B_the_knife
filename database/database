@@ -48,6 +48,7 @@ CREATE TABLE recensioni (
   id_ristorante INT NOT NULL,
   voto INT CHECK (voto BETWEEN 1 AND 5),
   testo TEXT NOT NULL,
+  fonte VARCHAR(100) NOT NULL,
   PRIMARY KEY (id),
   KEY id_utente (id_utente),
   KEY id_ristorante (id_ristorante),
@@ -73,6 +74,7 @@ CREATE TABLE risposte (
 CREATE TABLE preferiti (
   id_utente INT NOT NULL,
   id_ristorante INT NOT NULL,
+  fonte VARCHAR(100) NOT NULL,
   PRIMARY KEY (id_utente, id_ristorante),
   KEY id_ristorante (id_ristorante),
   CONSTRAINT preferiti_ibfk_1 FOREIGN KEY (id_utente) REFERENCES utenti (id) ON DELETE CASCADE,
