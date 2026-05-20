@@ -26,6 +26,7 @@ public class RecensioniUtenteController {
         this.onGoBack = onGoBack;
 
         initHandlers();
+        loadRecensioni();
     }
 
     private void initHandlers() {
@@ -56,6 +57,8 @@ public class RecensioniUtenteController {
 
             JsonArray arr = res.getData().getAsJsonArray("recensioni");
 
+
+
             Platform.runLater(() -> {
                 view.getTabella().getItems().clear();
 
@@ -65,7 +68,7 @@ public class RecensioniUtenteController {
                     RecensioneRow row = new RecensioneRow(
                             r.get("id").getAsInt(),
                             r.get("idRistorante").getAsInt(),
-                            r.get("nomeRistorante").getAsString(),   // ⭐ LETTO DAL SERVER
+                            r.get("nomeRistorante").getAsString(),   
                             r.get("voto").getAsInt(),
                             r.get("testo").getAsString(),
                             r.get("data").getAsString(),

@@ -130,17 +130,19 @@ public class RecensioneDAO {
 
             String sql = """
                 SELECT r.id, r.id_utente, r.id_ristorante, r.voto, r.testo, r.data, r.fonte,
-                       COALESCE(ru.nome, rt.nome) AS nome_ristorante
+                COALESCE(ru.nome, rt.nome) AS nome_ristorante
                 FROM recensioni r
                 LEFT JOIN ristorantiutente ru ON r.id_ristorante = ru.id AND r.fonte = 'UTENTE'
                 LEFT JOIN ristorantitheknife rt ON r.id_ristorante = rt.id AND r.fonte = 'THEKNIFE'
                 WHERE r.id_utente = ?
                 ORDER BY r.data DESC
+
             """;
 
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setInt(1, idUtente);
-
+            
+            System.out.println("Eseguo query getByUtente con idUtente = " + idUtente);
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
