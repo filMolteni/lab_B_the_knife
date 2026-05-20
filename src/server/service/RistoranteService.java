@@ -163,13 +163,38 @@ public class RistoranteService {
             String indirizzo = req.payload.get("indirizzo").getAsString();
             String tipoCucina = req.payload.get("tipo_cucina").getAsString();
 
-            int fasciaPrezzo = req.payload.has("fascia_prezzo") ? req.payload.get("fascia_prezzo").getAsInt() : 0;
-            boolean delivery = req.payload.has("delivery") && req.payload.get("delivery").getAsBoolean();
-            boolean prenotazione = req.payload.has("prenotazione") && req.payload.get("prenotazione").getAsBoolean();
+            int fasciaPrezzo = req.payload.has("fascia_prezzo") && !req.payload.get("fascia_prezzo").isJsonNull()
+                    ? req.payload.get("fascia_prezzo").getAsInt()
+                    : 0;
+
+            String citta = req.payload.has("citta") && !req.payload.get("citta").isJsonNull()
+                    ? req.payload.get("citta").getAsString()
+                    : "";
+
+            String nazione = req.payload.has("nazione") && !req.payload.get("nazione").isJsonNull()
+                    ? req.payload.get("nazione").getAsString()
+                    : "";
+
+            double lat = req.payload.has("latitudine") && !req.payload.get("latitudine").isJsonNull()
+                    ? req.payload.get("latitudine").getAsDouble()
+                    : 0.0;
+
+            double lon = req.payload.has("longitudine") && !req.payload.get("longitudine").isJsonNull()
+                    ? req.payload.get("longitudine").getAsDouble()
+                    : 0.0;
+
+            boolean delivery = req.payload.has("delivery") && !req.payload.get("delivery").isJsonNull()
+                    ? req.payload.get("delivery").getAsBoolean()
+                    : false;
+
+            boolean prenotazione = req.payload.has("prenotazione") && !req.payload.get("prenotazione").isJsonNull()
+                    ? req.payload.get("prenotazione").getAsBoolean()
+                    : false;
 
             boolean ok = RistoranteUtenteDAO.modifica(
                     id, nome, indirizzo, tipoCucina,
-                    fasciaPrezzo, delivery, prenotazione
+                    fasciaPrezzo, citta, nazione, lat, lon,
+                    delivery, prenotazione
             );
 
             if (!ok)
@@ -178,9 +203,11 @@ public class RistoranteService {
             return Response.ok();
 
         } catch (Exception e) {
+            e.printStackTrace();
             return Response.error("Errore modifica ristorante: " + e.getMessage());
         }
     }
+
 
     // ============================================================
     // ELIMINA RISTORANTE

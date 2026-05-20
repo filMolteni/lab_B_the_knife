@@ -53,35 +53,43 @@ public class RistoranteUtenteDAO {
     // ============================================================
     // MODIFICA RISTORANTE UTENTE
     // ============================================================
-    public static boolean modifica(int id, String nome, String indirizzo,
-                                   String tipoCucina, int fasciaPrezzo,
-                                   boolean delivery, boolean prenotazione) {
+   public static boolean modifica(int id, String nome, String indirizzo,
+                               String tipoCucina, int fasciaPrezzo,
+                               String citta, String nazione,
+                               double lat, double lon,
+                               boolean delivery, boolean prenotazione) {
 
-        String sql = """
-            UPDATE RistorantiUtente
-            SET nome = ?, indirizzo = ?, tipo_cucina = ?, fascia_prezzo = ?,
-                delivery = ?, prenotazione = ?
-            WHERE id = ?
-        """;
+    String sql = """
+        UPDATE RistorantiUtente
+        SET nome = ?, indirizzo = ?, tipo_cucina = ?, fascia_prezzo = ?,
+            citta = ?, nazione = ?, latitudine = ?, longitudine = ?,
+            delivery = ?, prenotazione = ?
+        WHERE id = ?
+    """;
 
-        try (Connection conn = DBConnectionPool.get();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+    try (Connection conn = DBConnectionPool.get();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setString(1, nome);
-            ps.setString(2, indirizzo);
-            ps.setString(3, tipoCucina);
-            ps.setInt(4, fasciaPrezzo);
-            ps.setBoolean(5, delivery);
-            ps.setBoolean(6, prenotazione);
-            ps.setInt(7, id);
+        ps.setString(1, nome);
+        ps.setString(2, indirizzo);
+        ps.setString(3, tipoCucina);
+        ps.setInt(4, fasciaPrezzo);
+        ps.setString(5, citta);
+        ps.setString(6, nazione);
+        ps.setDouble(7, lat);
+        ps.setDouble(8, lon);
+        ps.setBoolean(9, delivery);
+        ps.setBoolean(10, prenotazione);
+        ps.setInt(11, id);
 
-            return ps.executeUpdate() > 0;
+        return ps.executeUpdate() > 0;
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
+    } catch (Exception e) {
+        e.printStackTrace();
+        return false;
     }
+}
+
 
     // ============================================================
     // ELIMINA RISTORANTE UTENTE

@@ -61,8 +61,9 @@ public class ClientHandler implements Runnable {
             // RISTORANTI (MICHELIN + UTENTE)
             // ============================
             case CERCA_RISTORANTI -> RistoranteService.cerca(req);
-            case VISUALIZZA -> RistoranteService.visualizza(req);          // 🔥 DETTAGLI RISTORANTE
+            case VISUALIZZA -> RistoranteService.visualizza(req);         
             case VISUALIZZA_UTENTE -> RistoranteService.visualizzaUtente(req);
+           
 
             case AGGIUNGI_RISTORANTE -> RistoranteService.aggiungi(req);
             case MODIFICA_RISTORANTE -> RistoranteService.modifica(req);

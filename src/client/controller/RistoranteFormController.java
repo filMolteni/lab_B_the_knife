@@ -82,12 +82,15 @@ public class RistoranteFormController {
         Request req;
 
         if (idRistorante == null) {
+            // AGGIUNTA
             params.addProperty("idGestore", UtenteDTO.getUtenteLoggato().getId());
             req = new Request(MessageType.AGGIUNGI_RISTORANTE, params);
         } else {
+            // ⭐ MODIFICA
             params.addProperty("id", idRistorante);
             req = new Request(MessageType.MODIFICA_RISTORANTE, params);
         }
+
 
         try {
             Response res = connection.sendRequest(req);
