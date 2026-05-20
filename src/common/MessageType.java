@@ -17,7 +17,6 @@ public enum MessageType {
     VISUALIZZA_RIEPILOGO_GESTORE,
     VISUALIZZA_UTENTE,              // usato per i dettagli lato utente loggato
     
-    VISUALIZZA_RISTORANTE_UTENTE,
     VISUALIZZA_RECENSIONI_RISTORANTE,
     VISUALIZZA_RISTORANTE,
 

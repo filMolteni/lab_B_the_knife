@@ -136,10 +136,11 @@ public class GestoreRistorantiController {
                 return;
             }
 
+            // 1️⃣ CHIEDO I DETTAGLI COMPLETI
             JsonObject params = new JsonObject();
             params.addProperty("id", selected.getId());
 
-            Request req = new Request(MessageType.VISUALIZZA_RISTORANTE_UTENTE, params);
+            Request req = new Request(MessageType.VISUALIZZA_UTENTE, params);
 
             Response res;
             try {
@@ -156,6 +157,7 @@ public class GestoreRistorantiController {
 
             JsonObject r = res.getData();
 
+            // 2️⃣ APRO IL FORM PRECOMPILATO
             RistoranteFormView formView = new RistoranteFormView();
 
             formView.setValues(
@@ -171,21 +173,23 @@ public class GestoreRistorantiController {
                     r.get("prenotazione").getAsBoolean()
             );
 
+            // 3️⃣ APRO IL POPUP
             Stage stage = new Stage();
-            stage.setTitle("Aggiungi Ristorante");
+            stage.setTitle("Modifica Ristorante");
 
+            // 4️⃣ QUI PASSO L’ID → IL FORM INVIERÀ MODIFICA_RISTORANTE
             new RistoranteFormController(
                     formView,
                     connection,
                     this::loadRiepilogo,
-                    null,
+                    selected.getId(),   // ⭐ ID DEL RISTORANTE DA MODIFICARE
                     stage
             );
 
             stage.setScene(new Scene(formView, 600, 600));
             stage.show();
+        }
 
-    }
 
 
     // ============================
