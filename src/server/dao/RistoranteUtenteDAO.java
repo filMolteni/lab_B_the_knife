@@ -11,9 +11,9 @@ import java.util.List;
 
 public class RistoranteUtenteDAO {
 
-    // ============================
+    // ============================================================
     // AGGIUNGI RISTORANTE UTENTE
-    // ============================
+    // ============================================================
     public static boolean aggiungi(int idGestore, String nome, String indirizzo,
                                    String tipoCucina, int fasciaPrezzo,
                                    String citta, String nazione,
@@ -50,9 +50,9 @@ public class RistoranteUtenteDAO {
         }
     }
 
-    // ============================
+    // ============================================================
     // MODIFICA RISTORANTE UTENTE
-    // ============================
+    // ============================================================
     public static boolean modifica(int id, String nome, String indirizzo,
                                    String tipoCucina, int fasciaPrezzo,
                                    boolean delivery, boolean prenotazione) {
@@ -83,9 +83,9 @@ public class RistoranteUtenteDAO {
         }
     }
 
-    // ============================
+    // ============================================================
     // ELIMINA RISTORANTE UTENTE
-    // ============================
+    // ============================================================
     public static boolean elimina(int id) {
 
         String sql = "DELETE FROM RistorantiUtente WHERE id = ?";
@@ -102,9 +102,9 @@ public class RistoranteUtenteDAO {
         }
     }
 
-    // ============================
+    // ============================================================
     // GET RISTORANTI DI UN GESTORE
-    // ============================
+    // ============================================================
     public static List<Ristorante> getByGestore(int idGestore) {
 
         List<Ristorante> lista = new ArrayList<>();
@@ -130,7 +130,7 @@ public class RistoranteUtenteDAO {
                         rs.getString("nazione"),
                         rs.getBoolean("delivery"),
                         rs.getBoolean("prenotazione"),
-                        "UTENTE"   // ⭐ FONTE AGGIUNTA
+                        "UTENTE"   // ⭐ FONTE
                 ));
             }
 
@@ -143,9 +143,9 @@ public class RistoranteUtenteDAO {
         }
     }
 
-    // ============================
+    // ============================================================
     // GET BY ID
-    // ============================
+    // ============================================================
     public static Ristorante getById(int id) {
 
         String sql = "SELECT * FROM RistorantiUtente WHERE id = ?";
@@ -169,7 +169,7 @@ public class RistoranteUtenteDAO {
                         rs.getString("nazione"),
                         rs.getBoolean("delivery"),
                         rs.getBoolean("prenotazione"),
-                        "UTENTE"   // ⭐ FONTE AGGIUNTA
+                        "UTENTE"
                 );
             }
 

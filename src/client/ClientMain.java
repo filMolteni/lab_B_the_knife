@@ -173,7 +173,7 @@ public class ClientMain extends Application {
 
 
 
-        
+
         RecensioniRistoranteController controller =
                 new RecensioniRistoranteController(
                         view,
@@ -195,19 +195,25 @@ public class ClientMain extends Application {
     // GESTIONE RISTORANTI (GESTORE)
     // ============================
     private void mostraGestioneRistoranti() {
+
         GestoreRistorantiView view = new GestoreRistorantiView();
 
-        new GestoreRistorantiController(
+        // ⭐ CREA IL CONTROLLER E SALVALO IN UNA VARIABILE
+        GestoreRistorantiController controller = new GestoreRistorantiController(
                 view,
                 connection,
                 this::mostraHome,
                 this::mostraDettagliRistorante
         );
 
+        // ⭐ CARICA SUBITO I RISTORANTI DEL GESTORE
+        controller.loadRiepilogo();
+
         primaryStage.setScene(new Scene(view, 800, 600));
         primaryStage.setTitle("Gestione Ristoranti");
         primaryStage.show();
     }
+
 
     public static void main(String[] args) {
         launch(args);

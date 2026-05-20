@@ -14,9 +14,9 @@ import java.util.List;
 
 public class RistoranteService {
 
-    // ============================
-    // CERCA RISTORANTI
-    // ============================
+    // ============================================================
+    // CERCA RISTORANTI (THEKNIFE)
+    // ============================================================
     public static Response cerca(Request req) {
         try {
             String query = req.payload.get("query").getAsString();
@@ -34,10 +34,12 @@ public class RistoranteService {
                 o.addProperty("indirizzo", r.getIndirizzo());
                 o.addProperty("citta", r.getCitta());
                 o.addProperty("nazione", r.getNazione());
+                o.addProperty("latitudine", r.getLatitudine());
+                o.addProperty("longitudine", r.getLongitudine());
                 o.addProperty("tipo_cucina", r.getTipoCucina());
                 o.addProperty("fascia_prezzo", r.getFasciaPrezzo());
-
-                // ⭐ NUOVO
+                o.addProperty("delivery", r.isDelivery());
+                o.addProperty("prenotazione", r.isPrenotazione());
                 o.addProperty("fonte", "THEKNIFE");
 
                 arr.add(o);
@@ -53,16 +55,14 @@ public class RistoranteService {
         }
     }
 
-
-    // ============================
-    // VISUALIZZA DETTAGLI RISTORANTE (USATO DAL CLIENT)
-    // ============================
+    // ============================================================
+    // VISUALIZZA DETTAGLI RISTORANTE (THEKNIFE)
+    // ============================================================
     public static Response visualizza(Request req) {
         try {
             int id = req.payload.get("id").getAsInt();
 
             Ristorante r = RistoranteDAO.getById(id);
-
             if (r == null)
                 return Response.error("Ristorante non trovato");
 
@@ -78,8 +78,6 @@ public class RistoranteService {
             o.addProperty("fascia_prezzo", r.getFasciaPrezzo());
             o.addProperty("delivery", r.isDelivery());
             o.addProperty("prenotazione", r.isPrenotazione());
-
-            // ⭐ NUOVO
             o.addProperty("fonte", "THEKNIFE");
 
             return Response.ok(o);
@@ -89,16 +87,14 @@ public class RistoranteService {
         }
     }
 
-
-    // ============================
-    // VISUALIZZA DETTAGLI (UTENTE LOGGATO)
-    // ============================
+    // ============================================================
+    // VISUALIZZA DETTAGLI RISTORANTE UTENTE
+    // ============================================================
     public static Response visualizzaUtente(Request req) {
         try {
             int id = req.payload.get("id").getAsInt();
 
             Ristorante r = RistoranteUtenteDAO.getById(id);
-
             if (r == null)
                 return Response.error("Ristorante non trovato");
 
@@ -114,8 +110,6 @@ public class RistoranteService {
             o.addProperty("fascia_prezzo", r.getFasciaPrezzo());
             o.addProperty("delivery", r.isDelivery());
             o.addProperty("prenotazione", r.isPrenotazione());
-
-            // ⭐ NUOVO
             o.addProperty("fonte", "UTENTE");
 
             return Response.ok(o);
@@ -125,23 +119,23 @@ public class RistoranteService {
         }
     }
 
-
-    // ============================
-    // AGGIUNGI RISTORANTE
-    // ============================
+    // ============================================================
+    // AGGIUNGI RISTORANTE UTENTE
+    // ============================================================
     public static Response aggiungi(Request req) {
         try {
             int idGestore = req.payload.get("idGestore").getAsInt();
             String nome = req.payload.get("nome").getAsString();
             String indirizzo = req.payload.get("indirizzo").getAsString();
             String tipoCucina = req.payload.get("tipo_cucina").getAsString();
-            int fasciaPrezzo = req.payload.get("fascia_prezzo").getAsInt();
-            String citta = req.payload.get("citta").getAsString();
-            String nazione = req.payload.get("nazione").getAsString();
-            double lat = req.payload.get("latitudine").getAsDouble();
-            double lon = req.payload.get("longitudine").getAsDouble();
-            boolean delivery = req.payload.get("delivery").getAsBoolean();
-            boolean prenotazione = req.payload.get("prenotazione").getAsBoolean();
+
+            int fasciaPrezzo = req.payload.has("fascia_prezzo") ? req.payload.get("fascia_prezzo").getAsInt() : 0;
+            String citta = req.payload.has("citta") ? req.payload.get("citta").getAsString() : "";
+            String nazione = req.payload.has("nazione") ? req.payload.get("nazione").getAsString() : "";
+            double lat = req.payload.has("latitudine") ? req.payload.get("latitudine").getAsDouble() : 0.0;
+            double lon = req.payload.has("longitudine") ? req.payload.get("longitudine").getAsDouble() : 0.0;
+            boolean delivery = req.payload.has("delivery") && req.payload.get("delivery").getAsBoolean();
+            boolean prenotazione = req.payload.has("prenotazione") && req.payload.get("prenotazione").getAsBoolean();
 
             boolean ok = RistoranteUtenteDAO.aggiungi(
                     idGestore, nome, indirizzo, tipoCucina,
@@ -149,7 +143,8 @@ public class RistoranteService {
                     delivery, prenotazione
             );
 
-            if (!ok) return Response.error("Impossibile aggiungere ristorante");
+            if (!ok)
+                return Response.error("Impossibile aggiungere ristorante");
 
             return Response.ok();
 
@@ -158,25 +153,27 @@ public class RistoranteService {
         }
     }
 
-    // ============================
-    // MODIFICA RISTORANTE
-    // ============================
+    // ============================================================
+    // MODIFICA RISTORANTE UTENTE
+    // ============================================================
     public static Response modifica(Request req) {
         try {
             int id = req.payload.get("id").getAsInt();
             String nome = req.payload.get("nome").getAsString();
             String indirizzo = req.payload.get("indirizzo").getAsString();
             String tipoCucina = req.payload.get("tipo_cucina").getAsString();
-            int fasciaPrezzo = req.payload.get("fascia_prezzo").getAsInt();
-            boolean delivery = req.payload.get("delivery").getAsBoolean();
-            boolean prenotazione = req.payload.get("prenotazione").getAsBoolean();
+
+            int fasciaPrezzo = req.payload.has("fascia_prezzo") ? req.payload.get("fascia_prezzo").getAsInt() : 0;
+            boolean delivery = req.payload.has("delivery") && req.payload.get("delivery").getAsBoolean();
+            boolean prenotazione = req.payload.has("prenotazione") && req.payload.get("prenotazione").getAsBoolean();
 
             boolean ok = RistoranteUtenteDAO.modifica(
                     id, nome, indirizzo, tipoCucina,
                     fasciaPrezzo, delivery, prenotazione
             );
 
-            if (!ok) return Response.error("Impossibile modificare ristorante");
+            if (!ok)
+                return Response.error("Impossibile modificare ristorante");
 
             return Response.ok();
 
@@ -185,16 +182,17 @@ public class RistoranteService {
         }
     }
 
-    // ============================
+    // ============================================================
     // ELIMINA RISTORANTE
-    // ============================
+    // ============================================================
     public static Response elimina(Request req) {
         try {
             int id = req.payload.get("id").getAsInt();
 
             boolean ok = RistoranteUtenteDAO.elimina(id);
 
-            if (!ok) return Response.error("Impossibile eliminare ristorante");
+            if (!ok)
+                return Response.error("Impossibile eliminare ristorante");
 
             return Response.ok();
 
@@ -203,44 +201,41 @@ public class RistoranteService {
         }
     }
 
-    // ============================
+    // ============================================================
     // RIEPILOGO GESTORE
-    // ============================
+    // ============================================================
     public static Response riepilogoGestore(Request req) {
-    try {
-        int idGestore = req.payload.get("idGestore").getAsInt();
+        try {
+            int idGestore = req.payload.get("idGestore").getAsInt();
 
-        List<Ristorante> lista = RistoranteUtenteDAO.getByGestore(idGestore);
+            List<Ristorante> lista = RistoranteUtenteDAO.getByGestore(idGestore);
 
-        JsonArray arr = new JsonArray();
-        for (Ristorante r : lista) {
-            JsonObject o = new JsonObject();
-            o.addProperty("id", r.getId());
-            o.addProperty("nome", r.getNome());
-            o.addProperty("indirizzo", r.getIndirizzo());
-            o.addProperty("citta", r.getCitta());
-            o.addProperty("nazione", r.getNazione());
+            JsonArray arr = new JsonArray();
+            for (Ristorante r : lista) {
+                JsonObject o = new JsonObject();
+                o.addProperty("id", r.getId());
+                o.addProperty("nome", r.getNome());
+                o.addProperty("indirizzo", r.getIndirizzo());
+                o.addProperty("citta", r.getCitta());
+                o.addProperty("nazione", r.getNazione());
+                o.addProperty("fonte", "UTENTE");
 
-            // ⭐ NUOVO
-            o.addProperty("fonte", "UTENTE");
+                arr.add(o);
+            }
 
-            arr.add(o);
+            JsonObject payload = new JsonObject();
+            payload.add("ristoranti", arr);
+
+            return Response.ok(payload);
+
+        } catch (Exception e) {
+            return Response.error("Errore riepilogo gestore: " + e.getMessage());
         }
-
-        JsonObject payload = new JsonObject();
-        payload.add("ristoranti", arr);
-
-        return Response.ok(payload);
-
-    } catch (Exception e) {
-        return Response.error("Errore riepilogo gestore: " + e.getMessage());
     }
-}
 
-
-    // ============================
+    // ============================================================
     // RECENSIONI ANONIME
-    // ============================
+    // ============================================================
     public static Response visualizzaRecensioniAnonime(Request req) {
         try {
             int idRistorante = req.payload.get("idRistorante").getAsInt();

@@ -7,6 +7,7 @@ import client.net.Request;
 import client.net.Response;
 import com.google.gson.JsonObject;
 import common.MessageType;
+import javafx.stage.Stage;
 
 public class RistoranteFormController {
 
@@ -15,18 +16,24 @@ public class RistoranteFormController {
     private final Runnable onSuccess;
     private final Integer idRistorante;
 
-    public RistoranteFormController(RistoranteFormView view,
-                                    ClientConnection connection,
-                                    Runnable onSuccess,
-                                    Integer idRistorante) {
+    private final Stage stage;
 
-        this.view = view;
-        this.connection = connection;
-        this.onSuccess = onSuccess;
-        this.idRistorante = idRistorante;
+        public RistoranteFormController(
+                RistoranteFormView view,
+                ClientConnection connection,
+                Runnable onSuccess,
+                Integer idRistorante,
+                Stage stage) {
 
-        initHandlers();
-    }
+            this.view = view;
+            this.connection = connection;
+            this.onSuccess = onSuccess;
+            this.idRistorante = idRistorante;
+            this.stage = stage;
+
+            initHandlers();
+        }
+
 
     private void initHandlers() {
 
@@ -87,10 +94,16 @@ public class RistoranteFormController {
 
             if (res.isSuccess()) {
                 System.out.println("Operazione completata");
-                onSuccess.run();
-            } else {
-                System.out.println("Errore: " + res.getMessage());
+
+                // Aggiorna la tabella principale
+                if (onSuccess != null)
+                    onSuccess.run();
+
+                // Chiudi il popup
+                if (stage != null)
+                    stage.close();
             }
+
 
         } catch (Exception ex) {
             ex.printStackTrace();
