@@ -2,6 +2,7 @@ package client.controller;
 
 import client.gui.RecensioniUtenteView;
 import client.model.UtenteDTO;
+import client.gui.ModificaRecensioneDialog;
 import client.gui.RecensioneRow;
 import client.net.ClientConnection;
 import client.net.Request;
@@ -33,12 +34,56 @@ public class RecensioniUtenteController {
 
         view.getBtnIndietro().setOnAction(e -> onGoBack.run());
 
-        view.getBtnModifica().setOnAction(e -> {
-            System.out.println("Funzione modifica non implementata nella view");
-        });
+         view.getBtnModifica().setOnAction(e -> modificaRecensione());
 
         view.getBtnElimina().setOnAction(e -> eliminaRecensione());
     }
+
+    private void modificaRecensione() {
+
+    RecensioneRow selected = view.getTabella().getSelectionModel().getSelectedItem();
+
+    if (selected == null) {
+        System.out.println("Nessuna recensione selezionata");
+        return;
+    }
+
+    // Apri popup
+    ModificaRecensioneDialog dialog = new ModificaRecensioneDialog(
+            selected.getCommento(),
+            selected.getVoto()
+    );
+
+    dialog.show();
+
+    if (!dialog.isConfermato()) {
+        return;
+    }
+
+    // Prepara richiesta
+    JsonObject params = new JsonObject();
+    params.addProperty("idRecensione", selected.getId());
+    params.addProperty("voto", dialog.getVoto());
+    params.addProperty("testo", dialog.getCommento());
+
+    Request req = new Request(MessageType.MODIFICA_RECENSIONE, params);
+
+    try {
+        Response res = connection.sendRequest(req);
+
+        if (res.isSuccess()) {
+            System.out.println("Recensione modificata");
+            loadRecensioni();
+        } else {
+            System.out.println("Errore modifica: " + res.getMessage());
+        }
+
+    } catch (Exception ex) {
+        ex.printStackTrace();
+        System.out.println("Errore di connessione al server");
+    }
+}
+
 
     public void loadRecensioni() {
 
