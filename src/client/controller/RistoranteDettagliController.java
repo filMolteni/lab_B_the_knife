@@ -15,19 +15,19 @@ public class RistoranteDettagliController {
     private final ClientConnection connection;
     private final Runnable onBack;
     private final int idRistorante;
-    private final String fonte; // ⭐ NUOVO
+    private final String fonte; 
 
     public RistoranteDettagliController(RistoranteDettagliView view,
                                         ClientConnection connection,
                                         int idRistorante,
-                                        String fonte,          // ⭐ NUOVO
+                                        String fonte,         
                                         Runnable onBack) {
 
         this.view = view;
         this.connection = connection;
         this.onBack = onBack;
         this.idRistorante = idRistorante;
-        this.fonte = fonte; // ⭐ NUOVO
+        this.fonte = fonte; 
 
         caricaDettagli(idRistorante);
         initHandlers();
@@ -157,7 +157,13 @@ public class RistoranteDettagliController {
             JsonObject payload = new JsonObject();
             payload.addProperty("idRistorante", idRistorante);
 
-            Request req = new Request(MessageType.VISUALIZZA_RECENSIONI_ANONIME, payload);
+            boolean utenteLoggato = UtenteDTO.getUtenteLoggato() != null;
+
+            MessageType tipo = utenteLoggato
+                    ? MessageType.VISUALIZZA_RECENSIONI_NON_ANONIME
+                    : MessageType.VISUALIZZA_RECENSIONI_ANONIME;
+
+            Request req = new Request(tipo, payload);
             Response res = connection.sendRequest(req);
 
             if (res == null || !res.isOk()) {
@@ -170,8 +176,28 @@ public class RistoranteDettagliController {
 
             arr.forEach(el -> {
                 JsonObject r = el.getAsJsonObject();
-                sb.append("⭐ ").append(r.get("voto").getAsInt()).append("/5\n");
-                sb.append(r.get("testo").getAsString()).append("\n\n");
+
+                // ⭐ Nome utente solo se presente
+                if (utenteLoggato && r.has("nomeUtente") && !r.get("nomeUtente").isJsonNull()) {
+                    sb.append("👤 ").append(r.get("nomeUtente").getAsString()).append("\n");
+                }
+
+                // ⭐ Voto (sempre presente)
+                if (r.has("voto")) {
+                    sb.append("⭐ ").append(r.get("voto").getAsInt()).append("/5\n");
+                }
+
+                // ⭐ Testo (sempre presente)
+                if (r.has("testo")) {
+                    sb.append(r.get("testo").getAsString()).append("\n");
+                }
+
+                // ⭐ Data (potrebbe NON esserci → controllo)
+                if (r.has("data") && !r.get("data").isJsonNull()) {
+                    sb.append("📅 ").append(r.get("data").getAsString()).append("\n");
+                }
+
+                sb.append("\n");
             });
 
             view.getAreaRecensioni().setText(sb.toString());
@@ -180,4 +206,7 @@ public class RistoranteDettagliController {
             e.printStackTrace();
         }
     }
+
+
+
 }

@@ -78,11 +78,13 @@ public class ClientHandler implements Runnable {
             
             
             case VISUALIZZA_RECENSIONI_UTENTE ->
-                            RecensioneService.getByRistorante(req);
+                    RecensioneService.getByRistorante(req);
 
 
             case VISUALIZZA_RECENSIONI_ANONIME ->
                     RistoranteService.visualizzaRecensioniAnonime(req);     // RECENSIONI ANONIME
+            case VISUALIZZA_RECENSIONI_NON_ANONIME ->
+                    RecensioneService.getNonAnonime(req);
 
             case VISUALIZZA_RECENSIONI_GESTORE ->
                     RecensioneService.getByGestore(req);
