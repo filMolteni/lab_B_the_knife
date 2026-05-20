@@ -61,6 +61,22 @@ public class RistoranteDAO {
         return lista;
     }
 
+    public static boolean esisteUtente(int idRistorante) {
+    try (Connection conn = DBConnectionPool.get()) {
+        String sql = "SELECT 1 FROM ristorantiutente WHERE id = ? LIMIT 1";
+        PreparedStatement ps = conn.prepareStatement(sql);
+        ps.setInt(1, idRistorante);
+
+        ResultSet rs = ps.executeQuery();
+        return rs.next();
+
+    } catch (Exception e) {
+        e.printStackTrace();
+        return false;
+    }
+}
+
+
     // ============================
     // GET BY ID (THEKNIFE)
     // ============================

@@ -97,7 +97,7 @@ public class RistoranteDettagliController {
             Response res = connection.sendRequest(req);
 
             if (res == null) {
-                System.out.println("❌ Nessuna risposta dal server");
+                System.out.println(" Nessuna risposta dal server");
                 return;
             }
 

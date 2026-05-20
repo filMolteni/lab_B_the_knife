@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import common.Request;
 import common.Response;
 import server.dao.RecensioneDAO;
+import server.dao.RistoranteDAO;
 import server.model.Recensione;
 
 import java.util.List;
@@ -15,30 +16,38 @@ public class RecensioneService {
     // AGGIUNGI RECENSIONE
     // ============================
     public static Response aggiungi(Request req) {
-        try {
-            JsonObject p = req.payload;
+    try {
+        JsonObject p = req.payload;
 
-            int idUtente = p.get("idUtente").getAsInt();
-            int idRistorante = p.get("idRistorante").getAsInt();
-            int voto = p.get("voto").getAsInt();
-            String testo = p.get("testo").getAsString();
-            String fonte = p.get("fonte").getAsString();
+        int idUtente = p.get("idUtente").getAsInt();
+        int idRistorante = p.get("idRistorante").getAsInt();
+        int voto = p.get("voto").getAsInt();
+        String testo = p.get("testo").getAsString();
 
-            if (RecensioneDAO.recensioneEsiste(idUtente, idRistorante)) {
-                return Response.error("Hai già recensito questo ristorante.");
-            }
-
-            boolean ok = RecensioneDAO.aggiungi(idUtente, idRistorante, voto, testo, fonte);
-
-            if (!ok)
-                return Response.error("Impossibile aggiungere recensione");
-
-            return Response.ok();
-
-        } catch (Exception e) {
-            return Response.error("Errore aggiunta recensione: " + e.getMessage());
+        // ⭐ Determina automaticamente la fonte
+        String fonte;
+        if (RistoranteDAO.esisteUtente(idRistorante)) {
+            fonte = "UTENTE";
+        } else {
+            fonte = "THEKNIFE";
         }
+
+        if (RecensioneDAO.recensioneEsiste(idUtente, idRistorante)) {
+            return Response.error("Hai già recensito questo ristorante.");
+        }
+
+        boolean ok = RecensioneDAO.aggiungi(idUtente, idRistorante, voto, testo, fonte);
+
+        if (!ok)
+            return Response.error("Impossibile aggiungere recensione");
+
+        return Response.ok();
+
+    } catch (Exception e) {
+        return Response.error("Errore aggiunta recensione: " + e.getMessage());
     }
+}
+
 
     // ============================
     // MODIFICA RECENSIONE
