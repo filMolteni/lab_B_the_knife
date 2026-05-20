@@ -29,10 +29,8 @@ public class RegisterController {
 
     private void initHandlers() {
 
-        // TORNA INDIETRO
         view.getBtnIndietro().setOnAction(e -> onGoBack.run());
 
-        // REGISTRAZIONE
         view.getBtnRegistrati().setOnAction(e -> doRegister());
     }
 
@@ -43,7 +41,8 @@ public class RegisterController {
         String password = view.getTxtPassword().getText().trim();
         String conferma = view.getTxtConferma().getText().trim();
 
-        // VALIDAZIONI BASE
+        String ruolo = view.getChkGestore().isSelected() ? "GESTORE" : "CLIENTE";
+
         if (username.isEmpty() || email.isEmpty() || password.isEmpty() || conferma.isEmpty()) {
             System.out.println("Compila tutti i campi");
             return;
@@ -54,11 +53,11 @@ public class RegisterController {
             return;
         }
 
-        // COSTRUZIONE PARAMETRI JSON
         JsonObject params = new JsonObject();
         params.addProperty("username", username);
         params.addProperty("email", email);
         params.addProperty("password", password);
+        params.addProperty("ruolo", ruolo);
 
         Request req = new Request(MessageType.REGISTRAZIONE, params);
 
@@ -67,7 +66,7 @@ public class RegisterController {
 
             if (res.isSuccess()) {
                 System.out.println("Registrazione completata");
-                onRegisterSuccess.run();  // torna al login
+                onRegisterSuccess.run();
             } else {
                 System.out.println("Errore registrazione: " + res.getMessage());
             }

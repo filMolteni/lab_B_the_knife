@@ -2,10 +2,7 @@ package client.gui;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -18,6 +15,8 @@ public class RegisterView extends BorderPane {
     private PasswordField txtPassword;
     private PasswordField txtConferma;
 
+    private CheckBox chkGestore;
+
     private Button btnRegistrati;
     private Button btnIndietro;
 
@@ -27,9 +26,6 @@ public class RegisterView extends BorderPane {
 
     private void creaLayout() {
 
-        // ============================
-        // TITOLO
-        // ============================
         Label titolo = new Label("Registrazione Utente");
         titolo.setFont(new Font(26));
         titolo.setPadding(new Insets(20, 0, 20, 0));
@@ -38,9 +34,6 @@ public class RegisterView extends BorderPane {
         topBox.setAlignment(Pos.CENTER);
         this.setTop(topBox);
 
-        // ============================
-        // FORM
-        // ============================
         GridPane form = new GridPane();
         form.setPadding(new Insets(20));
         form.setHgap(10);
@@ -50,6 +43,7 @@ public class RegisterView extends BorderPane {
         txtEmail = new TextField();
         txtPassword = new PasswordField();
         txtConferma = new PasswordField();
+        chkGestore = new CheckBox("Registrati come gestore");
 
         form.add(new Label("Username:"), 0, 0);
         form.add(txtUsername, 1, 0);
@@ -63,11 +57,10 @@ public class RegisterView extends BorderPane {
         form.add(new Label("Conferma Password:"), 0, 3);
         form.add(txtConferma, 1, 3);
 
+        form.add(chkGestore, 1, 4);
+
         this.setCenter(form);
 
-        // ============================
-        // BOTTONI
-        // ============================
         btnIndietro = new Button("Indietro");
         btnIndietro.setPrefWidth(120);
 
@@ -80,21 +73,16 @@ public class RegisterView extends BorderPane {
 
         this.setBottom(bottomBox);
 
-        // ============================
-        // STILE GENERALE
-        // ============================
         this.setPadding(new Insets(15));
         this.setStyle("-fx-background-color: #f8f8f8;");
     }
-
-    // ============================
-    // GETTER PER IL CONTROLLER
-    // ============================
 
     public TextField getTxtUsername() { return txtUsername; }
     public TextField getTxtEmail() { return txtEmail; }
     public PasswordField getTxtPassword() { return txtPassword; }
     public PasswordField getTxtConferma() { return txtConferma; }
+
+    public CheckBox getChkGestore() { return chkGestore; }
 
     public Button getBtnRegistrati() { return btnRegistrati; }
     public Button getBtnIndietro() { return btnIndietro; }

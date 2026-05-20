@@ -171,6 +171,9 @@ public class ClientMain extends Application {
     private void mostraRecensioniRicevute() {
         RecensioniRistoranteView view = new RecensioniRistoranteView();
 
+
+
+        
         RecensioniRistoranteController controller =
                 new RecensioniRistoranteController(
                         view,
