@@ -11,7 +11,7 @@ public class RecensioneRistoranteRow {
     private final SimpleIntegerProperty voto;
     private final SimpleStringProperty commento;
     private final SimpleStringProperty data;
-    private final SimpleStringProperty fonte; // ⭐ NUOVO
+    private final SimpleStringProperty fonte; 
 
     public RecensioneRistoranteRow(int id, int idRistorante, String utente,
                                    int voto, String commento, String data, String fonte) {

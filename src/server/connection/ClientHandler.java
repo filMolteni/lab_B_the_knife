@@ -70,6 +70,9 @@ public class ClientHandler implements Runnable {
             case ELIMINA_RISTORANTE -> RistoranteService.elimina(req);
             case VISUALIZZA_RIEPILOGO_GESTORE -> RistoranteService.riepilogoGestore(req);
 
+            case CONTROLLA_PROPRIETA_RISTORANTE -> RistoranteService.controllaProprieta(req);
+
+
             // ============================
             // RECENSIONI
             // ============================

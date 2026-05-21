@@ -126,37 +126,47 @@ public class RecensioneService {
     }
 
        public static Response getNonAnonime(Request req) {
-    try {
-        int idRistorante = req.payload.get("idRistorante").getAsInt();
+        try {
+            int idRistorante = req.payload.get("idRistorante").getAsInt();
 
-        // ⭐ FUNZIONE CORRETTA
-        List<Recensione> lista = RecensioneDAO.getNonAnonimeByRistorante(idRistorante);
+            // ⭐ Recupera recensioni NON anonime
+            List<Recensione> lista = RecensioneDAO.getNonAnonimeByRistorante(idRistorante);
 
-        JsonArray arr = new JsonArray();
+            JsonArray arr = new JsonArray();
 
-        for (Recensione r : lista) {
-            JsonObject o = new JsonObject();
-            o.addProperty("id", r.getId());
-            o.addProperty("idUtente", r.getIdUtente());
-            o.addProperty("nomeUtente", r.getNomeUtente());          // ⭐ ORA ESISTE
-            o.addProperty("idRistorante", r.getIdRistorante());
-            o.addProperty("nomeRistorante", r.getNomeRistorante());
-            o.addProperty("voto", r.getVoto());
-            o.addProperty("testo", r.getTesto());
-            o.addProperty("data", r.getData());
-            o.addProperty("fonte", r.getFonte());
-            arr.add(o);
+            for (Recensione r : lista) {
+                JsonObject o = new JsonObject();
+
+                o.addProperty("id", r.getId());
+                o.addProperty("idUtente", r.getIdUtente());
+                o.addProperty("nomeUtente", r.getNomeUtente());
+                o.addProperty("idRistorante", r.getIdRistorante());
+                o.addProperty("nomeRistorante", r.getNomeRistorante());
+                o.addProperty("voto", r.getVoto());
+                o.addProperty("testo", r.getTesto());
+                o.addProperty("data", r.getData());
+                o.addProperty("fonte", r.getFonte());
+
+                // ⭐ AGGIUNGI LA RISPOSTA (se esiste)
+                String risposta = RecensioneDAO.getRispostaByRecensione(r.getId());
+                if (risposta != null)
+                    o.addProperty("risposta", risposta);
+                else
+                    o.add("risposta", null);
+
+                arr.add(o);
+            }
+
+            JsonObject res = new JsonObject();
+            res.add("recensioni", arr);
+
+            return Response.ok(res);
+
+        } catch (Exception e) {
+            return Response.error("Errore caricamento recensioni non anonime: " + e.getMessage());
         }
-
-        JsonObject res = new JsonObject();
-        res.add("recensioni", arr);
-
-        return Response.ok(res);
-
-    } catch (Exception e) {
-        return Response.error("Errore caricamento recensioni non anonime: " + e.getMessage());
     }
-}
+
 
 
 
@@ -233,7 +243,7 @@ public class RecensioneService {
     public static Response rispondi(Request req) {
         try {
             int idRecensione = req.payload.get("idRecensione").getAsInt();
-            String risposta = req.payload.get("risposta").getAsString();
+            String risposta = req.payload.get("testo").getAsString();
 
             boolean ok = RecensioneDAO.rispondi(idRecensione, risposta);
 

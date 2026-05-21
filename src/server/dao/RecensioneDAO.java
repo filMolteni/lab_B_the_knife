@@ -37,6 +37,28 @@ public class RecensioneDAO {
             return false;
         }
     }
+    public static String getRispostaByRecensione(int idRecensione) {
+
+    String sql = "SELECT testo FROM risposte WHERE id_recensione = ? LIMIT 1";
+
+    try (Connection conn = DBConnectionPool.get();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+
+        ps.setInt(1, idRecensione);
+
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getString("testo");
+            }
+        }
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+
+    return null; // Nessuna risposta trovata
+}
+
 
     // ============================
     // AGGIUNGI RECENSIONE
@@ -300,26 +322,23 @@ public class RecensioneDAO {
         return lista;
     }
 
-    public static boolean rispondi(int idRecensione, String risposta) {
-    try {
-        Connection conn = DBConnectionPool.get();
+    public static boolean rispondi(int idRecensione, String testo) {
 
-        String sql = "UPDATE recensioni SET risposta = ? WHERE id = ?";
-        PreparedStatement ps = conn.prepareStatement(sql);
-        ps.setString(1, risposta);
-        ps.setInt(2, idRecensione);
+        String sql = "INSERT INTO risposte (id_recensione, testo) VALUES (?, ?)";
 
-        int rows = ps.executeUpdate();
+        try (Connection conn = DBConnectionPool.get();
+            PreparedStatement ps = conn.prepareStatement(sql)) {
 
-        ps.close();
-        DBConnectionPool.release(conn);
+            ps.setInt(1, idRecensione);
+            ps.setString(2, testo);
 
-        return rows > 0;
+            return ps.executeUpdate() > 0;
 
-    } catch (Exception e) {
-        e.printStackTrace();
-        return false;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
-}
+
 
 }

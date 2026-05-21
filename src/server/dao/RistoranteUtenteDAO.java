@@ -15,51 +15,78 @@ public class RistoranteUtenteDAO {
     // CERCA RISTORANTI TABELLA UTENTE
     // ============================================================
     public static List<Ristorante> cerca(String query, String tipoCucina) {
-    List<Ristorante> lista = new ArrayList<>();
+        List<Ristorante> lista = new ArrayList<>();
 
-    try (Connection conn = DBConnectionPool.get()) {
+        try (Connection conn = DBConnectionPool.get()) {
 
-        String sql = "SELECT * FROM RistorantiUtente WHERE LOWER(nome) LIKE LOWER(?)";
+            String sql = "SELECT * FROM RistorantiUtente WHERE LOWER(nome) LIKE LOWER(?)";
 
-        if (!tipoCucina.equalsIgnoreCase("Tutte")) {
-            sql += " AND LOWER(tipo_cucina) LIKE LOWER(?)";
+            if (!tipoCucina.equalsIgnoreCase("Tutte")) {
+                sql += " AND LOWER(tipo_cucina) LIKE LOWER(?)";
+            }
+
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, "%" + query + "%");
+
+            if (!tipoCucina.equalsIgnoreCase("Tutte")) {
+                ps.setString(2, "%" + tipoCucina + "%");
+            }
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                lista.add(new Ristorante(
+                        rs.getInt("id"),
+                        rs.getString("nome"),
+                        rs.getString("indirizzo"),
+                        rs.getString("tipo_cucina"),
+                        rs.getInt("fascia_prezzo"),
+                        rs.getDouble("latitudine"),
+                        rs.getDouble("longitudine"),
+                        rs.getString("citta"),
+                        rs.getString("nazione"),
+                        rs.getBoolean("delivery"),
+                        rs.getBoolean("prenotazione"),
+                        "UTENTE"   // ⭐ Fonte corretta
+                ));
+            }
+
+            rs.close();
+            ps.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
-        PreparedStatement ps = conn.prepareStatement(sql);
-        ps.setString(1, "%" + query + "%");
-
-        if (!tipoCucina.equalsIgnoreCase("Tutte")) {
-            ps.setString(2, "%" + tipoCucina + "%");
-        }
-
-        ResultSet rs = ps.executeQuery();
-
-        while (rs.next()) {
-            lista.add(new Ristorante(
-                    rs.getInt("id"),
-                    rs.getString("nome"),
-                    rs.getString("indirizzo"),
-                    rs.getString("tipo_cucina"),
-                    rs.getInt("fascia_prezzo"),
-                    rs.getDouble("latitudine"),
-                    rs.getDouble("longitudine"),
-                    rs.getString("citta"),
-                    rs.getString("nazione"),
-                    rs.getBoolean("delivery"),
-                    rs.getBoolean("prenotazione"),
-                    "UTENTE"   // ⭐ Fonte corretta
-            ));
-        }
-
-        rs.close();
-        ps.close();
-
-    } catch (Exception e) {
-        e.printStackTrace();
+        return lista;
     }
+        public static boolean isOwnedBy(int idRistorante, int idGestore) {
 
-    return lista;
-}
+            String sql = "SELECT COUNT(*) FROM RistorantiUtente WHERE id = ? AND id_Gestore = ?";
+
+            try (Connection conn = DBConnectionPool.get();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+
+                ps.setInt(1, idRistorante);
+                ps.setInt(2, idGestore);
+
+                
+
+                ResultSet rs = ps.executeQuery();
+
+                if (rs.next()) {
+                    int count = rs.getInt(1);
+
+                    return count > 0;
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            return false;
+        }
+
 
 
     // ============================================================

@@ -87,6 +87,23 @@ public class RistoranteService {
         return Response.error("Errore ricerca ristoranti: " + e.getMessage());
     }
 }
+    public static Response controllaProprieta(Request req) {
+    try {
+        int idRistorante = req.payload.get("idRistorante").getAsInt();
+        int idGestore = req.payload.get("idGestore").getAsInt();
+
+        boolean proprietario = RistoranteUtenteDAO.isOwnedBy(idRistorante, idGestore);
+
+        if (proprietario) {
+            return Response.ok(); // ⭐ È suo
+        } else {
+            return Response.error("Non sei il proprietario del ristorante");
+        }
+
+    } catch (Exception e) {
+        return Response.error("Errore controllo proprietà: " + e.getMessage());
+    }
+}
 
 
     // ============================================================
@@ -298,25 +315,37 @@ public class RistoranteService {
     // RECENSIONI ANONIME
     // ============================================================
     public static Response visualizzaRecensioniAnonime(Request req) {
-        try {
-            int idRistorante = req.payload.get("idRistorante").getAsInt();
-            List<Recensione> lista = RecensioneDAO.getByRistorante(idRistorante);
+    try {
+        int idRistorante = req.payload.get("idRistorante").getAsInt();
+        List<Recensione> lista = RecensioneDAO.getByRistorante(idRistorante);
 
-            JsonArray arr = new JsonArray();
-            for (Recensione r : lista) {
-                JsonObject o = new JsonObject();
-                o.addProperty("voto", r.getVoto());
-                o.addProperty("testo", r.getTesto());
-                arr.add(o);
-            }
+        JsonArray arr = new JsonArray();
 
-            JsonObject data = new JsonObject();
-            data.add("recensioni", arr);
+        for (Recensione r : lista) {
+            JsonObject o = new JsonObject();
 
-            return Response.ok(data);
+            o.addProperty("id", r.getId());               // ⭐ NECESSARIO PER RISPOSTE
+            o.addProperty("voto", r.getVoto());
+            o.addProperty("testo", r.getTesto());
 
-        } catch (Exception e) {
-            return Response.error("Errore caricamento recensioni anonime: " + e.getMessage());
+            // ⭐ AGGIUNGI LA RISPOSTA (può essere null)
+            String risposta = RecensioneDAO.getRispostaByRecensione(r.getId());
+            if (risposta != null)
+                o.addProperty("risposta", risposta);
+            else
+                o.add("risposta", null);
+
+            arr.add(o);
         }
+
+        JsonObject data = new JsonObject();
+        data.add("recensioni", arr);
+
+        return Response.ok(data);
+
+    } catch (Exception e) {
+        return Response.error("Errore caricamento recensioni anonime: " + e.getMessage());
     }
+}
+
 }

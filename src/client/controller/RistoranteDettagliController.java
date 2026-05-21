@@ -8,6 +8,10 @@ import client.net.Response;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import common.MessageType;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
+import javafx.scene.layout.VBox;
 
 public class RistoranteDettagliController {
 
@@ -15,43 +19,75 @@ public class RistoranteDettagliController {
     private final ClientConnection connection;
     private final Runnable onBack;
     private final int idRistorante;
-    private final String fonte; 
+    private final String fonte;
+
+    private boolean gestoreProprietario = false;
 
     public RistoranteDettagliController(RistoranteDettagliView view,
                                         ClientConnection connection,
                                         int idRistorante,
-                                        String fonte,         
+                                        String fonte,
                                         Runnable onBack) {
 
         this.view = view;
         this.connection = connection;
         this.onBack = onBack;
         this.idRistorante = idRistorante;
-        this.fonte = fonte; 
+        this.fonte = fonte;
 
-        caricaDettagli(idRistorante);
+        
         initHandlers();
-        controllaPermessi();
+        controllaPermessiCliente();
+        controllaPermessiGestore();
+        caricaDettagli(idRistorante);
     }
 
     private void initHandlers() {
-
         view.getBtnIndietro().setOnAction(e -> onBack.run());
-
         view.getBtnPreferiti().setOnAction(e -> aggiungiPreferito());
-
         view.getBtnScriviRecensione().setOnAction(e -> inviaRecensione());
     }
-    private void controllaPermessi() {
 
-    // Se NON è cliente → nascondi tutta la parte recensioni/preferiti
-    if (!UtenteDTO.getUtenteLoggato().isCliente()) {
+    // ============================================================
+    // ⭐ PERMESSI CLIENTE
+    // ============================================================
+    private void controllaPermessiCliente() {
+        if (!UtenteDTO.getUtenteLoggato().isCliente()) {
             view.nascondiFunzioniCliente();
         }
     }
 
     // ============================================================
-    // ⭐ AGGIUNGI AI PREFERITI (con fonte)
+    // ⭐ PERMESSI GESTORE (controllo proprietà)
+    // ============================================================
+    private void controllaPermessiGestore() {
+        try {
+            if (!UtenteDTO.getUtenteLoggato().isGestore()) {
+                gestoreProprietario = false;
+                return;
+            }
+
+            int idGestore = UtenteDTO.getUtenteLoggato().getId();
+
+            JsonObject payload = new JsonObject();
+            payload.addProperty("idRistorante", idRistorante);
+            payload.addProperty("idGestore", idGestore);
+
+            Request req = new Request(MessageType.CONTROLLA_PROPRIETA_RISTORANTE, payload);
+            Response res = connection.sendRequest(req);
+
+           
+
+            gestoreProprietario = res != null && res.isOk();
+
+        } catch (Exception e) {
+            gestoreProprietario = false;
+            e.printStackTrace();
+        }
+    }
+
+    // ============================================================
+    // ⭐ AGGIUNGI AI PREFERITI
     // ============================================================
     private void aggiungiPreferito() {
         try {
@@ -60,7 +96,7 @@ public class RistoranteDettagliController {
             JsonObject payload = new JsonObject();
             payload.addProperty("idUtente", idUtente);
             payload.addProperty("idRistorante", idRistorante);
-            payload.addProperty("fonte", fonte); // ⭐ AUTOMATICO
+            payload.addProperty("fonte", fonte);
 
             Request req = new Request(MessageType.AGGIUNGI_PREFERITO, payload);
             Response res = connection.sendRequest(req);
@@ -82,7 +118,7 @@ public class RistoranteDettagliController {
     }
 
     // ============================================================
-    // 📝 INVIA RECENSIONE
+    // ⭐ INVIA RECENSIONE
     // ============================================================
     private void inviaRecensione() {
         try {
@@ -105,7 +141,7 @@ public class RistoranteDettagliController {
             Response res = connection.sendRequest(req);
 
             if (res == null) {
-                System.out.println(" Nessuna risposta dal server");
+                System.out.println("❌ Nessuna risposta dal server");
                 return;
             }
 
@@ -122,50 +158,48 @@ public class RistoranteDettagliController {
     }
 
     // ============================================================
-    // 🔍 CARICA DETTAGLI
+    // ⭐ CARICA DETTAGLI RISTORANTE
     // ============================================================
     private void caricaDettagli(int idRistorante) {
-    try {
-        JsonObject payload = new JsonObject();
-        payload.addProperty("id", idRistorante);
+        try {
+            JsonObject payload = new JsonObject();
+            payload.addProperty("id", idRistorante);
 
-        // ⭐ Scegli il messaggio in base alla fonte
-        MessageType tipoRichiesta = 
-                fonte.equalsIgnoreCase("UTENTE")
-                ? MessageType.VISUALIZZA_UTENTE
-                : MessageType.VISUALIZZA;
+            MessageType tipoRichiesta =
+                    fonte.equalsIgnoreCase("UTENTE")
+                            ? MessageType.VISUALIZZA_UTENTE
+                            : MessageType.VISUALIZZA;
 
-        Request req = new Request(tipoRichiesta, payload);
-        Response res = connection.sendRequest(req);
+            Request req = new Request(tipoRichiesta, payload);
+            Response res = connection.sendRequest(req);
 
-        if (res == null || !res.isOk()) {
-            view.getAreaRecensioni().setText("Errore: " + (res != null ? res.getMessage() : "nessuna risposta"));
-            return;
+            if (res == null || !res.isOk()) {
+                System.out.println("Errore caricamento dettagli");
+                return;
+            }
+
+            JsonObject data = res.getData();
+
+            view.getLblNome().setText(data.get("nome").getAsString());
+            view.getLblIndirizzo().setText("Indirizzo: " + data.get("indirizzo").getAsString());
+            view.getLblCitta().setText("Città: " + data.get("citta").getAsString());
+            view.getLblNazione().setText("Nazione: " + data.get("nazione").getAsString());
+            view.getLblTipoCucina().setText("Tipo cucina: " + data.get("tipo_cucina").getAsString());
+            view.getLblFasciaPrezzo().setText("Fascia prezzo: " + data.get("fascia_prezzo").getAsInt());
+            view.getLblLatitudine().setText("Latitudine: " + data.get("latitudine").getAsDouble());
+            view.getLblLongitudine().setText("Longitudine: " + data.get("longitudine").getAsDouble());
+            view.getLblDelivery().setText("Delivery: " + (data.get("delivery").getAsBoolean() ? "Sì" : "No"));
+            view.getLblPrenotazione().setText("Prenotazione: " + (data.get("prenotazione").getAsBoolean() ? "Sì" : "No"));
+
+            caricaRecensioni(idRistorante);
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
-        JsonObject data = res.getData();
-
-        view.getLblNome().setText(data.get("nome").getAsString());
-        view.getLblIndirizzo().setText("Indirizzo: " + data.get("indirizzo").getAsString());
-        view.getLblCitta().setText("Città: " + data.get("citta").getAsString());
-        view.getLblNazione().setText("Nazione: " + data.get("nazione").getAsString());
-        view.getLblTipoCucina().setText("Tipo cucina: " + data.get("tipo_cucina").getAsString());
-        view.getLblFasciaPrezzo().setText("Fascia prezzo: " + data.get("fascia_prezzo").getAsInt());
-        view.getLblLatitudine().setText("Latitudine: " + data.get("latitudine").getAsDouble());
-        view.getLblLongitudine().setText("Longitudine: " + data.get("longitudine").getAsDouble());
-        view.getLblDelivery().setText("Delivery: " + (data.get("delivery").getAsBoolean() ? "Sì" : "No"));
-        view.getLblPrenotazione().setText("Prenotazione: " + (data.get("prenotazione").getAsBoolean() ? "Sì" : "No"));
-
-        caricaRecensioni(idRistorante);
-
-    } catch (Exception e) {
-        e.printStackTrace();
     }
-}
-
 
     // ============================================================
-    // 📜 CARICA RECENSIONI
+    // ⭐ CARICA RECENSIONI (con card dinamiche)
     // ============================================================
     private void caricaRecensioni(int idRistorante) {
         try {
@@ -182,40 +216,66 @@ public class RistoranteDettagliController {
             Response res = connection.sendRequest(req);
 
             if (res == null || !res.isOk()) {
-                view.getAreaRecensioni().setText("Errore caricamento recensioni.");
+                System.out.println("Errore caricamento recensioni");
                 return;
             }
 
             JsonArray arr = res.getData().getAsJsonArray("recensioni");
-            StringBuilder sb = new StringBuilder();
+
+            view.getRecensioniContainer().getChildren().clear();
 
             arr.forEach(el -> {
                 JsonObject r = el.getAsJsonObject();
 
-                // ⭐ Nome utente solo se presente
-                if (utenteLoggato && r.has("nomeUtente") && !r.get("nomeUtente").isJsonNull()) {
-                    sb.append("👤 ").append(r.get("nomeUtente").getAsString()).append("\n");
+                int idRecensione = r.get("id").getAsInt();
+                String utente = r.has("nomeUtente") && !r.get("nomeUtente").isJsonNull()
+                        ? r.get("nomeUtente").getAsString()
+                        : "Anonimo";
+
+                int voto = r.get("voto").getAsInt();
+                String testo = r.get("testo").getAsString();
+                String data = r.get("data").getAsString();
+
+                // ⭐ RISPOSTA (può essere null)
+                String risposta = null;
+                if (r.has("risposta") && !r.get("risposta").isJsonNull()) {
+                    risposta = r.get("risposta").getAsString();
                 }
 
-                // ⭐ Voto (sempre presente)
-                if (r.has("voto")) {
-                    sb.append("⭐ ").append(r.get("voto").getAsInt()).append("/5\n");
+                VBox card = new VBox(5);
+                card.setStyle("-fx-border-color: #ccc; -fx-padding: 10; -fx-background-color: #fafafa;");
+
+                Label lblUtente = new Label("👤 " + utente);
+                Label lblVoto = new Label("⭐ " + voto + "/5");
+                Label lblTesto = new Label(testo);
+                Label lblData = new Label("📅 " + data);
+
+                card.getChildren().addAll(lblUtente, lblVoto, lblTesto, lblData);
+
+                // ⭐ SE ESISTE UNA RISPOSTA → MOSTRALA
+                if (risposta != null) {
+                    Label lblRisposta = new Label("↳ Risposta del gestore: " + risposta);
+                    lblRisposta.setStyle("-fx-text-fill: #444; -fx-padding: 0 0 0 20;");
+                    card.getChildren().add(lblRisposta);
                 }
 
-                // ⭐ Testo (sempre presente)
-                if (r.has("testo")) {
-                    sb.append(r.get("testo").getAsString()).append("\n");
+                // ⭐ TEXTAREA E BOTTONE SOLO SE:
+                // - il gestore è proprietario
+                // - NON esiste già una risposta
+                if (gestoreProprietario && risposta == null) {
+
+                    TextArea rispostaArea = new TextArea();
+                    rispostaArea.setPromptText("Scrivi una risposta...");
+                    rispostaArea.setPrefHeight(60);
+
+                    Button btnRispondi = new Button("💬 Rispondi");
+                    btnRispondi.setOnAction(e -> inviaRisposta(idRecensione, rispostaArea.getText()));
+
+                    card.getChildren().addAll(rispostaArea, btnRispondi);
                 }
 
-                // ⭐ Data (potrebbe NON esserci → controllo)
-                if (r.has("data") && !r.get("data").isJsonNull()) {
-                    sb.append("📅 ").append(r.get("data").getAsString()).append("\n");
-                }
-
-                sb.append("\n");
+                view.getRecensioniContainer().getChildren().add(card);
             });
-
-            view.getAreaRecensioni().setText(sb.toString());
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -223,5 +283,33 @@ public class RistoranteDettagliController {
     }
 
 
+    // ============================================================
+    // ⭐ INVIA RISPOSTA A UNA RECENSIONE
+    // ============================================================
+    private void inviaRisposta(int idRecensione, String testo) {
+        try {
+            if (testo.trim().isEmpty()) {
+                System.out.println("Risposta vuota");
+                return;
+            }
 
+            JsonObject payload = new JsonObject();
+            payload.addProperty("idRecensione", idRecensione);
+            payload.addProperty("idGestore", UtenteDTO.getUtenteLoggato().getId());
+            payload.addProperty("testo", testo);
+
+            Request req = new Request(MessageType.RISPONDI_RECENSIONE, payload);
+            Response res = connection.sendRequest(req);
+
+            if (res != null && res.isOk()) {
+                System.out.println("Risposta inviata!");
+                caricaRecensioni(idRistorante);
+            } else {
+                System.out.println("Errore risposta: " + (res != null ? res.getMessage() : "null"));
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

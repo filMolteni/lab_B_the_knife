@@ -19,7 +19,8 @@ public class RistoranteDettagliView extends BorderPane {
     private Label lblDelivery;
     private Label lblPrenotazione;
 
-    private TextArea areaRecensioni;
+    // ⭐ NUOVO: contenitore dinamico recensioni
+    private VBox recensioniContainer;
 
     private Button btnIndietro;
     private Button btnPreferiti;
@@ -47,9 +48,9 @@ public class RistoranteDettagliView extends BorderPane {
         lblDelivery = new Label();
         lblPrenotazione = new Label();
 
-        areaRecensioni = new TextArea();
-        areaRecensioni.setEditable(false);
-        areaRecensioni.setPrefHeight(250);
+        // ⭐ NUOVO: contenitore recensioni
+        recensioniContainer = new VBox(10);
+        recensioniContainer.setPadding(new Insets(10));
 
         btnIndietro = new Button("← indietro ");
         btnPreferiti = new Button("⭐ Aggiungi ai preferiti");
@@ -73,8 +74,10 @@ public class RistoranteDettagliView extends BorderPane {
                 lblLongitudine,
                 lblDelivery,
                 lblPrenotazione,
+
                 new Label("Recensioni:"),
-                areaRecensioni,
+                recensioniContainer,   // ⭐ sostituisce areaRecensioni
+
                 new Label("Scrivi una recensione:"),
                 votoSpinner,
                 txtRecensione,
@@ -89,6 +92,9 @@ public class RistoranteDettagliView extends BorderPane {
         this.setCenter(box);
     }
 
+    // ============================================================
+    // ⭐ NASCONDI FUNZIONI CLIENTE
+    // ============================================================
     public void nascondiFunzioniCliente() {
         txtRecensione.setManaged(false);
         txtRecensione.setVisible(false);
@@ -103,7 +109,10 @@ public class RistoranteDettagliView extends BorderPane {
         btnPreferiti.setVisible(false);
     }
 
-
+    
+    // ============================================================
+    // GETTERS
+    // ============================================================
     public Label getLblNome() { return lblNome; }
     public Label getLblIndirizzo() { return lblIndirizzo; }
     public Label getLblCitta() { return lblCitta; }
@@ -115,7 +124,7 @@ public class RistoranteDettagliView extends BorderPane {
     public Label getLblDelivery() { return lblDelivery; }
     public Label getLblPrenotazione() { return lblPrenotazione; }
 
-    public TextArea getAreaRecensioni() { return areaRecensioni; }
+    public VBox getRecensioniContainer() { return recensioniContainer; }
 
     public Button getBtnIndietro() { return btnIndietro; }
     public Button getBtnPreferiti() { return btnPreferiti; }
