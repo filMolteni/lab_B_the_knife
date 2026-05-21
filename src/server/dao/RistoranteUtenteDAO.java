@@ -12,6 +12,57 @@ import java.util.List;
 public class RistoranteUtenteDAO {
 
     // ============================================================
+    // CERCA RISTORANTI TABELLA UTENTE
+    // ============================================================
+    public static List<Ristorante> cerca(String query, String tipoCucina) {
+    List<Ristorante> lista = new ArrayList<>();
+
+    try (Connection conn = DBConnectionPool.get()) {
+
+        String sql = "SELECT * FROM RistorantiUtente WHERE LOWER(nome) LIKE LOWER(?)";
+
+        if (!tipoCucina.equalsIgnoreCase("Tutte")) {
+            sql += " AND LOWER(tipo_cucina) LIKE LOWER(?)";
+        }
+
+        PreparedStatement ps = conn.prepareStatement(sql);
+        ps.setString(1, "%" + query + "%");
+
+        if (!tipoCucina.equalsIgnoreCase("Tutte")) {
+            ps.setString(2, "%" + tipoCucina + "%");
+        }
+
+        ResultSet rs = ps.executeQuery();
+
+        while (rs.next()) {
+            lista.add(new Ristorante(
+                    rs.getInt("id"),
+                    rs.getString("nome"),
+                    rs.getString("indirizzo"),
+                    rs.getString("tipo_cucina"),
+                    rs.getInt("fascia_prezzo"),
+                    rs.getDouble("latitudine"),
+                    rs.getDouble("longitudine"),
+                    rs.getString("citta"),
+                    rs.getString("nazione"),
+                    rs.getBoolean("delivery"),
+                    rs.getBoolean("prenotazione"),
+                    "UTENTE"   // ⭐ Fonte corretta
+            ));
+        }
+
+        rs.close();
+        ps.close();
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+
+    return lista;
+}
+
+
+    // ============================================================
     // AGGIUNGI RISTORANTE UTENTE
     // ============================================================
     public static boolean aggiungi(int idGestore, String nome, String indirizzo,

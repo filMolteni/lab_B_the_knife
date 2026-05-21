@@ -31,6 +31,7 @@ public class RistoranteDettagliController {
 
         caricaDettagli(idRistorante);
         initHandlers();
+        controllaPermessi();
     }
 
     private void initHandlers() {
@@ -40,6 +41,13 @@ public class RistoranteDettagliController {
         view.getBtnPreferiti().setOnAction(e -> aggiungiPreferito());
 
         view.getBtnScriviRecensione().setOnAction(e -> inviaRecensione());
+    }
+    private void controllaPermessi() {
+
+    // Se NON è cliente → nascondi tutta la parte recensioni/preferiti
+    if (!UtenteDTO.getUtenteLoggato().isCliente()) {
+            view.nascondiFunzioniCliente();
+        }
     }
 
     // ============================================================
@@ -117,37 +125,44 @@ public class RistoranteDettagliController {
     // 🔍 CARICA DETTAGLI
     // ============================================================
     private void caricaDettagli(int idRistorante) {
-        try {
-            JsonObject payload = new JsonObject();
-            payload.addProperty("id", idRistorante);
+    try {
+        JsonObject payload = new JsonObject();
+        payload.addProperty("id", idRistorante);
 
-            Request req = new Request(MessageType.VISUALIZZA, payload);
-            Response res = connection.sendRequest(req);
+        // ⭐ Scegli il messaggio in base alla fonte
+        MessageType tipoRichiesta = 
+                fonte.equalsIgnoreCase("UTENTE")
+                ? MessageType.VISUALIZZA_UTENTE
+                : MessageType.VISUALIZZA;
 
-            if (res == null || !res.isOk()) {
-                view.getAreaRecensioni().setText("Errore: " + (res != null ? res.getMessage() : "nessuna risposta"));
-                return;
-            }
+        Request req = new Request(tipoRichiesta, payload);
+        Response res = connection.sendRequest(req);
 
-            JsonObject data = res.getData();
-
-            view.getLblNome().setText(data.get("nome").getAsString());
-            view.getLblIndirizzo().setText("Indirizzo: " + data.get("indirizzo").getAsString());
-            view.getLblCitta().setText("Città: " + data.get("citta").getAsString());
-            view.getLblNazione().setText("Nazione: " + data.get("nazione").getAsString());
-            view.getLblTipoCucina().setText("Tipo cucina: " + data.get("tipo_cucina").getAsString());
-            view.getLblFasciaPrezzo().setText("Fascia prezzo: " + data.get("fascia_prezzo").getAsInt());
-            view.getLblLatitudine().setText("Latitudine: " + data.get("latitudine").getAsDouble());
-            view.getLblLongitudine().setText("Longitudine: " + data.get("longitudine").getAsDouble());
-            view.getLblDelivery().setText("Delivery: " + (data.get("delivery").getAsBoolean() ? "Sì" : "No"));
-            view.getLblPrenotazione().setText("Prenotazione: " + (data.get("prenotazione").getAsBoolean() ? "Sì" : "No"));
-
-            caricaRecensioni(idRistorante);
-
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (res == null || !res.isOk()) {
+            view.getAreaRecensioni().setText("Errore: " + (res != null ? res.getMessage() : "nessuna risposta"));
+            return;
         }
+
+        JsonObject data = res.getData();
+
+        view.getLblNome().setText(data.get("nome").getAsString());
+        view.getLblIndirizzo().setText("Indirizzo: " + data.get("indirizzo").getAsString());
+        view.getLblCitta().setText("Città: " + data.get("citta").getAsString());
+        view.getLblNazione().setText("Nazione: " + data.get("nazione").getAsString());
+        view.getLblTipoCucina().setText("Tipo cucina: " + data.get("tipo_cucina").getAsString());
+        view.getLblFasciaPrezzo().setText("Fascia prezzo: " + data.get("fascia_prezzo").getAsInt());
+        view.getLblLatitudine().setText("Latitudine: " + data.get("latitudine").getAsDouble());
+        view.getLblLongitudine().setText("Longitudine: " + data.get("longitudine").getAsDouble());
+        view.getLblDelivery().setText("Delivery: " + (data.get("delivery").getAsBoolean() ? "Sì" : "No"));
+        view.getLblPrenotazione().setText("Prenotazione: " + (data.get("prenotazione").getAsBoolean() ? "Sì" : "No"));
+
+        caricaRecensioni(idRistorante);
+
+    } catch (Exception e) {
+        e.printStackTrace();
     }
+}
+
 
     // ============================================================
     // 📜 CARICA RECENSIONI

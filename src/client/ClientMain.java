@@ -120,7 +120,7 @@ public class ClientMain extends Application {
                 connection,
                 id,
                 fonte, // ⭐ PASSIAMO LA FONTE
-                this::mostraRicercaRistoranti
+                this::mostraHome
         );
 
         primaryStage.setScene(new Scene(view, 700, 500));

@@ -29,6 +29,7 @@ public class LoginController {
         this.onGoBack = onGoBack;
 
         initHandlers();
+        
     }
 
     private void initHandlers() {

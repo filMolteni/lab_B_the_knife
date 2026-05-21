@@ -9,57 +9,59 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RistoranteDAO {
+    public class RistoranteDAO {
 
-    // ============================
-    // CERCA RISTORANTI THEKNIFE
-    // ============================
-    public static List<Ristorante> cerca(String query, String tipoCucina) {
-        List<Ristorante> lista = new ArrayList<>();
+        // ============================
+        // CERCA RISTORANTI THEKNIFE
+        // ============================
+        public static List<Ristorante> cerca(String query, String tipoCucina) {
+            List<Ristorante> lista = new ArrayList<>();
 
-        try (Connection conn = DBConnectionPool.get()) {
+            try (Connection conn = DBConnectionPool.get()) {
 
-            String sql = "SELECT * FROM RistorantiTheKnife WHERE LOWER(nome) LIKE LOWER(?)";
+                String sql = "SELECT * FROM RistorantiTheKnife WHERE LOWER(nome) LIKE LOWER(?)";
 
-            if (!tipoCucina.equalsIgnoreCase("Tutte")) {
-                sql += " AND LOWER(tipo_cucina) LIKE LOWER(?)";
+                if (!tipoCucina.equalsIgnoreCase("Tutte")) {
+                    sql += " AND LOWER(tipo_cucina) LIKE LOWER(?)";
+                }
+
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ps.setString(1, "%" + query + "%");
+
+                if (!tipoCucina.equalsIgnoreCase("Tutte")) {
+                    ps.setString(2, "%" + tipoCucina + "%");
+                }
+
+                ResultSet rs = ps.executeQuery();
+
+                while (rs.next()) {
+                    lista.add(new Ristorante(
+                            rs.getInt("id"),
+                            rs.getString("nome"),
+                            rs.getString("indirizzo"),
+                            rs.getString("tipo_cucina"),
+                            rs.getInt("fascia_prezzo"),
+                            rs.getDouble("latitudine"),
+                            rs.getDouble("longitudine"),
+                            rs.getString("citta"),
+                            rs.getString("nazione"),
+                            rs.getBoolean("delivery"),
+                            rs.getBoolean("prenotazione"),
+                            "THEKNIFE"   // ⭐ Fonte corretta
+                    ));
+                }
+
+                rs.close();
+                ps.close();
+
+            } catch (Exception e) {
+                e.printStackTrace();
             }
 
-            PreparedStatement ps = conn.prepareStatement(sql);
-            ps.setString(1, "%" + query + "%");
-
-            if (!tipoCucina.equalsIgnoreCase("Tutte")) {
-                ps.setString(2, "%" + tipoCucina + "%");
-            }
-
-            ResultSet rs = ps.executeQuery();
-
-            while (rs.next()) {
-                lista.add(new Ristorante(
-                        rs.getInt("id"),
-                        rs.getString("nome"),
-                        rs.getString("indirizzo"),
-                        rs.getString("tipo_cucina"),
-                        rs.getInt("fascia_prezzo"),
-                        rs.getDouble("latitudine"),
-                        rs.getDouble("longitudine"),
-                        rs.getString("citta"),
-                        rs.getString("nazione"),
-                        rs.getBoolean("delivery"),
-                        rs.getBoolean("prenotazione"),
-                        "THEKNIFE"   // ⭐ FONTE AGGIUNTA
-                ));
-            }
-
-            rs.close();
-            ps.close();
-
-        } catch (Exception e) {
-            e.printStackTrace();
+            return lista;
         }
 
-        return lista;
-    }
+
 
     public static boolean esisteUtente(int idRistorante) {
     try (Connection conn = DBConnectionPool.get()) {

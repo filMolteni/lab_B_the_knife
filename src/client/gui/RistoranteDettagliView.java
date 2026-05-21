@@ -51,7 +51,7 @@ public class RistoranteDettagliView extends BorderPane {
         areaRecensioni.setEditable(false);
         areaRecensioni.setPrefHeight(250);
 
-        btnIndietro = new Button("← Torna alla ricerca");
+        btnIndietro = new Button("← indietro ");
         btnPreferiti = new Button("⭐ Aggiungi ai preferiti");
         btnScriviRecensione = new Button("📝 Invia recensione");
 
@@ -88,6 +88,21 @@ public class RistoranteDettagliView extends BorderPane {
 
         this.setCenter(box);
     }
+
+    public void nascondiFunzioniCliente() {
+        txtRecensione.setManaged(false);
+        txtRecensione.setVisible(false);
+
+        votoSpinner.setManaged(false);
+        votoSpinner.setVisible(false);
+
+        btnScriviRecensione.setManaged(false);
+        btnScriviRecensione.setVisible(false);
+
+        btnPreferiti.setManaged(false);
+        btnPreferiti.setVisible(false);
+    }
+
 
     public Label getLblNome() { return lblNome; }
     public Label getLblIndirizzo() { return lblIndirizzo; }
