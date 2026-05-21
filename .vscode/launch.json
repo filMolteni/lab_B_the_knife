@@ -6,14 +6,21 @@
             "name": "ServerMain",
             "request": "launch",
             "mainClass": "server.ServerMain",
-            "projectName": "lab_B_35d6ae79"
+            "projectName": "lab_B_the_knife_8f145de7"
         },
         {
             "type": "java",
-            "name": "Run Client",
+            "name": "ServerMain",
             "request": "launch",
-            "mainClass": "client.ClientMain",
-            "vmArgs": "--module-path \"C:/Users/Fil/Desktop/UNI/lab_B/lib/javafx-sdk-21.0.2/lib\" --add-modules javafx.controls,javafx.fxml"
+            "mainClass": "server.ServerMain",
+            "projectName": "lab_B_35d6ae79"
+        },
+        {
+             "type": "java",
+    "name": "Run Client",
+    "request": "launch",
+    "mainClass": "client.ClientMain",
+    "vmArgs": "--module-path \"C:\\Users\\User\\OneDrive\\Desktop\\labb\\lab_B_the_knife\\lib\\javafx-sdk-21.0.2\\lib\" --add-modules javafx.controls,javafx.fxml"
         }
     ]
 }
