@@ -35,10 +35,9 @@ public class RistoranteDettagliController {
         this.idRistorante = idRistorante;
         this.fonte = fonte;
 
-        
         initHandlers();
         controllaPermessiCliente();
-        controllaPermessiGestore();
+        controllaPermessiGestore();   // ⭐ PRIMA DI CARICARE LE RECENSIONI
         caricaDettagli(idRistorante);
     }
 
@@ -58,7 +57,7 @@ public class RistoranteDettagliController {
     }
 
     // ============================================================
-    // ⭐ PERMESSI GESTORE (controllo proprietà)
+    // ⭐ PERMESSI GESTORE
     // ============================================================
     private void controllaPermessiGestore() {
         try {
@@ -75,8 +74,6 @@ public class RistoranteDettagliController {
 
             Request req = new Request(MessageType.CONTROLLA_PROPRIETA_RISTORANTE, payload);
             Response res = connection.sendRequest(req);
-
-           
 
             gestoreProprietario = res != null && res.isOk();
 
@@ -199,92 +196,103 @@ public class RistoranteDettagliController {
     }
 
     // ============================================================
-    // ⭐ CARICA RECENSIONI (con card dinamiche)
+    // ⭐ CARICA RECENSIONI + RISPOSTE + MEDIA VOTI
     // ============================================================
     private void caricaRecensioni(int idRistorante) {
-        try {
-            JsonObject payload = new JsonObject();
-            payload.addProperty("idRistorante", idRistorante);
+    try {
+        JsonObject payload = new JsonObject();
+        payload.addProperty("idRistorante", idRistorante);
 
-            boolean utenteLoggato = UtenteDTO.getUtenteLoggato() != null;
+        boolean utenteLoggato = UtenteDTO.getUtenteLoggato() != null;
 
-            MessageType tipo = utenteLoggato
-                    ? MessageType.VISUALIZZA_RECENSIONI_NON_ANONIME
-                    : MessageType.VISUALIZZA_RECENSIONI_ANONIME;
+        MessageType tipo = utenteLoggato
+                ? MessageType.VISUALIZZA_RECENSIONI_NON_ANONIME
+                : MessageType.VISUALIZZA_RECENSIONI_ANONIME;
 
-            Request req = new Request(tipo, payload);
-            Response res = connection.sendRequest(req);
+        Request req = new Request(tipo, payload);
+        Response res = connection.sendRequest(req);
 
-            if (res == null || !res.isOk()) {
-                System.out.println("Errore caricamento recensioni");
-                return;
+        if (res == null || !res.isOk()) {
+            System.out.println("Errore caricamento recensioni");
+            return;
+        }
+
+        JsonArray arr = res.getData().getAsJsonArray("recensioni");
+
+        view.getRecensioniContainer().getChildren().clear();
+
+        int sommaVoti = 0;
+        int numeroRecensioni = 0;
+
+        // ⭐ NON USIAMO LAMBDA → USIAMO FOR CLASSICO
+        for (int i = 0; i < arr.size(); i++) {
+
+            JsonObject r = arr.get(i).getAsJsonObject();
+
+            int idRecensione = r.get("id").getAsInt();
+            String utente = r.has("nomeUtente") && !r.get("nomeUtente").isJsonNull()
+                    ? r.get("nomeUtente").getAsString()
+                    : "Anonimo";
+
+            int voto = r.get("voto").getAsInt();
+            String testo = r.get("testo").getAsString();
+            String data = r.get("data").getAsString();
+
+            sommaVoti += voto;
+            numeroRecensioni++;
+
+            String risposta = null;
+            if (r.has("risposta") && !r.get("risposta").isJsonNull()) {
+                risposta = r.get("risposta").getAsString();
             }
 
-            JsonArray arr = res.getData().getAsJsonArray("recensioni");
+            VBox card = new VBox(5);
+            card.setStyle("-fx-border-color: #ccc; -fx-padding: 10; -fx-background-color: #fafafa;");
 
-            view.getRecensioniContainer().getChildren().clear();
+            Label lblUtente = new Label("👤 " + utente);
+            Label lblVoto = new Label("⭐ " + voto + "/5");
+            Label lblTesto = new Label(testo);
+            Label lblData = new Label("📅 " + data);
 
-            arr.forEach(el -> {
-                JsonObject r = el.getAsJsonObject();
+            card.getChildren().addAll(lblUtente, lblVoto, lblTesto, lblData);
 
-                int idRecensione = r.get("id").getAsInt();
-                String utente = r.has("nomeUtente") && !r.get("nomeUtente").isJsonNull()
-                        ? r.get("nomeUtente").getAsString()
-                        : "Anonimo";
+            if (risposta != null) {
+                Label lblRisposta = new Label("↳ Risposta del gestore: " + risposta);
+                lblRisposta.setStyle("-fx-text-fill: #444; -fx-padding: 0 0 0 20;");
+                card.getChildren().add(lblRisposta);
+            }
 
-                int voto = r.get("voto").getAsInt();
-                String testo = r.get("testo").getAsString();
-                String data = r.get("data").getAsString();
+            if (gestoreProprietario && risposta == null) {
 
-                // ⭐ RISPOSTA (può essere null)
-                String risposta = null;
-                if (r.has("risposta") && !r.get("risposta").isJsonNull()) {
-                    risposta = r.get("risposta").getAsString();
-                }
+                TextArea rispostaArea = new TextArea();
+                rispostaArea.setPromptText("Scrivi una risposta...");
+                rispostaArea.setPrefHeight(60);
 
-                VBox card = new VBox(5);
-                card.setStyle("-fx-border-color: #ccc; -fx-padding: 10; -fx-background-color: #fafafa;");
+                Button btnRispondi = new Button("💬 Rispondi");
+                btnRispondi.setOnAction(e -> inviaRisposta(idRecensione, rispostaArea.getText()));
 
-                Label lblUtente = new Label("👤 " + utente);
-                Label lblVoto = new Label("⭐ " + voto + "/5");
-                Label lblTesto = new Label(testo);
-                Label lblData = new Label("📅 " + data);
+                card.getChildren().addAll(rispostaArea, btnRispondi);
+            }
 
-                card.getChildren().addAll(lblUtente, lblVoto, lblTesto, lblData);
-
-                // ⭐ SE ESISTE UNA RISPOSTA → MOSTRALA
-                if (risposta != null) {
-                    Label lblRisposta = new Label("↳ Risposta del gestore: " + risposta);
-                    lblRisposta.setStyle("-fx-text-fill: #444; -fx-padding: 0 0 0 20;");
-                    card.getChildren().add(lblRisposta);
-                }
-
-                // ⭐ TEXTAREA E BOTTONE SOLO SE:
-                // - il gestore è proprietario
-                // - NON esiste già una risposta
-                if (gestoreProprietario && risposta == null) {
-
-                    TextArea rispostaArea = new TextArea();
-                    rispostaArea.setPromptText("Scrivi una risposta...");
-                    rispostaArea.setPrefHeight(60);
-
-                    Button btnRispondi = new Button("💬 Rispondi");
-                    btnRispondi.setOnAction(e -> inviaRisposta(idRecensione, rispostaArea.getText()));
-
-                    card.getChildren().addAll(rispostaArea, btnRispondi);
-                }
-
-                view.getRecensioniContainer().getChildren().add(card);
-            });
-
-        } catch (Exception e) {
-            e.printStackTrace();
+            view.getRecensioniContainer().getChildren().add(card);
         }
+
+        // ⭐ CALCOLO MEDIA
+        if (numeroRecensioni > 0) {
+            double media = (double) sommaVoti / numeroRecensioni;
+            view.getLblMediaVoti().setText(String.format("Media voti: %.1f / 5", media));
+        } else {
+            view.getLblMediaVoti().setText("Nessuna recensione");
+        }
+
+    } catch (Exception e) {
+        e.printStackTrace();
     }
+}
 
 
     // ============================================================
-    // ⭐ INVIA RISPOSTA A UNA RECENSIONE
+    // ⭐ INVIA RISPOSTA
     // ============================================================
     private void inviaRisposta(int idRecensione, String testo) {
         try {
@@ -295,7 +303,6 @@ public class RistoranteDettagliController {
 
             JsonObject payload = new JsonObject();
             payload.addProperty("idRecensione", idRecensione);
-            payload.addProperty("idGestore", UtenteDTO.getUtenteLoggato().getId());
             payload.addProperty("testo", testo);
 
             Request req = new Request(MessageType.RISPONDI_RECENSIONE, payload);

@@ -19,7 +19,10 @@ public class RistoranteDettagliView extends BorderPane {
     private Label lblDelivery;
     private Label lblPrenotazione;
 
-    // ⭐ NUOVO: contenitore dinamico recensioni
+    // ⭐ NUOVO: media voti
+    private Label lblMediaVoti;
+
+    // ⭐ contenitore dinamico recensioni
     private VBox recensioniContainer;
 
     private Button btnIndietro;
@@ -48,11 +51,15 @@ public class RistoranteDettagliView extends BorderPane {
         lblDelivery = new Label();
         lblPrenotazione = new Label();
 
-        // ⭐ NUOVO: contenitore recensioni
+        // ⭐ NUOVO: media voti
+        lblMediaVoti = new Label("Media voti: -");
+        lblMediaVoti.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #444;");
+
+        // ⭐ contenitore recensioni
         recensioniContainer = new VBox(10);
         recensioniContainer.setPadding(new Insets(10));
 
-        btnIndietro = new Button("← indietro ");
+        btnIndietro = new Button("← Indietro");
         btnPreferiti = new Button("⭐ Aggiungi ai preferiti");
         btnScriviRecensione = new Button("📝 Invia recensione");
 
@@ -75,8 +82,11 @@ public class RistoranteDettagliView extends BorderPane {
                 lblDelivery,
                 lblPrenotazione,
 
+                // ⭐ MEDIA VOTI
+                lblMediaVoti,
+
                 new Label("Recensioni:"),
-                recensioniContainer,   // ⭐ sostituisce areaRecensioni
+                recensioniContainer,
 
                 new Label("Scrivi una recensione:"),
                 votoSpinner,
@@ -109,7 +119,6 @@ public class RistoranteDettagliView extends BorderPane {
         btnPreferiti.setVisible(false);
     }
 
-    
     // ============================================================
     // GETTERS
     // ============================================================
@@ -123,6 +132,8 @@ public class RistoranteDettagliView extends BorderPane {
     public Label getLblLongitudine() { return lblLongitudine; }
     public Label getLblDelivery() { return lblDelivery; }
     public Label getLblPrenotazione() { return lblPrenotazione; }
+
+    public Label getLblMediaVoti() { return lblMediaVoti; }
 
     public VBox getRecensioniContainer() { return recensioniContainer; }
 
