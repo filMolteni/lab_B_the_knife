@@ -1,0 +1,17 @@
+@startuml
+
+state "NonPresente" as NonPresente
+state "Attivo" as Attivo
+state "Modifica" as Modifica
+state "Eliminato" as Eliminato
+
+[*] --> NonPresente
+
+NonPresente --> Attivo : aggiunto dal gestore
+
+Attivo --> Modifica : modifica dati
+Modifica --> Attivo : salvato
+
+Attivo --> Eliminato : eliminato dal gestore
+
+@enduml

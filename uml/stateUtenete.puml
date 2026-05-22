@@ -1,0 +1,20 @@
+@startuml
+
+[*] --> NonAutenticato
+
+NonAutenticato --> Autenticato : login
+Autenticato --> NonAutenticato : logout
+
+Autenticato --> InRicerca : cerca ristoranti
+InRicerca --> Autenticato : torna home
+
+Autenticato --> InDettagli : apre ristorante
+InDettagli --> Autenticato : chiude dettagli
+
+Autenticato --> ScrivendoRecensione : scrivi recensione
+ScrivendoRecensione --> Autenticato : invia recensione
+
+Autenticato --> GestionePreferiti : apre preferiti
+GestionePreferiti --> Autenticato : chiude preferiti
+
+@enduml

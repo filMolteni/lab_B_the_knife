@@ -1,0 +1,26 @@
+@startuml
+
+actor Utente
+participant RV
+participant RC
+participant Server
+participant DB
+
+Utente -> RV : apre registrazione
+RV -> RC : init
+
+Utente -> RV : inserisce dati
+RV -> RC : doRegister
+RC -> Server : register
+
+Server -> DB : verifica email
+DB --> Server : risultato
+
+Server --> RC : email libera
+RC -> Server : insert utente
+Server -> DB : insert
+DB --> Server : ok
+Server --> RC : ok
+RC -> RV : successo
+
+@enduml

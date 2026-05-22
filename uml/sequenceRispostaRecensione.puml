@@ -1,0 +1,33 @@
+@startuml
+
+actor Gestore
+participant "RV" as RV
+participant "RC" as RC
+participant "FRV" as FRV
+participant "FRC" as FRC
+participant "Server" as Server
+participant "DB" as DB
+
+Gestore -> RV : apre recensioni
+RV -> RC : init
+RC -> Server : getRecensioni
+Server -> DB : select
+DB --> Server : lista
+Server --> RC : ok
+RC -> RV : mostra
+
+Gestore -> RV : rispondi
+RV -> RC : apriForm
+RC -> FRC : creaController
+FRC -> FRV : creaView
+
+Gestore -> FRV : scrive risposta
+FRV -> FRC : invia
+FRC -> Server : salvaRisposta
+Server -> DB : update
+DB --> Server : ok
+Server --> FRC : ok
+FRC -> RC : successo
+RC -> RV : aggiorna
+
+@enduml

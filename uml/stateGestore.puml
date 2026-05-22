@@ -1,0 +1,23 @@
+@startuml
+
+[*] --> NonAutenticato
+
+NonAutenticato --> GestoreAutenticato : login gestore
+GestoreAutenticato --> NonAutenticato : logout
+
+GestoreAutenticato --> GestioneRistoranti : apre gestione
+GestioneRistoranti --> GestoreAutenticato : chiude gestione
+
+GestioneRistoranti --> AggiuntaRistorante : aggiungi
+AggiuntaRistorante --> GestioneRistoranti : salva
+
+GestioneRistoranti --> ModificaRistorante : modifica
+ModificaRistorante --> GestioneRistoranti : salva
+
+GestoreAutenticato --> RisposteRecensioni : apre recensioni ricevute
+RisposteRecensioni --> GestoreAutenticato : chiude
+
+RisposteRecensioni --> Rispondendo : rispondi recensione
+Rispondendo --> RisposteRecensioni : invia risposta
+
+@enduml

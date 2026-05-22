@@ -1,0 +1,21 @@
+@startuml
+
+actor Utente
+participant "RV" as RV
+participant "RC" as RC
+participant "Server" as Server
+participant "DB" as DB
+
+Utente -> RV : apre ricerca
+RV -> RC : init
+
+Utente -> RV : inserisce filtri
+RV -> RC : cerca
+RC -> Server : getRistoranti(filtri)
+
+Server -> DB : select filtrato
+DB --> Server : lista
+Server --> RC : ok
+RC -> RV : mostraRisultati
+
+@enduml
