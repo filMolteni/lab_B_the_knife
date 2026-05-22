@@ -1,0 +1,27 @@
+@startuml
+
+actor Utente
+participant "RUV" as RUV
+participant "RUC" as RUC
+participant "MRV" as MRV
+participant "Server" as Server
+participant "DB" as DB
+
+Utente -> RUV : apre recensioni
+RUV -> RUC : init
+
+Utente -> RUV : seleziona recensione
+Utente -> RUV : clicca Modifica
+RUV -> RUC : apriModifica(id)
+RUC -> MRV : mostraDialog
+
+Utente -> MRV : modifica testo/voto
+MRV -> RUC : conferma
+RUC -> Server : updateRecensione(id, dati)
+
+Server -> DB : update
+DB --> Server : ok
+Server --> RUC : ok
+RUC -> RUV : aggiorna
+
+@enduml

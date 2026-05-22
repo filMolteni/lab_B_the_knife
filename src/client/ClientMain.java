@@ -28,7 +28,7 @@ public class ClientMain extends Application {
     }
 
     // ============================
-    // LOGIN (ORA A SCHERMO INTERO)
+    // LOGIN 
     // ============================
     private void mostraLogin() {
         LoginView view = new LoginView();
@@ -44,7 +44,7 @@ public class ClientMain extends Application {
         Scene scene = new Scene(view);
         primaryStage.setScene(scene);
         primaryStage.setTitle("Login");
-        primaryStage.setMaximized(true);   // ⭐ SCHERMO INTERO
+        primaryStage.setMaximized(true);   
         primaryStage.show();
     }
 
@@ -64,12 +64,12 @@ public class ClientMain extends Application {
         Scene scene = new Scene(view);
         primaryStage.setScene(scene);
         primaryStage.setTitle("Registrazione");
-        primaryStage.setMaximized(true);   // ⭐ SCHERMO INTERO
+        primaryStage.setMaximized(true);   
         primaryStage.show();
     }
 
     // ============================
-    // HOME (A SCHERMO INTERO)
+    // HOME 
     // ============================
     private void mostraHome() {
         HomeView view = new HomeView();

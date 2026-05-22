@@ -1,0 +1,26 @@
+@startuml
+
+actor Utente
+participant CM
+participant RDC
+participant RDV
+participant Server
+participant DB
+
+Utente -> CM : seleziona ristorante
+CM -> RDC : apriDettagli(id)
+RDC -> RDV : creaView
+
+RDC -> Server : getDettagli(id)
+Server -> DB : select ristorante
+DB --> Server : dati
+Server --> RDC : ok
+RDC -> RDV : mostraDettagli
+
+RDC -> Server : getRecensioni(id)
+Server -> DB : select recensioni
+DB --> Server : lista
+Server --> RDC : ok
+RDC -> RDV : mostraRecensioni
+
+@enduml
