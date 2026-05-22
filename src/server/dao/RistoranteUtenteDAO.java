@@ -14,22 +14,86 @@ public class RistoranteUtenteDAO {
     // ============================================================
     // CERCA RISTORANTI TABELLA UTENTE
     // ============================================================
-    public static List<Ristorante> cerca(String query, String tipoCucina) {
+    public static List<Ristorante> cerca(
+            String query,
+            String tipoCucina,
+            String localita,
+            int prezzoMin,
+            int prezzoMax,
+            boolean delivery,
+            boolean prenotazione,
+            int stelleMin
+    ) {
         List<Ristorante> lista = new ArrayList<>();
 
         try (Connection conn = DBConnectionPool.get()) {
 
-            String sql = "SELECT * FROM RistorantiUtente WHERE LOWER(nome) LIKE LOWER(?)";
+            StringBuilder sql = new StringBuilder(
+                "SELECT r.* " +
+                "FROM RistorantiUtente r " +
+                "LEFT JOIN Recensioni rec ON rec.id_ristorante = r.id " +
+                "WHERE LOWER(r.nome) LIKE LOWER(?) "
+            );
 
+            List<Object> params = new ArrayList<>();
+            params.add("%" + query + "%");
+
+            // ============================
+            // FILTRO TIPO CUCINA
+            // ============================
             if (!tipoCucina.equalsIgnoreCase("Tutte")) {
-                sql += " AND LOWER(tipo_cucina) LIKE LOWER(?)";
+                sql.append(" AND LOWER(r.tipo_cucina) LIKE LOWER(?) ");
+                params.add("%" + tipoCucina + "%");
             }
 
-            PreparedStatement ps = conn.prepareStatement(sql);
-            ps.setString(1, "%" + query + "%");
+            // ============================
+            // FILTRO LOCALITÀ
+            // ============================
+            if (!localita.equalsIgnoreCase("Tutte")) {
+                sql.append(" AND (LOWER(r.citta) = LOWER(?) OR LOWER(r.nazione) = LOWER(?)) ");
+                params.add(localita.toLowerCase());
+                params.add(localita.toLowerCase());
+            }
 
-            if (!tipoCucina.equalsIgnoreCase("Tutte")) {
-                ps.setString(2, "%" + tipoCucina + "%");
+            // ============================
+            // FILTRO PREZZO
+            // ============================
+            sql.append(" AND r.fascia_prezzo BETWEEN ? AND ? ");
+            params.add(prezzoMin);
+            params.add(prezzoMax);
+
+            // ============================
+            // FILTRO DELIVERY
+            // ============================
+            if (delivery) {
+                sql.append(" AND r.delivery = TRUE ");
+            }
+
+            // ============================
+            // FILTRO PRENOTAZIONE
+            // ============================
+            if (prenotazione) {
+                sql.append(" AND r.prenotazione = TRUE ");
+            }
+
+            // ============================
+            // GROUP BY PER MEDIA STELLE
+            // ============================
+            sql.append(" GROUP BY r.id ");
+
+            // ============================
+            // FILTRO STELLE (SOLO PER FILTRARE)
+            // ============================
+            if (stelleMin > 0) {
+                sql.append(" HAVING COALESCE(AVG(rec.voto), 0) >= ? ");
+                params.add(stelleMin);
+            }
+
+            PreparedStatement ps = conn.prepareStatement(sql.toString());
+
+            // Bind parametri
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
             }
 
             ResultSet rs = ps.executeQuery();
@@ -47,7 +111,7 @@ public class RistoranteUtenteDAO {
                         rs.getString("nazione"),
                         rs.getBoolean("delivery"),
                         rs.getBoolean("prenotazione"),
-                        "UTENTE"   // ⭐ Fonte corretta
+                        "UTENTE"
                 ));
             }
 
@@ -58,8 +122,9 @@ public class RistoranteUtenteDAO {
             e.printStackTrace();
         }
 
-        return lista;
-    }
+    return lista;
+}
+
         public static boolean isOwnedBy(int idRistorante, int idGestore) {
 
             String sql = "SELECT COUNT(*) FROM RistorantiUtente WHERE id = ? AND id_Gestore = ?";

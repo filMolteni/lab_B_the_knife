@@ -37,7 +37,7 @@ public class RistoranteDettagliController {
 
         initHandlers();
         controllaPermessiCliente();
-        controllaPermessiGestore();   // ⭐ PRIMA DI CARICARE LE RECENSIONI
+        controllaPermessiGestore();   
         caricaDettagli(idRistorante);
     }
 
@@ -48,7 +48,7 @@ public class RistoranteDettagliController {
     }
 
     // ============================================================
-    // ⭐ PERMESSI CLIENTE
+    // PERMESSI CLIENTE
     // ============================================================
     private void controllaPermessiCliente() {
         if (!UtenteDTO.getUtenteLoggato().isCliente()) {
@@ -57,7 +57,7 @@ public class RistoranteDettagliController {
     }
 
     // ============================================================
-    // ⭐ PERMESSI GESTORE
+    // PERMESSI GESTORE
     // ============================================================
     private void controllaPermessiGestore() {
         try {
@@ -84,7 +84,7 @@ public class RistoranteDettagliController {
     }
 
     // ============================================================
-    // ⭐ AGGIUNGI AI PREFERITI
+    // AGGIUNGI AI PREFERITI
     // ============================================================
     private void aggiungiPreferito() {
         try {
@@ -115,7 +115,7 @@ public class RistoranteDettagliController {
     }
 
     // ============================================================
-    // ⭐ INVIA RECENSIONE
+    // INVIA RECENSIONE
     // ============================================================
     private void inviaRecensione() {
         try {
@@ -138,7 +138,7 @@ public class RistoranteDettagliController {
             Response res = connection.sendRequest(req);
 
             if (res == null) {
-                System.out.println("❌ Nessuna risposta dal server");
+                System.out.println(" Nessuna risposta dal server");
                 return;
             }
 
@@ -155,7 +155,7 @@ public class RistoranteDettagliController {
     }
 
     // ============================================================
-    // ⭐ CARICA DETTAGLI RISTORANTE
+    // CARICA DETTAGLI RISTORANTE
     // ============================================================
     private void caricaDettagli(int idRistorante) {
         try {
@@ -196,7 +196,7 @@ public class RistoranteDettagliController {
     }
 
     // ============================================================
-    // ⭐ CARICA RECENSIONI + RISPOSTE + MEDIA VOTI
+    // CARICA RECENSIONI + RISPOSTE + MEDIA VOTI
     // ============================================================
     private void caricaRecensioni(int idRistorante) {
     try {
@@ -224,7 +224,7 @@ public class RistoranteDettagliController {
         int sommaVoti = 0;
         int numeroRecensioni = 0;
 
-        // ⭐ NON USIAMO LAMBDA → USIAMO FOR CLASSICO
+       
         for (int i = 0; i < arr.size(); i++) {
 
             JsonObject r = arr.get(i).getAsJsonObject();
@@ -277,7 +277,7 @@ public class RistoranteDettagliController {
             view.getRecensioniContainer().getChildren().add(card);
         }
 
-        // ⭐ CALCOLO MEDIA
+        //  CALCOLO MEDIA
         if (numeroRecensioni > 0) {
             double media = (double) sommaVoti / numeroRecensioni;
             view.getLblMediaVoti().setText(String.format("Media voti: %.1f / 5", media));
@@ -292,7 +292,7 @@ public class RistoranteDettagliController {
 
 
     // ============================================================
-    // ⭐ INVIA RISPOSTA
+    // INVIA RISPOSTA
     // ============================================================
     private void inviaRisposta(int idRecensione, String testo) {
         try {

@@ -2,12 +2,8 @@ package client.gui;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
+import javafx.scene.control.*;
+import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 
 public class RecensioniUtenteView extends BorderPane {
@@ -24,47 +20,55 @@ public class RecensioniUtenteView extends BorderPane {
 
     private void creaLayout() {
 
+        // ============================
+        // TITOLO
+        // ============================
         Label titolo = new Label("Le Tue Recensioni");
-        titolo.setFont(new Font(26));
-        titolo.setPadding(new Insets(20, 0, 20, 0));
+        titolo.setFont(new Font(30));
+        titolo.setPadding(new Insets(20, 0, 30, 0));
 
-        HBox topBox = new HBox(titolo);
+        VBox topBox = new VBox(titolo);
         topBox.setAlignment(Pos.CENTER);
+        topBox.setPadding(new Insets(10));
+
         this.setTop(topBox);
 
+        // ============================
+        // TABELLA (ESPANDIBILE)
+        // ============================
         tabella = new TableView<>();
 
         TableColumn<RecensioneRow, String> colRistorante = new TableColumn<>("Ristorante");
         colRistorante.setCellValueFactory(c -> c.getValue().nomeRistoranteProperty());
-        colRistorante.setPrefWidth(180);
 
         TableColumn<RecensioneRow, Integer> colVoto = new TableColumn<>("Voto");
         colVoto.setCellValueFactory(c -> c.getValue().votoProperty().asObject());
-        colVoto.setPrefWidth(60);
 
         TableColumn<RecensioneRow, String> colCommento = new TableColumn<>("Commento");
         colCommento.setCellValueFactory(c -> c.getValue().commentoProperty());
-        colCommento.setPrefWidth(250);
 
         TableColumn<RecensioneRow, String> colData = new TableColumn<>("Data");
         colData.setCellValueFactory(c -> c.getValue().dataProperty());
-        colData.setPrefWidth(120);
 
-        tabella.getColumns().add(colRistorante);
-        tabella.getColumns().add(colVoto);
-        tabella.getColumns().add(colCommento);
-        tabella.getColumns().add(colData);
+        tabella.getColumns().addAll(colRistorante, colVoto, colCommento, colData);
+        tabella.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
+        // ⭐ La tabella ora si espande a tutto lo spazio disponibile
+        BorderPane.setMargin(tabella, new Insets(10));
         this.setCenter(tabella);
 
+        // ============================
+        // BOTTONI IN BASSO
+        // ============================
         btnIndietro = new Button("Indietro");
-        btnIndietro.setPrefWidth(120);
-
         btnModifica = new Button("Modifica");
-        btnModifica.setPrefWidth(120);
-
         btnElimina = new Button("Elimina");
-        btnElimina.setPrefWidth(120);
+
+        Button[] buttons = { btnIndietro, btnModifica, btnElimina };
+        for (Button b : buttons) {
+            b.setPrefWidth(150);
+            b.setStyle("-fx-font-size: 16px;");
+        }
 
         HBox bottomBox = new HBox(20, btnIndietro, btnModifica, btnElimina);
         bottomBox.setAlignment(Pos.CENTER);
@@ -72,7 +76,8 @@ public class RecensioniUtenteView extends BorderPane {
 
         this.setBottom(bottomBox);
 
-        this.setPadding(new Insets(15));
+        // Padding generale
+        this.setPadding(new Insets(10));
         this.setStyle("-fx-background-color: #f8f8f8;");
     }
 

@@ -6,9 +6,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
+import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 
 public class LoginView extends BorderPane {
@@ -26,21 +24,30 @@ public class LoginView extends BorderPane {
 
     private void creaLayout() {
 
+        // ============================
+        // TITOLO
+        // ============================
         Label titolo = new Label("Accesso Utente");
-        titolo.setFont(new Font(26));
-        titolo.setPadding(new Insets(20, 0, 20, 0));
+        titolo.setFont(new Font(32));
+        titolo.setPadding(new Insets(20, 0, 40, 0));
 
-        HBox topBox = new HBox(titolo);
+        VBox topBox = new VBox(titolo);
         topBox.setAlignment(Pos.CENTER);
         this.setTop(topBox);
 
+        // ============================
+        // FORM CENTRALE
+        // ============================
         GridPane form = new GridPane();
         form.setPadding(new Insets(20));
-        form.setHgap(10);
-        form.setVgap(15);
+        form.setHgap(15);
+        form.setVgap(20);
 
         txtEmail = new TextField();
+        txtEmail.setPrefWidth(300);
+
         txtPassword = new PasswordField();
+        txtPassword.setPrefWidth(300);
 
         form.add(new Label("Email:"), 0, 0);
         form.add(txtEmail, 1, 0);
@@ -48,24 +55,36 @@ public class LoginView extends BorderPane {
         form.add(new Label("Password:"), 0, 1);
         form.add(txtPassword, 1, 1);
 
-        this.setCenter(form);
+        // ⭐ Centra il form nello schermo
+        VBox centerBox = new VBox(form);
+        centerBox.setAlignment(Pos.CENTER);
+        VBox.setVgrow(centerBox, Priority.ALWAYS);
 
+        this.setCenter(centerBox);
+
+        // ============================
+        // BOTTONI IN BASSO
+        // ============================
         btnIndietro = new Button("Indietro");
-        btnIndietro.setPrefWidth(120);
-
         btnRegistrati = new Button("Registrati");
-        btnRegistrati.setPrefWidth(120);
-
         btnAccedi = new Button("Accedi");
-        btnAccedi.setPrefWidth(120);
 
-        HBox bottomBox = new HBox(20, btnIndietro, btnRegistrati, btnAccedi);
+        Button[] buttons = { btnIndietro, btnRegistrati, btnAccedi };
+        for (Button b : buttons) {
+            b.setPrefWidth(150);
+            b.setStyle("-fx-font-size: 16px;");
+        }
+
+        HBox bottomBox = new HBox(30, btnIndietro, btnRegistrati, btnAccedi);
         bottomBox.setAlignment(Pos.CENTER);
-        bottomBox.setPadding(new Insets(20));
+        bottomBox.setPadding(new Insets(30));
 
         this.setBottom(bottomBox);
 
-        this.setPadding(new Insets(15));
+        // ============================
+        // STILE GENERALE
+        // ============================
+        this.setPadding(new Insets(20));
         this.setStyle("-fx-background-color: #f8f8f8;");
     }
 

@@ -3,8 +3,7 @@ package client.gui;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 
 public class RistoranteDettagliView extends BorderPane {
 
@@ -19,10 +18,8 @@ public class RistoranteDettagliView extends BorderPane {
     private Label lblDelivery;
     private Label lblPrenotazione;
 
-    // ⭐ NUOVO: media voti
     private Label lblMediaVoti;
 
-    // ⭐ contenitore dinamico recensioni
     private VBox recensioniContainer;
 
     private Button btnIndietro;
@@ -38,8 +35,11 @@ public class RistoranteDettagliView extends BorderPane {
 
     private void creaLayout() {
 
+        // ============================
+        // LABEL PRINCIPALI
+        // ============================
         lblNome = new Label();
-        lblNome.setStyle("-fx-font-size: 22px; -fx-font-weight: bold;");
+        lblNome.setStyle("-fx-font-size: 28px; -fx-font-weight: bold;");
 
         lblIndirizzo = new Label();
         lblCitta = new Label();
@@ -51,26 +51,39 @@ public class RistoranteDettagliView extends BorderPane {
         lblDelivery = new Label();
         lblPrenotazione = new Label();
 
-        // ⭐ NUOVO: media voti
         lblMediaVoti = new Label("Media voti: -");
-        lblMediaVoti.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #444;");
+        lblMediaVoti.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #444;");
 
-        // ⭐ contenitore recensioni
-        recensioniContainer = new VBox(10);
+        // ============================
+        // CONTENITORE RECENSIONI
+        // ============================
+        recensioniContainer = new VBox(12);
         recensioniContainer.setPadding(new Insets(10));
 
-        btnIndietro = new Button("← Indietro");
-        btnPreferiti = new Button("⭐ Aggiungi ai preferiti");
-        btnScriviRecensione = new Button("📝 Invia recensione");
-
+        // ============================
+        // SEZIONE SCRITTURA RECENSIONE
+        // ============================
         txtRecensione = new TextArea();
         txtRecensione.setPromptText("Scrivi qui la tua recensione...");
-        txtRecensione.setPrefHeight(80);
+        txtRecensione.setPrefRowCount(5);
+        txtRecensione.setStyle("-fx-font-size: 14px;");
 
         votoSpinner = new Spinner<>(1, 5, 5);
 
-        VBox box = new VBox(
-                10,
+        btnScriviRecensione = new Button("📝 Invia recensione");
+        btnScriviRecensione.setPrefWidth(200);
+
+        btnPreferiti = new Button("⭐ Aggiungi ai preferiti");
+        btnPreferiti.setPrefWidth(200);
+
+        btnIndietro = new Button("← Indietro");
+        btnIndietro.setPrefWidth(200);
+
+        // ============================
+        // LAYOUT CENTRALE (SCROLLABILE)
+        // ============================
+        VBox contenuto = new VBox(
+                15,
                 lblNome,
                 lblIndirizzo,
                 lblCitta,
@@ -81,8 +94,6 @@ public class RistoranteDettagliView extends BorderPane {
                 lblLongitudine,
                 lblDelivery,
                 lblPrenotazione,
-
-                // ⭐ MEDIA VOTI
                 lblMediaVoti,
 
                 new Label("Recensioni:"),
@@ -96,14 +107,25 @@ public class RistoranteDettagliView extends BorderPane {
                 btnIndietro
         );
 
-        box.setAlignment(Pos.TOP_LEFT);
-        box.setPadding(new Insets(20));
+        contenuto.setPadding(new Insets(25));
+        contenuto.setAlignment(Pos.TOP_LEFT);
 
-        this.setCenter(box);
+        // ⭐ ScrollPane per rendere tutto responsive
+        ScrollPane scroll = new ScrollPane(contenuto);
+        scroll.setFitToWidth(true);
+        scroll.setPadding(new Insets(10));
+
+        this.setCenter(scroll);
+
+        // ============================
+        // STILE GENERALE
+        // ============================
+        this.setPadding(new Insets(10));
+        this.setStyle("-fx-background-color: #f8f8f8;");
     }
 
     // ============================================================
-    // ⭐ NASCONDI FUNZIONI CLIENTE
+    // NASCONDI FUNZIONI CLIENTE
     // ============================================================
     public void nascondiFunzioniCliente() {
         txtRecensione.setManaged(false);

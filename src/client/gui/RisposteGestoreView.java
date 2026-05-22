@@ -2,13 +2,8 @@ package client.gui;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
+import javafx.scene.control.*;
+import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.util.Callback;
 
@@ -29,15 +24,16 @@ public class RisposteGestoreView extends BorderPane {
         // TITOLO
         // ============================
         Label titolo = new Label("Recensioni ricevute");
-        titolo.setFont(new Font(26));
-        titolo.setPadding(new Insets(20, 0, 10, 0));
+        titolo.setFont(new Font(30));
+        titolo.setPadding(new Insets(20, 0, 30, 0));
 
-        HBox topBox = new HBox(titolo);
+        VBox topBox = new VBox(titolo);
         topBox.setAlignment(Pos.CENTER);
+        topBox.setPadding(new Insets(10));
         this.setTop(topBox);
 
         // ============================
-        // TABELLA
+        // TABELLA (ESPANDIBILE)
         // ============================
         tabella = new TableView<>();
         tabella.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
@@ -45,41 +41,42 @@ public class RisposteGestoreView extends BorderPane {
         // UTENTE
         TableColumn<RispostaRow, String> colUtente = new TableColumn<>("Utente");
         colUtente.setCellValueFactory(c -> c.getValue().utenteProperty());
-        colUtente.setMinWidth(100);
 
         // VOTO
         TableColumn<RispostaRow, Integer> colVoto = new TableColumn<>("Voto");
         colVoto.setCellValueFactory(c -> c.getValue().votoProperty().asObject());
-        colVoto.setMinWidth(60);
 
-        // COMMENTO (con wrapping)
+        // COMMENTO (wrapping)
         TableColumn<RispostaRow, String> colCommento = new TableColumn<>("Commento");
         colCommento.setCellValueFactory(c -> c.getValue().commentoProperty());
-        colCommento.setMinWidth(250);
         colCommento.setCellFactory(getWrappingCellFactory());
 
-        // RISPOSTA (con wrapping)
+        // RISPOSTA (wrapping)
         TableColumn<RispostaRow, String> colRisposta = new TableColumn<>("Risposta del Gestore");
         colRisposta.setCellValueFactory(c -> c.getValue().rispostaProperty());
-        colRisposta.setMinWidth(250);
         colRisposta.setCellFactory(getWrappingCellFactory());
 
         tabella.getColumns().addAll(colUtente, colVoto, colCommento, colRisposta);
 
+        // ⭐ La tabella ora si espande a tutto lo schermo
+        BorderPane.setMargin(tabella, new Insets(10));
         this.setCenter(tabella);
 
         // ============================
-        // BOTTONI
+        // BOTTONI IN BASSO
         // ============================
         btnIndietro = new Button("Indietro");
-        btnIndietro.setPrefWidth(120);
-
         btnRispondi = new Button("Rispondi");
-        btnRispondi.setPrefWidth(120);
+
+        Button[] buttons = { btnIndietro, btnRispondi };
+        for (Button b : buttons) {
+            b.setPrefWidth(150);
+            b.setStyle("-fx-font-size: 16px;");
+        }
 
         HBox bottomBox = new HBox(20, btnIndietro, btnRispondi);
         bottomBox.setAlignment(Pos.CENTER);
-        bottomBox.setPadding(new Insets(20));
+        bottomBox.setPadding(new Insets(25));
 
         this.setBottom(bottomBox);
 
@@ -91,7 +88,7 @@ public class RisposteGestoreView extends BorderPane {
     }
 
     /**
-     * Crea celle che fanno wrapping del testo
+     * Celle con wrapping del testo
      */
     private Callback<TableColumn<RispostaRow, String>, TableCell<RispostaRow, String>> getWrappingCellFactory() {
         return col -> new TableCell<>() {
@@ -121,7 +118,6 @@ public class RisposteGestoreView extends BorderPane {
     // ============================
 
     public TableView<RispostaRow> getTabella() { return tabella; }
-
     public Button getBtnIndietro() { return btnIndietro; }
     public Button getBtnRispondi() { return btnRispondi; }
 }

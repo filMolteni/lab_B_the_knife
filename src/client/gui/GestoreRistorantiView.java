@@ -3,9 +3,7 @@ package client.gui;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 
 public class GestoreRistorantiView extends BorderPane {
@@ -24,7 +22,9 @@ public class GestoreRistorantiView extends BorderPane {
 
     private void creaLayout() {
 
-        // TITOLO
+        // ============================
+        // TITOLO + INDIETRO
+        // ============================
         Label titolo = new Label("Gestione Ristoranti");
         titolo.setFont(new Font(26));
         titolo.setPadding(new Insets(10, 0, 10, 0));
@@ -37,10 +37,12 @@ public class GestoreRistorantiView extends BorderPane {
 
         VBox topBox = new VBox(titolo, topButtons);
         topBox.setAlignment(Pos.CENTER);
+        topBox.setPadding(new Insets(10));
+
         this.setTop(topBox);
 
         // ============================
-        // TABELLA
+        // TABELLA (ESPANDIBILE)
         // ============================
         tabella = new TableView<>();
 
@@ -61,8 +63,11 @@ public class GestoreRistorantiView extends BorderPane {
         colTipoCucina.setPrefWidth(150);
 
         tabella.getColumns().addAll(colId, colNome, colIndirizzo, colTipoCucina);
-        tabella.setPrefHeight(350);
 
+        // ⭐ Permette alla tabella di espandersi a tutto lo spazio disponibile
+        VBox.setVgrow(tabella, Priority.ALWAYS);
+
+        BorderPane.setMargin(tabella, new Insets(10));
         this.setCenter(tabella);
 
         // ============================
@@ -78,6 +83,9 @@ public class GestoreRistorantiView extends BorderPane {
         bottoni.setPadding(new Insets(15));
 
         this.setBottom(bottoni);
+
+        // Padding generale
+        this.setPadding(new Insets(10));
     }
 
     // GETTER

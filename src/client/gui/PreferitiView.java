@@ -3,17 +3,25 @@ package client.gui;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 
-public class PreferitiView extends VBox {
+public class PreferitiView extends BorderPane {
 
     private final TableView<PreferitoRow> tabella = new TableView<>();
     private final Button btnIndietro = new Button("← Indietro");
 
     public PreferitiView() {
+        creaLayout();
+    }
 
-        // COLONNE
+    private void creaLayout() {
+
+        // ============================
+        // TABELLA
+        // ============================
         TableColumn<PreferitoRow, Number> colId = new TableColumn<>("ID");
         colId.setCellValueFactory(c -> new SimpleIntegerProperty(c.getValue().getId()));
 
@@ -41,21 +49,34 @@ public class PreferitiView extends VBox {
         TableColumn<PreferitoRow, Boolean> colPrenotazione = new TableColumn<>("Prenotazione");
         colPrenotazione.setCellValueFactory(c -> new SimpleBooleanProperty(c.getValue().isPrenotazione()));
 
-        // ⭐ NUOVA COLONNA: FONTE (THEKNIFE / UTENTE)
         TableColumn<PreferitoRow, String> colFonte = new TableColumn<>("Fonte");
         colFonte.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getFonte()));
 
-        // AGGIUNTA COLONNE ALLA TABELLA
         tabella.getColumns().addAll(
                 colId, colNome, colIndirizzo, colCitta, colNazione,
-                colCucina, colPrezzo, colDelivery, colPrenotazione,
-                colFonte // ⭐ NUOVO
+                colCucina, colPrezzo, colDelivery, colPrenotazione, colFonte
         );
 
         tabella.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
-        setSpacing(10);
-        getChildren().addAll(tabella, btnIndietro);
+        // ⭐ La tabella ora si espande a tutto lo spazio disponibile
+        BorderPane.setMargin(tabella, new Insets(10));
+        this.setCenter(tabella);
+
+        // ============================
+        // BOTTONE INDIETRO
+        // ============================
+        btnIndietro.setPrefWidth(150);
+        btnIndietro.setStyle("-fx-font-size: 16px;");
+
+        HBox bottom = new HBox(btnIndietro);
+        bottom.setAlignment(Pos.CENTER);
+        bottom.setPadding(new Insets(20));
+
+        this.setBottom(bottom);
+
+        // Padding generale
+        this.setPadding(new Insets(10));
     }
 
     public TableView<PreferitoRow> getTabella() { return tabella; }

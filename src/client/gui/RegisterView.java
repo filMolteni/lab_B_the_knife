@@ -3,9 +3,7 @@ package client.gui;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
+import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 
 public class RegisterView extends BorderPane {
@@ -26,23 +24,38 @@ public class RegisterView extends BorderPane {
 
     private void creaLayout() {
 
+        // ============================
+        // TITOLO
+        // ============================
         Label titolo = new Label("Registrazione Utente");
-        titolo.setFont(new Font(26));
-        titolo.setPadding(new Insets(20, 0, 20, 0));
+        titolo.setFont(new Font(32));
+        titolo.setPadding(new Insets(20, 0, 40, 0));
 
-        HBox topBox = new HBox(titolo);
+        VBox topBox = new VBox(titolo);
         topBox.setAlignment(Pos.CENTER);
+        topBox.setPadding(new Insets(10));
         this.setTop(topBox);
 
+        // ============================
+        // FORM CENTRALE
+        // ============================
         GridPane form = new GridPane();
         form.setPadding(new Insets(20));
-        form.setHgap(10);
-        form.setVgap(15);
+        form.setHgap(15);
+        form.setVgap(20);
 
         txtUsername = new TextField();
+        txtUsername.setPrefWidth(300);
+
         txtEmail = new TextField();
+        txtEmail.setPrefWidth(300);
+
         txtPassword = new PasswordField();
+        txtPassword.setPrefWidth(300);
+
         txtConferma = new PasswordField();
+        txtConferma.setPrefWidth(300);
+
         chkGestore = new CheckBox("Registrati come gestore");
 
         form.add(new Label("Username:"), 0, 0);
@@ -59,21 +72,35 @@ public class RegisterView extends BorderPane {
 
         form.add(chkGestore, 1, 4);
 
-        this.setCenter(form);
+        // ⭐ Centra il form nello schermo
+        VBox centerBox = new VBox(form);
+        centerBox.setAlignment(Pos.CENTER);
+        VBox.setVgrow(centerBox, Priority.ALWAYS);
 
+        this.setCenter(centerBox);
+
+        // ============================
+        // BOTTONI IN BASSO
+        // ============================
         btnIndietro = new Button("Indietro");
-        btnIndietro.setPrefWidth(120);
-
         btnRegistrati = new Button("Registrati");
-        btnRegistrati.setPrefWidth(120);
 
-        HBox bottomBox = new HBox(20, btnIndietro, btnRegistrati);
+        Button[] buttons = { btnIndietro, btnRegistrati };
+        for (Button b : buttons) {
+            b.setPrefWidth(150);
+            b.setStyle("-fx-font-size: 16px;");
+        }
+
+        HBox bottomBox = new HBox(30, btnIndietro, btnRegistrati);
         bottomBox.setAlignment(Pos.CENTER);
-        bottomBox.setPadding(new Insets(20));
+        bottomBox.setPadding(new Insets(30));
 
         this.setBottom(bottomBox);
 
-        this.setPadding(new Insets(15));
+        // ============================
+        // STILE GENERALE
+        // ============================
+        this.setPadding(new Insets(20));
         this.setStyle("-fx-background-color: #f8f8f8;");
     }
 

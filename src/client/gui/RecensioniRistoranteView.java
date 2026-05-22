@@ -3,8 +3,7 @@ package client.gui;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
+import javafx.scene.layout.*;
 
 public class RecensioniRistoranteView extends BorderPane {
 
@@ -17,12 +16,21 @@ public class RecensioniRistoranteView extends BorderPane {
 
     private void creaLayout() {
 
+        // ============================
+        // TITOLO
+        // ============================
         Label titolo = new Label("Recensioni del Ristorante");
-        titolo.setStyle("-fx-font-size: 22px; -fx-font-weight: bold;");
-        BorderPane.setAlignment(titolo, Pos.CENTER);
-        this.setTop(titolo);
-        BorderPane.setMargin(titolo, new Insets(20, 0, 20, 0));
+        titolo.setStyle("-fx-font-size: 26px; -fx-font-weight: bold;");
 
+        VBox topBox = new VBox(titolo);
+        topBox.setAlignment(Pos.CENTER);
+        topBox.setPadding(new Insets(20, 0, 20, 0));
+
+        this.setTop(topBox);
+
+        // ============================
+        // TABELLA (ESPANDIBILE)
+        // ============================
         tabella = new TableView<>();
 
         TableColumn<RecensioneRistoranteRow, String> colUtente = new TableColumn<>("Utente");
@@ -38,15 +46,27 @@ public class RecensioniRistoranteView extends BorderPane {
         colData.setCellValueFactory(c -> c.getValue().dataProperty());
 
         tabella.getColumns().addAll(colUtente, colVoto, colCommento, colData);
+        tabella.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
+        // ⭐ La tabella ora si espande a tutto lo spazio disponibile
+        BorderPane.setMargin(tabella, new Insets(10));
         this.setCenter(tabella);
 
+        // ============================
+        // BOTTONE CHIUDI
+        // ============================
         btnChiudi = new Button("Chiudi");
-        HBox box = new HBox(btnChiudi);
-        box.setAlignment(Pos.CENTER);
-        box.setPadding(new Insets(20));
+        btnChiudi.setPrefWidth(150);
+        btnChiudi.setStyle("-fx-font-size: 16px;");
 
-        this.setBottom(box);
+        HBox bottomBox = new HBox(btnChiudi);
+        bottomBox.setAlignment(Pos.CENTER);
+        bottomBox.setPadding(new Insets(20));
+
+        this.setBottom(bottomBox);
+
+        // Padding generale
+        this.setPadding(new Insets(10));
     }
 
     public TableView<RecensioneRistoranteRow> getTabella() { return tabella; }

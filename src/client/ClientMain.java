@@ -28,7 +28,7 @@ public class ClientMain extends Application {
     }
 
     // ============================
-    // LOGIN
+    // LOGIN (ORA A SCHERMO INTERO)
     // ============================
     private void mostraLogin() {
         LoginView view = new LoginView();
@@ -41,13 +41,15 @@ public class ClientMain extends Application {
                 this::mostraHome
         );
 
-        primaryStage.setScene(new Scene(view, 500, 400));
+        Scene scene = new Scene(view);
+        primaryStage.setScene(scene);
         primaryStage.setTitle("Login");
+        primaryStage.setMaximized(true);   // ⭐ SCHERMO INTERO
         primaryStage.show();
     }
 
     // ============================
-    // REGISTRAZIONE
+    // REGISTRAZIONE (A SCHERMO INTERO)
     // ============================
     private void mostraRegistrazione() {
         RegisterView view = new RegisterView();
@@ -59,13 +61,15 @@ public class ClientMain extends Application {
                 this::mostraLogin
         );
 
-        primaryStage.setScene(new Scene(view, 500, 450));
+        Scene scene = new Scene(view);
+        primaryStage.setScene(scene);
         primaryStage.setTitle("Registrazione");
+        primaryStage.setMaximized(true);   // ⭐ SCHERMO INTERO
         primaryStage.show();
     }
 
     // ============================
-    // HOME
+    // HOME (A SCHERMO INTERO)
     // ============================
     private void mostraHome() {
         HomeView view = new HomeView();
@@ -73,20 +77,22 @@ public class ClientMain extends Application {
         new HomeController(
                 view,
                 connection,
-                this::mostraRicercaRistoranti,   // CERCA
-                this::mostraPreferiti,           // PREFERITI
-                this::mostraRecensioniUtente,    // RECENSIONI UTENTE
-                this::mostraGestioneRistoranti,  // GESTIONE (GESTORE)
-                this::mostraRecensioniRicevute,  // RECENSIONI RICEVUTE (GESTORE)
-                this::mostraLogin,               // LOGIN
-                () -> {                          // LOGOUT
+                this::mostraRicercaRistoranti,
+                this::mostraPreferiti,
+                this::mostraRecensioniUtente,
+                this::mostraGestioneRistoranti,
+                this::mostraRecensioniRicevute,
+                this::mostraLogin,
+                () -> {
                     System.out.println("Logout eseguito");
                     mostraHome();
                 }
         );
 
-        primaryStage.setScene(new Scene(view, 600, 500));
+        Scene scene = new Scene(view);
+        primaryStage.setScene(scene);
         primaryStage.setTitle("Home");
+        primaryStage.setMaximized(true);   // ⭐ SCHERMO INTERO
         primaryStage.show();
     }
 
@@ -94,40 +100,42 @@ public class ClientMain extends Application {
     // RICERCA RISTORANTI
     // ============================
     private void mostraRicercaRistoranti() {
-            RicercaRistorantiView view = new RicercaRistorantiView();
+        RicercaRistorantiView view = new RicercaRistorantiView();
 
-            new RicercaRistorantiController(
-                    view,
-                    connection,
-                    this::mostraHome,
-                    (id, fonte) -> mostraDettagliRistorante(id, fonte)   // ⭐ AGGIORNATO
-            );
+        new RicercaRistorantiController(
+                view,
+                connection,
+                this::mostraHome,
+                (id, fonte) -> mostraDettagliRistorante(id, fonte)
+        );
 
-            primaryStage.setScene(new Scene(view, 800, 600));
-            primaryStage.setTitle("Cerca Ristoranti");
-            primaryStage.show();
-        }
-
+        Scene scene = new Scene(view);
+        primaryStage.setScene(scene);
+        primaryStage.setTitle("Cerca Ristoranti");
+        primaryStage.setMaximized(true);   // ⭐ SCHERMO INTERO
+        primaryStage.show();
+    }
 
     // ============================
     // DETTAGLI RISTORANTE
     // ============================
-   private void mostraDettagliRistorante(int id, String fonte) {
+    private void mostraDettagliRistorante(int id, String fonte) {
         RistoranteDettagliView view = new RistoranteDettagliView();
 
         new RistoranteDettagliController(
                 view,
                 connection,
                 id,
-                fonte, // ⭐ PASSIAMO LA FONTE
+                fonte,
                 this::mostraHome
         );
 
-        primaryStage.setScene(new Scene(view, 700, 500));
+        Scene scene = new Scene(view);
+        primaryStage.setScene(scene);
         primaryStage.setTitle("Dettagli Ristorante");
+        primaryStage.setMaximized(true);   // ⭐ SCHERMO INTERO
         primaryStage.show();
     }
-
 
     // ============================
     // PREFERITI
@@ -139,14 +147,15 @@ public class ClientMain extends Application {
                 view,
                 connection,
                 this::mostraHome,
-                (id, fonte) -> mostraDettagliRistorante(id, fonte)   // ⭐ AGGIUNTO
+                (id, fonte) -> mostraDettagliRistorante(id, fonte)
         );
 
-        primaryStage.setScene(new Scene(view, 600, 500));
+        Scene scene = new Scene(view);
+        primaryStage.setScene(scene);
         primaryStage.setTitle("Preferiti");
+        primaryStage.setMaximized(true);   // ⭐ SCHERMO INTERO
         primaryStage.show();
     }
-
 
     // ============================
     // RECENSIONI UTENTE
@@ -160,8 +169,10 @@ public class ClientMain extends Application {
                 this::mostraHome
         );
 
-        primaryStage.setScene(new Scene(view, 700, 500));
+        Scene scene = new Scene(view);
+        primaryStage.setScene(scene);
         primaryStage.setTitle("Le mie recensioni");
+        primaryStage.setMaximized(true);   // ⭐ SCHERMO INTERO
         primaryStage.show();
     }
 
@@ -170,9 +181,6 @@ public class ClientMain extends Application {
     // ============================
     private void mostraRecensioniRicevute() {
         RecensioniRistoranteView view = new RecensioniRistoranteView();
-
-
-
 
         RecensioniRistoranteController controller =
                 new RecensioniRistoranteController(
@@ -183,22 +191,19 @@ public class ClientMain extends Application {
 
         controller.loadRecensioni();
 
-        primaryStage.setScene(new Scene(view, 700, 500));
+        Scene scene = new Scene(view);
+        primaryStage.setScene(scene);
         primaryStage.setTitle("Recensioni ricevute");
+        primaryStage.setMaximized(true);   // ⭐ SCHERMO INTERO
         primaryStage.show();
     }
-
-
-
 
     // ============================
     // GESTIONE RISTORANTI (GESTORE)
     // ============================
     private void mostraGestioneRistoranti() {
-
         GestoreRistorantiView view = new GestoreRistorantiView();
 
-        // ⭐ CREA IL CONTROLLER E SALVALO IN UNA VARIABILE
         GestoreRistorantiController controller = new GestoreRistorantiController(
                 view,
                 connection,
@@ -206,14 +211,14 @@ public class ClientMain extends Application {
                 this::mostraDettagliRistorante
         );
 
-        // ⭐ CARICA SUBITO I RISTORANTI DEL GESTORE
         controller.loadRiepilogo();
 
-        primaryStage.setScene(new Scene(view, 800, 600));
+        Scene scene = new Scene(view);
+        primaryStage.setScene(scene);
         primaryStage.setTitle("Gestione Ristoranti");
+        primaryStage.setMaximized(true);   // ⭐ SCHERMO INTERO
         primaryStage.show();
     }
-
 
     public static void main(String[] args) {
         launch(args);

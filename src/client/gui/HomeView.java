@@ -3,11 +3,9 @@ package client.gui;
 import client.model.UtenteDTO;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 
 public class HomeView extends BorderPane {
@@ -26,36 +24,42 @@ public class HomeView extends BorderPane {
 
     private void creaLayout() {
 
+        // ============================
+        // TITOLO
+        // ============================
         Label titolo = new Label("Benvenuto in TheKnife");
-        titolo.setFont(new Font(28));
-        titolo.setPadding(new Insets(20, 0, 30, 0));
+        titolo.setFont(new Font(32));
+        titolo.setPadding(new Insets(30, 0, 40, 0));
 
         VBox topBox = new VBox(titolo);
         topBox.setAlignment(Pos.CENTER);
+        topBox.setPadding(new Insets(20));
         this.setTop(topBox);
 
+        // ============================
+        // MENU CENTRALE
+        // ============================
         btnCerca = new Button("Cerca Ristoranti");
-        btnCerca.setPrefWidth(220);
-
         btnPreferiti = new Button("I miei Preferiti");
-        btnPreferiti.setPrefWidth(220);
-
         btnRecensioni = new Button("Le mie Recensioni");
-        btnRecensioni.setPrefWidth(220);
-
         btnGestione = new Button("Gestione Ristoranti");
-        btnGestione.setPrefWidth(220);
-
         btnRecensioniRicevute = new Button("Recensioni ricevute");
-        btnRecensioniRicevute.setPrefWidth(220);
-
         btnLogin = new Button("Login");
-        btnLogin.setPrefWidth(220);
-
         btnLogout = new Button("Logout");
-        btnLogout.setPrefWidth(220);
 
-        VBox menu = new VBox(15,
+        // Larghezza pulsanti responsive
+        Button[] buttons = {
+                btnCerca, btnPreferiti, btnRecensioni,
+                btnGestione, btnRecensioniRicevute,
+                btnLogin, btnLogout
+        };
+
+        for (Button b : buttons) {
+            b.setPrefWidth(260);
+            b.setStyle("-fx-font-size: 16px;");
+        }
+
+        VBox menu = new VBox(20,
                 btnCerca,
                 btnPreferiti,
                 btnRecensioni,
@@ -68,57 +72,55 @@ public class HomeView extends BorderPane {
         menu.setAlignment(Pos.CENTER);
         menu.setPadding(new Insets(40));
 
-        this.setCenter(menu);
+        // ⭐ Permette al menu di espandersi verticalmente
+        VBox.setVgrow(menu, Priority.ALWAYS);
 
-        this.setPadding(new Insets(15));
+        this.setCenter(menu);
+        BorderPane.setAlignment(menu, Pos.CENTER);
+
+        // Padding generale
+        this.setPadding(new Insets(20));
         this.setStyle("-fx-background-color: #f8f8f8;");
     }
 
+    // ============================
+    // VISIBILITÀ IN BASE AL LOGIN
+    // ============================
     public void refreshVisibility() {
 
-    UtenteDTO u = UtenteDTO.getUtenteLoggato();
+        UtenteDTO u = UtenteDTO.getUtenteLoggato();
+        boolean logged = (u != null && u.getUsername() != null);
 
-    boolean logged = (u != null && u.getUsername() != null);
+        btnLogin.setVisible(!logged);
+        btnLogout.setVisible(logged);
 
-    // LOGIN / LOGOUT
-    btnLogin.setVisible(!logged);
-    btnLogout.setVisible(logged);
+        if (!logged) {
+            btnCerca.setVisible(true);
+            btnPreferiti.setVisible(false);
+            btnRecensioni.setVisible(false);
+            btnGestione.setVisible(false);
+            btnRecensioniRicevute.setVisible(false);
+            return;
+        }
 
-    // Se non loggato → può solo cercare
-    if (!logged) {
-        btnCerca.setVisible(true);
-        btnPreferiti.setVisible(false);
-        btnRecensioni.setVisible(false);
-        btnGestione.setVisible(false);
-        btnRecensioniRicevute.setVisible(false);
-        return;
+        if (u.isCliente()) {
+            btnCerca.setVisible(true);
+            btnPreferiti.setVisible(true);
+            btnRecensioni.setVisible(true);
+            btnGestione.setVisible(false);
+            btnRecensioniRicevute.setVisible(false);
+        }
+
+        if (u.isGestore()) {
+            btnCerca.setVisible(true);
+            btnPreferiti.setVisible(false);
+            btnRecensioni.setVisible(false);
+            btnGestione.setVisible(true);
+            btnRecensioniRicevute.setVisible(true);
+        }
     }
 
-    // ============================
-    // CLIENTE
-    // ============================
-    if (u.isCliente()) {
-        btnCerca.setVisible(true);
-        btnPreferiti.setVisible(true);       // preferiti del cliente
-        btnRecensioni.setVisible(true);      // recensioni dell’utente
-        btnGestione.setVisible(false);
-        btnRecensioniRicevute.setVisible(false);
-    }
-
-    // ============================
-    // GESTORE
-    // ============================
-    if (u.isGestore()) {
-        btnCerca.setVisible(true);
-        btnPreferiti.setVisible(false);
-        btnRecensioni.setVisible(false);
-        btnGestione.setVisible(true);        // gestione ristoranti
-        btnRecensioniRicevute.setVisible(true); // recensioni ricevute
-    }
-}
-
-
-    // === GETTER ===
+    // GETTER
     public Button getBtnCerca() { return btnCerca; }
     public Button getBtnPreferiti() { return btnPreferiti; }
     public Button getBtnRecensioni() { return btnRecensioni; }
@@ -126,5 +128,4 @@ public class HomeView extends BorderPane {
     public Button getBtnRecensioniRicevute() { return btnRecensioniRicevute; }
     public Button getBtnLogin() { return btnLogin; }
     public Button getBtnLogout() { return btnLogout; }
-
 }

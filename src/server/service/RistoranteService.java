@@ -18,75 +18,129 @@ public class RistoranteService {
     // CERCA RISTORANTI (ALL)
     // ============================================================
     public static Response cerca(Request req) {
-    try {
-        String query = req.payload.get("query").getAsString();
-        String tipoCucina = req.payload.has("tipoCucina")
-                ? req.payload.get("tipoCucina").getAsString()
-                : "Tutte";
+        try {
 
-        // ============================
-        // 1️⃣ CERCA IN THEKNIFE
-        // ============================
-        List<Ristorante> listaTK = RistoranteDAO.cerca(query, tipoCucina);
+            // ============================
+            // LETTURA FILTRI DAL PAYLOAD
+            // ============================
 
-        // ============================
-        // 2️⃣ CERCA IN RISTORANTI UTENTE
-        // ============================
-        List<Ristorante> listaUT = RistoranteUtenteDAO.cerca(query, tipoCucina);
+            String query = req.payload.has("query")
+                    ? req.payload.get("query").getAsString()
+                    : "";
 
-        // ============================
-        // 3️⃣ UNISCI LE DUE LISTE
-        // ============================
-        JsonArray arr = new JsonArray();
+            String tipoCucina = req.payload.has("tipoCucina")
+                    ? req.payload.get("tipoCucina").getAsString()
+                    : "Tutte";
 
-        // THEKNIFE
-        for (Ristorante r : listaTK) {
-            JsonObject o = new JsonObject();
-            o.addProperty("id", r.getId());
-            o.addProperty("nome", r.getNome());
-            o.addProperty("indirizzo", r.getIndirizzo());
-            o.addProperty("citta", r.getCitta());
-            o.addProperty("nazione", r.getNazione());
-            o.addProperty("latitudine", r.getLatitudine());
-            o.addProperty("longitudine", r.getLongitudine());
-            o.addProperty("tipo_cucina", r.getTipoCucina());
-            o.addProperty("fascia_prezzo", r.getFasciaPrezzo());
-            o.addProperty("delivery", r.isDelivery());
-            o.addProperty("prenotazione", r.isPrenotazione());
-            o.addProperty("fonte", "THEKNIFE");
-            arr.add(o);
+            String localita = req.payload.has("localita")
+                    ? req.payload.get("localita").getAsString()
+                    : "Tutte";
+
+            int prezzoMin = req.payload.has("prezzoMin")
+                    ? req.payload.get("prezzoMin").getAsInt()
+                    : 1;
+
+            int prezzoMax = req.payload.has("prezzoMax")
+                    ? req.payload.get("prezzoMax").getAsInt()
+                    : 5;
+
+            boolean delivery = req.payload.has("delivery")
+                    && req.payload.get("delivery").getAsBoolean();
+
+            boolean prenotazione = req.payload.has("prenotazione")
+                    && req.payload.get("prenotazione").getAsBoolean();
+
+            int stelleMin = req.payload.has("stelleMin")
+                    ? req.payload.get("stelleMin").getAsInt()
+                    : 0;
+
+            // ============================
+            // 1️⃣ CERCA IN THEKNIFE
+            // ============================
+
+            List<Ristorante> listaTK = RistoranteDAO.cerca(
+                    query,
+                    tipoCucina,
+                    localita,
+                    prezzoMin,
+                    prezzoMax,
+                    delivery,
+                    prenotazione,
+                    stelleMin
+            );
+
+            // ============================
+            // 2️⃣ CERCA IN RISTORANTI UTENTE
+            // ============================
+
+            List<Ristorante> listaUT = RistoranteUtenteDAO.cerca(
+                    query,
+                    tipoCucina,
+                    localita,
+                    prezzoMin,
+                    prezzoMax,
+                    delivery,
+                    prenotazione,
+                    stelleMin
+            );
+
+            // ============================
+            // 3️⃣ UNISCI LE DUE LISTE
+            // ============================
+
+            JsonArray arr = new JsonArray();
+
+            // THEKNIFE
+            for (Ristorante r : listaTK) {
+                JsonObject o = new JsonObject();
+                o.addProperty("id", r.getId());
+                o.addProperty("nome", r.getNome());
+                o.addProperty("indirizzo", r.getIndirizzo());
+                o.addProperty("citta", r.getCitta());
+                o.addProperty("nazione", r.getNazione());
+                o.addProperty("latitudine", r.getLatitudine());
+                o.addProperty("longitudine", r.getLongitudine());
+                o.addProperty("tipo_cucina", r.getTipoCucina());
+                o.addProperty("fascia_prezzo", r.getFasciaPrezzo());
+                o.addProperty("delivery", r.isDelivery());
+                o.addProperty("prenotazione", r.isPrenotazione());
+                o.addProperty("fonte", "THEKNIFE");
+                arr.add(o);
+            }
+
+            // UTENTE
+            for (Ristorante r : listaUT) {
+                JsonObject o = new JsonObject();
+                o.addProperty("id", r.getId());
+                o.addProperty("nome", r.getNome());
+                o.addProperty("indirizzo", r.getIndirizzo());
+                o.addProperty("citta", r.getCitta());
+                o.addProperty("nazione", r.getNazione());
+                o.addProperty("latitudine", r.getLatitudine());
+                o.addProperty("longitudine", r.getLongitudine());
+                o.addProperty("tipo_cucina", r.getTipoCucina());
+                o.addProperty("fascia_prezzo", r.getFasciaPrezzo());
+                o.addProperty("delivery", r.isDelivery());
+                o.addProperty("prenotazione", r.isPrenotazione());
+                o.addProperty("fonte", "UTENTE");
+                arr.add(o);
+            }
+
+            // ============================
+            // 4️⃣ RESTITUISCI RISPOSTA
+            // ============================
+
+            JsonObject payload = new JsonObject();
+            payload.add("ristoranti", arr);
+
+            return Response.ok(payload);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.error("Errore ricerca ristoranti: " + e.getMessage());
         }
-
-        // UTENTE
-        for (Ristorante r : listaUT) {
-            JsonObject o = new JsonObject();
-            o.addProperty("id", r.getId());
-            o.addProperty("nome", r.getNome());
-            o.addProperty("indirizzo", r.getIndirizzo());
-            o.addProperty("citta", r.getCitta());
-            o.addProperty("nazione", r.getNazione());
-            o.addProperty("latitudine", r.getLatitudine());
-            o.addProperty("longitudine", r.getLongitudine());
-            o.addProperty("tipo_cucina", r.getTipoCucina());
-            o.addProperty("fascia_prezzo", r.getFasciaPrezzo());
-            o.addProperty("delivery", r.isDelivery());
-            o.addProperty("prenotazione", r.isPrenotazione());
-            o.addProperty("fonte", "UTENTE");
-            arr.add(o);
-        }
-
-        // ============================
-        // 4️⃣ RESTITUISCI RISPOSTA
-        // ============================
-        JsonObject payload = new JsonObject();
-        payload.add("ristoranti", arr);
-
-        return Response.ok(payload);
-
-    } catch (Exception e) {
-        return Response.error("Errore ricerca ristoranti: " + e.getMessage());
     }
-}
+
     public static Response controllaProprieta(Request req) {
     try {
         int idRistorante = req.payload.get("idRistorante").getAsInt();
@@ -95,7 +149,7 @@ public class RistoranteService {
         boolean proprietario = RistoranteUtenteDAO.isOwnedBy(idRistorante, idGestore);
 
         if (proprietario) {
-            return Response.ok(); // ⭐ È suo
+            return Response.ok(); 
         } else {
             return Response.error("Non sei il proprietario del ristorante");
         }
