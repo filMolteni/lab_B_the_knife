@@ -70,7 +70,7 @@ Driver JDBC
 
 Dataset ristoranti aggiornato
 
-Librerie esterne incluse nel progetto
+Librerie esterne incluse nel progetto(settings json)
 
 Estensione PlantUML
 
