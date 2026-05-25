@@ -69,7 +69,7 @@ public class GestoreRistorantiController {
         view.getBtnElimina().setOnAction(e -> eliminaRistorante());
         view.getBtnIndietro().setOnAction(e -> onGoBack.run());
 
-        // ⭐ DOPPIO CLICK → APRI DETTAGLI RISTORANTE UTENTE
+        
         view.getTabella().setOnMouseClicked(e -> {
             if (e.getClickCount() == 2) {
                 RistoranteRow r = view.getTabella().getSelectionModel().getSelectedItem();
