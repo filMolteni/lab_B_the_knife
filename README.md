@@ -1,5 +1,3 @@
-README TECNICO – PROGETTO THEKNIFE
-
 NOME DEL PROGETTO
 TheKnife – Piattaforma di gestione ristoranti, recensioni e preferiti
 
@@ -48,6 +46,16 @@ Il progetto utilizza una classe dedicata al popolamento del database, responsabi
 I percorsi delle librerie, dei dataset e dei file di supporto sono stati aggiornati e normalizzati per garantire compatibilità e caricamento corretto in fase di esecuzione.
 Il populator esegue automaticamente la creazione delle entità e l’inserimento dei dati di base necessari al funzionamento dell’applicazione.
 
+NOTA IMPORTANTE SUI PERCORSI  
+All’interno del progetto sono presenti file che richiedono la modifica manuale dei percorsi locali in base alla macchina su cui viene eseguito il sistema.
+In particolare:
+
+nel file settings.json vanno aggiornati i percorsi delle librerie esterne
+
+nella classe DatabasePopulator vanno aggiornati i percorsi relativi ai dataset e ai file SQL
+
+Questi percorsi devono essere adattati dall’utente in base alla propria struttura locale.
+
 GESTIONE FILE E LIBRERIE
 Tutti i path relativi a dataset, driver, risorse e file di configurazione sono stati rivisti e aggiornati.
 La struttura del progetto è ora coerente e permette il caricamento corretto delle dipendenze senza errori di percorso o riferimenti mancanti.
@@ -70,10 +78,10 @@ Driver JDBC
 
 Dataset ristoranti aggiornato
 
-Librerie esterne incluse nel progetto(settings json)
+Librerie esterne incluse nel progetto (settings.json)
 
 Estensione PlantUML
 
 NOTE FINALI
 Il progetto è stato sviluppato con attenzione alla modularità, alla separazione delle responsabilità e alla manutenibilità del codice.
-La struttura attuale consente estensioni future senza modifiche invasive ai moduli esistenti.
+La struttura attuale consente estensioni future senza modifiche invasive ai moduli esistenti
