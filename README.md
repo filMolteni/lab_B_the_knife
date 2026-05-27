@@ -56,10 +56,6 @@ nella classe DatabasePopulator vanno aggiornati i percorsi relativi ai dataset e
 
 Questi percorsi devono essere adattati dall’utente in base alla propria struttura locale.
 
-GESTIONE FILE E LIBRERIE
-Tutti i path relativi a dataset, driver, risorse e file di configurazione sono stati rivisti e aggiornati.
-La struttura del progetto è ora coerente e permette il caricamento corretto delle dipendenze senza errori di percorso o riferimenti mancanti.
-
 INTERFACCIA E USABILITA
 È stato introdotto un pulsante “Copia” nelle sezioni che richiedono operazioni rapide, come la copia di identificativi, query, testi o contenuti generati.
 La funzionalità utilizza la clipboard di sistema ed è disponibile in tutte le schermate rilevanti.
