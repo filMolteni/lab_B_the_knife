@@ -9,6 +9,18 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 
+/**
+ * View grafica dedicata alla schermata di login.
+ * Mostra:
+ * - titolo della schermata
+ * - form per email e password
+ * - pulsanti per accedere, registrarsi o tornare indietro
+ *
+ * La view è strutturata come un BorderPane:
+ * - Top: titolo
+ * - Center: form centrato
+ * - Bottom: pulsanti di navigazione
+ */
 public class LoginView extends BorderPane {
 
     private TextField txtEmail;
@@ -18,10 +30,20 @@ public class LoginView extends BorderPane {
     private Button btnRegistrati;
     private Button btnIndietro;
 
+    /**
+     * Costruisce la schermata di login e inizializza il layout.
+     */
     public LoginView() {
         creaLayout();
     }
 
+    /**
+     * Crea l'intero layout grafico della schermata:
+     * - titolo
+     * - form con email e password
+     * - pulsanti di azione
+     * - stile e padding
+     */
     private void creaLayout() {
 
         // ============================
@@ -88,10 +110,18 @@ public class LoginView extends BorderPane {
         this.setStyle("-fx-background-color: #f8f8f8;");
     }
 
+    /** @return campo email */
     public TextField getTxtEmail() { return txtEmail; }
+
+    /** @return campo password */
     public PasswordField getTxtPassword() { return txtPassword; }
 
+    /** @return pulsante Accedi */
     public Button getBtnAccedi() { return btnAccedi; }
+
+    /** @return pulsante Registrati */
     public Button getBtnRegistrati() { return btnRegistrati; }
+
+    /** @return pulsante Indietro */
     public Button getBtnIndietro() { return btnIndietro; }
 }

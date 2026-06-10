@@ -7,11 +7,30 @@ import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+/**
+ * Entry point dell'applicazione client.
+ *
+ * Questa classe:
+ * - avvia la connessione con il server
+ * - inizializza la finestra principale (Stage)
+ * - gestisce la navigazione tra tutte le schermate dell'applicazione
+ *
+ * Ogni metodo {@code mostraX()} crea la relativa View, istanzia il Controller
+ * e imposta la scena nello Stage principale.
+ *
+ * L'applicazione gira sempre a schermo intero (maximized).
+ */
 public class ClientMain extends Application {
 
     private Stage primaryStage;
     private ClientConnection connection;
 
+    /**
+     * Metodo di avvio JavaFX.
+     * Stabilisce la connessione al server e mostra la Home.
+     *
+     * @param stage finestra principale
+     */
     @Override
     public void start(Stage stage) {
         this.primaryStage = stage;
@@ -28,8 +47,12 @@ public class ClientMain extends Application {
     }
 
     // ============================
-    // LOGIN 
+    // LOGIN
     // ============================
+
+    /**
+     * Mostra la schermata di login.
+     */
     private void mostraLogin() {
         LoginView view = new LoginView();
 
@@ -44,13 +67,17 @@ public class ClientMain extends Application {
         Scene scene = new Scene(view);
         primaryStage.setScene(scene);
         primaryStage.setTitle("Login");
-        primaryStage.setMaximized(true);   
+        primaryStage.setMaximized(true);
         primaryStage.show();
     }
 
     // ============================
-    // REGISTRAZIONE (A SCHERMO INTERO)
+    // REGISTRAZIONE
     // ============================
+
+    /**
+     * Mostra la schermata di registrazione.
+     */
     private void mostraRegistrazione() {
         RegisterView view = new RegisterView();
 
@@ -64,13 +91,17 @@ public class ClientMain extends Application {
         Scene scene = new Scene(view);
         primaryStage.setScene(scene);
         primaryStage.setTitle("Registrazione");
-        primaryStage.setMaximized(true);   
+        primaryStage.setMaximized(true);
         primaryStage.show();
     }
 
     // ============================
-    // HOME 
+    // HOME
     // ============================
+
+    /**
+     * Mostra la schermata principale dell'applicazione.
+     */
     private void mostraHome() {
         HomeView view = new HomeView();
 
@@ -92,13 +123,17 @@ public class ClientMain extends Application {
         Scene scene = new Scene(view);
         primaryStage.setScene(scene);
         primaryStage.setTitle("Home");
-        primaryStage.setMaximized(true);   // ⭐ SCHERMO INTERO
+        primaryStage.setMaximized(true);
         primaryStage.show();
     }
 
     // ============================
     // RICERCA RISTORANTI
     // ============================
+
+    /**
+     * Mostra la schermata di ricerca ristoranti.
+     */
     private void mostraRicercaRistoranti() {
         RicercaRistorantiView view = new RicercaRistorantiView();
 
@@ -112,13 +147,20 @@ public class ClientMain extends Application {
         Scene scene = new Scene(view);
         primaryStage.setScene(scene);
         primaryStage.setTitle("Cerca Ristoranti");
-        primaryStage.setMaximized(true);   // ⭐ SCHERMO INTERO
+        primaryStage.setMaximized(true);
         primaryStage.show();
     }
 
     // ============================
     // DETTAGLI RISTORANTE
     // ============================
+
+    /**
+     * Mostra la schermata dei dettagli di un ristorante.
+     *
+     * @param id id del ristorante
+     * @param fonte provenienza del ristorante (THEKNIFE / UTENTE)
+     */
     private void mostraDettagliRistorante(int id, String fonte) {
         RistoranteDettagliView view = new RistoranteDettagliView();
 
@@ -133,13 +175,17 @@ public class ClientMain extends Application {
         Scene scene = new Scene(view);
         primaryStage.setScene(scene);
         primaryStage.setTitle("Dettagli Ristorante");
-        primaryStage.setMaximized(true);   // ⭐ SCHERMO INTERO
+        primaryStage.setMaximized(true);
         primaryStage.show();
     }
 
     // ============================
     // PREFERITI
     // ============================
+
+    /**
+     * Mostra la schermata dei ristoranti preferiti.
+     */
     private void mostraPreferiti() {
         PreferitiView view = new PreferitiView();
 
@@ -153,13 +199,17 @@ public class ClientMain extends Application {
         Scene scene = new Scene(view);
         primaryStage.setScene(scene);
         primaryStage.setTitle("Preferiti");
-        primaryStage.setMaximized(true);   // ⭐ SCHERMO INTERO
+        primaryStage.setMaximized(true);
         primaryStage.show();
     }
 
     // ============================
     // RECENSIONI UTENTE
     // ============================
+
+    /**
+     * Mostra la schermata con le recensioni scritte dall'utente.
+     */
     private void mostraRecensioniUtente() {
         RecensioniUtenteView view = new RecensioniUtenteView();
 
@@ -172,13 +222,17 @@ public class ClientMain extends Application {
         Scene scene = new Scene(view);
         primaryStage.setScene(scene);
         primaryStage.setTitle("Le mie recensioni");
-        primaryStage.setMaximized(true);   // ⭐ SCHERMO INTERO
+        primaryStage.setMaximized(true);
         primaryStage.show();
     }
 
     // ============================
     // RECENSIONI RICEVUTE (GESTORE)
     // ============================
+
+    /**
+     * Mostra la schermata delle recensioni ricevute dai ristoranti del gestore.
+     */
     private void mostraRecensioniRicevute() {
         RecensioniRistoranteView view = new RecensioniRistoranteView();
 
@@ -194,13 +248,17 @@ public class ClientMain extends Application {
         Scene scene = new Scene(view);
         primaryStage.setScene(scene);
         primaryStage.setTitle("Recensioni ricevute");
-        primaryStage.setMaximized(true);   // ⭐ SCHERMO INTERO
+        primaryStage.setMaximized(true);
         primaryStage.show();
     }
 
     // ============================
     // GESTIONE RISTORANTI (GESTORE)
     // ============================
+
+    /**
+     * Mostra la schermata di gestione dei ristoranti del gestore.
+     */
     private void mostraGestioneRistoranti() {
         GestoreRistorantiView view = new GestoreRistorantiView();
 
@@ -216,10 +274,13 @@ public class ClientMain extends Application {
         Scene scene = new Scene(view);
         primaryStage.setScene(scene);
         primaryStage.setTitle("Gestione Ristoranti");
-        primaryStage.setMaximized(true);   // ⭐ SCHERMO INTERO
+        primaryStage.setMaximized(true);
         primaryStage.show();
     }
 
+    /**
+     * Metodo main: avvia l'applicazione JavaFX.
+     */
     public static void main(String[] args) {
         launch(args);
     }

@@ -7,6 +7,19 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 
+/**
+ * View grafica dedicata alla creazione o modifica di un ristorante.
+ * Mostra:
+ * - un form completo con nome, indirizzo, tipo cucina, fascia prezzo
+ * - informazioni geografiche (città, nazione, latitudine, longitudine)
+ * - servizi disponibili (delivery, prenotazione)
+ * - pulsanti Salva e Annulla
+ *
+ * La view è strutturata come un BorderPane:
+ * - Top: titolo
+ * - Center: form dei campi
+ * - Bottom: pulsanti di azione
+ */
 public class RistoranteFormView extends BorderPane {
 
     private TextField txtNome;
@@ -24,10 +37,20 @@ public class RistoranteFormView extends BorderPane {
     private Button btnSalva;
     private Button btnAnnulla;
 
+    /**
+     * Costruisce la schermata e inizializza il layout.
+     */
     public RistoranteFormView() {
         creaLayout();
     }
 
+    /**
+     * Crea l’intero layout grafico:
+     * - titolo
+     * - form con tutti i campi del ristorante
+     * - pulsanti Salva e Annulla
+     * - padding e stile generale
+     */
     private void creaLayout() {
 
         Label titolo = new Label("Gestione Ristorante");
@@ -93,22 +116,60 @@ public class RistoranteFormView extends BorderPane {
         this.setBottom(buttons);
     }
 
+    // ============================
     // GETTER
+    // ============================
+
+    /** @return campo nome */
     public TextField getTxtNome() { return txtNome; }
+
+    /** @return campo indirizzo */
     public TextField getTxtIndirizzo() { return txtIndirizzo; }
+
+    /** @return campo tipo cucina */
     public TextField getTxtTipoCucina() { return txtTipoCucina; }
+
+    /** @return spinner fascia prezzo */
     public Spinner<Integer> getSpFasciaPrezzo() { return spFasciaPrezzo; }
+
+    /** @return campo città */
     public TextField getTxtCitta() { return txtCitta; }
+
+    /** @return campo nazione */
     public TextField getTxtNazione() { return txtNazione; }
+
+    /** @return campo latitudine */
     public TextField getTxtLatitudine() { return txtLatitudine; }
+
+    /** @return campo longitudine */
     public TextField getTxtLongitudine() { return txtLongitudine; }
+
+    /** @return true se delivery è selezionato */
     public boolean isDelivery() { return chkDelivery.isSelected(); }
+
+    /** @return true se prenotazione è selezionato */
     public boolean isPrenotazione() { return chkPrenotazione.isSelected(); }
 
+    /** @return pulsante Salva */
     public Button getBtnSalva() { return btnSalva; }
+
+    /** @return pulsante Annulla */
     public Button getBtnAnnulla() { return btnAnnulla; }
 
-    // Precompila i campi in caso di modifica
+    /**
+     * Precompila i campi del form quando si modifica un ristorante esistente.
+     *
+     * @param nome nome del ristorante
+     * @param indirizzo indirizzo completo
+     * @param tipoCucina tipo di cucina
+     * @param fasciaPrezzo fascia prezzo (1–5)
+     * @param citta città
+     * @param nazione nazione
+     * @param lat latitudine
+     * @param lon longitudine
+     * @param delivery disponibilità delivery
+     * @param prenotazione disponibilità prenotazione
+     */
     public void setValues(String nome, String indirizzo, String tipoCucina,
                           int fasciaPrezzo, String citta, String nazione,
                           double lat, double lon, boolean delivery, boolean prenotazione) {
@@ -125,12 +186,19 @@ public class RistoranteFormView extends BorderPane {
         chkPrenotazione.setSelected(prenotazione);
     }
 
-    // Metodi helper per controller
+    // ============================
+    // METODI HELPER
+    // ============================
+
+    /** @return fascia prezzo selezionata */
     public int getFasciaPrezzo() { return spFasciaPrezzo.getValue(); }
+
+    /** @return latitudine convertita in double */
     public double getLatitudine() {
         return Double.parseDouble(txtLatitudine.getText().trim());
     }
 
+    /** @return longitudine convertita in double */
     public double getLongitudine() {
         return Double.parseDouble(txtLongitudine.getText().trim());
     }

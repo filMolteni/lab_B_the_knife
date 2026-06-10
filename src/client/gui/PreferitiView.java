@@ -8,15 +8,34 @@ import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 
+/**
+ * View grafica dedicata alla visualizzazione dei ristoranti preferiti dell’utente.
+ * Mostra:
+ * - una tabella con tutti i ristoranti salvati come preferiti
+ * - un pulsante per tornare indietro
+ *
+ * La view è strutturata come un BorderPane:
+ * - Center: tabella dei preferiti
+ * - Bottom: pulsante Indietro
+ */
 public class PreferitiView extends BorderPane {
 
     private final TableView<PreferitoRow> tabella = new TableView<>();
     private final Button btnIndietro = new Button("← Indietro");
 
+    /**
+     * Costruisce la schermata dei preferiti e inizializza il layout.
+     */
     public PreferitiView() {
         creaLayout();
     }
 
+    /**
+     * Crea l’intero layout grafico:
+     * - definizione delle colonne della tabella
+     * - stile e comportamento della tabella
+     * - pulsante Indietro
+     */
     private void creaLayout() {
 
         // ============================
@@ -59,7 +78,6 @@ public class PreferitiView extends BorderPane {
 
         tabella.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
-        // ⭐ La tabella ora si espande a tutto lo spazio disponibile
         BorderPane.setMargin(tabella, new Insets(10));
         this.setCenter(tabella);
 
@@ -79,6 +97,9 @@ public class PreferitiView extends BorderPane {
         this.setPadding(new Insets(10));
     }
 
+    /** @return la tabella dei ristoranti preferiti */
     public TableView<PreferitoRow> getTabella() { return tabella; }
+
+    /** @return pulsante Indietro */
     public Button getBtnIndietro() { return btnIndietro; }
 }

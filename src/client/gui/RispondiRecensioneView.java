@@ -5,6 +5,18 @@ import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 
+/**
+ * View grafica dedicata alla risposta del gestore a una recensione.
+ * Mostra:
+ * - il testo della recensione originale
+ * - un'area di testo per scrivere la risposta
+ * - pulsanti per inviare o annullare
+ *
+ * La view è strutturata come un BorderPane:
+ * - Top: testo della recensione
+ * - Center: area di risposta
+ * - Bottom: pulsanti di azione
+ */
 public class RispondiRecensioneView extends BorderPane {
 
     private Label lblRecensione;
@@ -12,10 +24,20 @@ public class RispondiRecensioneView extends BorderPane {
     private Button btnInvia;
     private Button btnAnnulla;
 
+    /**
+     * Costruisce la schermata e inizializza il layout.
+     */
     public RispondiRecensioneView() {
         creaLayout();
     }
 
+    /**
+     * Crea l’intero layout grafico:
+     * - titolo della recensione
+     * - area di testo espandibile
+     * - pulsanti Invia e Annulla
+     * - padding e stile generale
+     */
     private void creaLayout() {
 
         // ============================
@@ -33,7 +55,6 @@ public class RispondiRecensioneView extends BorderPane {
         txtRisposta.setStyle("-fx-font-size: 16px;");
         txtRisposta.setPrefRowCount(8);
 
-        // ⭐ Permette all’area di testo di espandersi
         VBox centerBox = new VBox(20, lblRecensione, txtRisposta);
         centerBox.setPadding(new Insets(30));
         VBox.setVgrow(txtRisposta, Priority.ALWAYS);
@@ -65,11 +86,21 @@ public class RispondiRecensioneView extends BorderPane {
         this.setStyle("-fx-background-color: #f8f8f8;");
     }
 
+    /**
+     * Imposta il testo della recensione da mostrare in alto.
+     *
+     * @param testo contenuto della recensione originale
+     */
     public void setRecensioneText(String testo) {
         lblRecensione.setText("Recensione: " + testo);
     }
 
+    /** @return area di testo per scrivere la risposta */
     public TextArea getTxtRisposta() { return txtRisposta; }
+
+    /** @return pulsante per inviare la risposta */
     public Button getBtnInvia() { return btnInvia; }
+
+    /** @return pulsante per annullare */
     public Button getBtnAnnulla() { return btnAnnulla; }
 }

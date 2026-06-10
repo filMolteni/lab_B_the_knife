@@ -8,6 +8,15 @@ import client.net.Response;
 import com.google.gson.JsonObject;
 import common.MessageType;
 
+/**
+ * Controller della schermata Home.
+ * Gestisce:
+ * - la navigazione verso le varie sezioni dell'app
+ * - la visibilità dei pulsanti in base allo stato di login
+ * - l'invio di richieste semplici al server (es. caricamento preferiti)
+ *
+ * Funziona come punto centrale di smistamento delle azioni dell'utente.
+ */
 public class HomeController {
 
     private final HomeView view;
@@ -22,6 +31,19 @@ public class HomeController {
     private final Runnable onGoLogin;
     private final Runnable onLogout;
 
+    /**
+     * Costruisce il controller della Home e inizializza gli handler dei pulsanti.
+     *
+     * @param view interfaccia grafica della Home
+     * @param connection connessione al server
+     * @param onGoSearch callback per aprire la schermata di ricerca
+     * @param onGoPreferiti callback per aprire la schermata dei preferiti
+     * @param onGoRecensioni callback per aprire la schermata delle recensioni utente
+     * @param onGoGestione callback per aprire la gestione ristoranti (solo gestore)
+     * @param onGoRecensioniRicevute callback per aprire le recensioni ricevute (solo gestore)
+     * @param onGoLogin callback per aprire la schermata di login
+     * @param onLogout callback eseguita al logout
+     */
     public HomeController(HomeView view,
                       ClientConnection connection,
                       Runnable onGoSearch,
@@ -49,6 +71,10 @@ public class HomeController {
         view.refreshVisibility();
     }
 
+    /**
+     * Inizializza tutti gli handler dei pulsanti della Home.
+     * Ogni pulsante richiama la callback associata.
+     */
     private void initHandlers() {
 
         // CERCA RISTORANTI
@@ -81,36 +107,39 @@ public class HomeController {
     }
 
     /**
-     * Invia una richiesta semplice al server (senza parametri)
+     * Invia una richiesta semplice al server (senza parametri aggiuntivi).
+     * Aggiunge automaticamente l'id dell'utente loggato se presente.
+     *
+     * @param type tipo di messaggio da inviare al server
      */
     private void sendSimple(MessageType type) {
-    try {
-        JsonObject params = new JsonObject();
+        try {
+            JsonObject params = new JsonObject();
 
-        // Aggiungo automaticamente l'utente loggato
-        if (UtenteDTO.getUtenteLoggato() != null) {
-            params.addProperty("idUtente", UtenteDTO.getUtenteLoggato().getId());
+            // Aggiungo automaticamente l'utente loggato
+            if (UtenteDTO.getUtenteLoggato() != null) {
+                params.addProperty("idUtente", UtenteDTO.getUtenteLoggato().getId());
+            }
+
+            Request req = new Request(type, params);
+            Response res = connection.sendRequest(req);
+
+            if (res == null) {
+                System.out.println("❌ Nessuna risposta dal server");
+                return;
+            }
+
+            System.out.println("Risposta server: " + res.getMessage());
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            System.out.println("Errore di connessione al server");
         }
-
-        Request req = new Request(type, params);
-        Response res = connection.sendRequest(req);
-
-        if (res == null) {
-            System.out.println("❌ Nessuna risposta dal server");
-            return;
-        }
-
-        System.out.println("Risposta server: " + res.getMessage());
-
-    } catch (Exception ex) {
-        ex.printStackTrace();
-        System.out.println("Errore di connessione al server");
     }
-}
-
 
     /**
-     * Metodo da chiamare quando si torna alla Home
+     * Aggiorna la visibilità dei pulsanti della Home.
+     * Da chiamare quando si ritorna alla schermata principale.
      */
     public void refresh() {
         view.refreshVisibility();

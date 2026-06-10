@@ -5,15 +5,37 @@ import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 
+/**
+ * View grafica dedicata alla visualizzazione delle recensioni di un ristorante.
+ * Mostra:
+ * - un titolo centrale
+ * - una tabella con utente, voto, commento e data
+ * - un pulsante per chiudere la finestra
+ *
+ * La view è strutturata come un BorderPane:
+ * - Top: titolo
+ * - Center: tabella delle recensioni
+ * - Bottom: pulsante Chiudi
+ */
 public class RecensioniRistoranteView extends BorderPane {
 
     private TableView<RecensioneRistoranteRow> tabella;
     private Button btnChiudi;
 
+    /**
+     * Costruisce la schermata e inizializza il layout.
+     */
     public RecensioniRistoranteView() {
         creaLayout();
     }
 
+    /**
+     * Crea l’intero layout grafico:
+     * - titolo
+     * - tabella con colonne dinamiche
+     * - pulsante Chiudi
+     * - padding e stile generale
+     */
     private void creaLayout() {
 
         // ============================
@@ -48,7 +70,6 @@ public class RecensioniRistoranteView extends BorderPane {
         tabella.getColumns().addAll(colUtente, colVoto, colCommento, colData);
         tabella.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
-        // ⭐ La tabella ora si espande a tutto lo spazio disponibile
         BorderPane.setMargin(tabella, new Insets(10));
         this.setCenter(tabella);
 
@@ -69,6 +90,9 @@ public class RecensioniRistoranteView extends BorderPane {
         this.setPadding(new Insets(10));
     }
 
+    /** @return la tabella delle recensioni */
     public TableView<RecensioneRistoranteRow> getTabella() { return tabella; }
+
+    /** @return pulsante Chiudi */
     public Button getBtnChiudi() { return btnChiudi; }
 }

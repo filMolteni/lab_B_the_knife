@@ -8,6 +8,18 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 
+/**
+ * View principale dell'applicazione.
+ * Mostra:
+ * - il titolo dell'app
+ * - il menu centrale con i pulsanti di navigazione
+ * - pulsanti visibili o nascosti in base al ruolo dell'utente (cliente/gestore)
+ *
+ * La view è strutturata come un BorderPane:
+ * - Top: titolo
+ * - Center: menu con i pulsanti
+ * - Background: colore chiaro
+ */
 public class HomeView extends BorderPane {
 
     private Button btnCerca;
@@ -18,10 +30,19 @@ public class HomeView extends BorderPane {
     private Button btnLogin;
     private Button btnLogout;
 
+    /**
+     * Costruisce la schermata Home e inizializza il layout.
+     */
     public HomeView() {
         creaLayout();
     }
 
+    /**
+     * Crea l'intero layout grafico della Home:
+     * - titolo
+     * - menu centrale con i pulsanti
+     * - stile e padding
+     */
     private void creaLayout() {
 
         // ============================
@@ -86,6 +107,16 @@ public class HomeView extends BorderPane {
     // ============================
     // VISIBILITÀ IN BASE AL LOGIN
     // ============================
+
+    /**
+     * Aggiorna la visibilità dei pulsanti in base allo stato di login
+     * e al ruolo dell'utente (cliente o gestore).
+     *
+     * Regole:
+     * - Utente non loggato → mostra solo Cerca + Login
+     * - Cliente → mostra Preferiti e Recensioni
+     * - Gestore → mostra Gestione e Recensioni ricevute
+     */
     public void refreshVisibility() {
 
         UtenteDTO u = UtenteDTO.getUtenteLoggato();
@@ -121,11 +152,25 @@ public class HomeView extends BorderPane {
     }
 
     // GETTER
+
+    /** @return pulsante Cerca Ristoranti */
     public Button getBtnCerca() { return btnCerca; }
+
+    /** @return pulsante Preferiti */
     public Button getBtnPreferiti() { return btnPreferiti; }
+
+    /** @return pulsante Recensioni utente */
     public Button getBtnRecensioni() { return btnRecensioni; }
+
+    /** @return pulsante Gestione ristoranti */
     public Button getBtnGestione() { return btnGestione; }
+
+    /** @return pulsante Recensioni ricevute */
     public Button getBtnRecensioniRicevute() { return btnRecensioniRicevute; }
+
+    /** @return pulsante Login */
     public Button getBtnLogin() { return btnLogin; }
+
+    /** @return pulsante Logout */
     public Button getBtnLogout() { return btnLogout; }
 }

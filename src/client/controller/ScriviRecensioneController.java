@@ -9,6 +9,14 @@ import com.google.gson.JsonObject;
 import common.MessageType;
 import javafx.stage.Stage;
 
+/**
+ * Controller dedicato alla scrittura di una recensione da parte dell'utente.
+ * Gestisce:
+ * - la validazione dei campi (voto e commento)
+ * - l'invio della recensione al server
+ * - la chiusura della finestra
+ * - la callback di aggiornamento dopo l'invio
+ */
 public class ScriviRecensioneController {
 
     private final ScriviRecensioneView view;
@@ -16,6 +24,14 @@ public class ScriviRecensioneController {
     private final int idRistorante;
     private final Runnable onSuccess;
 
+    /**
+     * Costruisce il controller e inizializza gli handler.
+     *
+     * @param view interfaccia grafica per scrivere la recensione
+     * @param connection connessione al server
+     * @param idRistorante id del ristorante a cui associare la recensione
+     * @param onSuccess callback eseguita dopo l'invio corretto della recensione
+     */
     public ScriviRecensioneController(ScriviRecensioneView view,
                                       ClientConnection connection,
                                       int idRistorante,
@@ -29,6 +45,11 @@ public class ScriviRecensioneController {
         initHandlers();
     }
 
+    /**
+     * Inizializza gli handler dei pulsanti:
+     * - Invia → invia la recensione
+     * - Annulla → chiude la finestra
+     */
     private void initHandlers() {
 
         view.getBtnInvia().setOnAction(e -> inviaRecensione());
@@ -39,6 +60,20 @@ public class ScriviRecensioneController {
         });
     }
 
+    /**
+     * Invia la recensione al server.
+     *
+     * Funzionamento:
+     * 1. Legge voto e commento dalla view.
+     * 2. Valida i campi (voto obbligatorio, commento non vuoto).
+     * 3. Prepara il payload JSON.
+     * 4. Invia una richiesta AGGIUNGI_RECENSIONE.
+     * 5. Se la risposta è positiva:
+     *    - chiude la finestra
+     *    - esegue la callback onSuccess
+     *
+     * In caso di errore, mostra il messaggio nella label della view.
+     */
     private void inviaRecensione() {
 
         Integer voto = view.getCmbVoto().getValue();

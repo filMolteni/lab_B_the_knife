@@ -1,0 +1,12 @@
+client
+client.controller
+client.gui
+client.model
+client.net
+common
+server
+server.connection
+server.dao
+server.model
+server.service
+server.utils

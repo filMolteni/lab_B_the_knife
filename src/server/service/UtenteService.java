@@ -6,11 +6,36 @@ import common.Response;
 import server.dao.UtenteDAO;
 import server.model.Utente;
 
+/**
+ * Service dedicato alla gestione degli utenti.
+ *
+ * Gestisce:
+ * - login
+ * - registrazione
+ *
+ * Ogni metodo:
+ * - legge i parametri dal payload della {@link Request}
+ * - interagisce con il {@link UtenteDAO}
+ * - costruisce una {@link Response} JSON per il client
+ */
 public class UtenteService {
 
     // ============================
     // LOGIN
     // ============================
+
+    /**
+     * Effettua il login di un utente verificando email e password.
+     *
+     * Logica:
+     * 1. Legge email e password dal payload
+     * 2. Interroga il {@link UtenteDAO}
+     * 3. Se l'utente esiste, restituisce i suoi dati
+     * 4. Altrimenti ritorna un errore
+     *
+     * @param req richiesta contenente email e password
+     * @return risposta OK con i dati dell'utente o errore
+     */
     public static Response login(Request req) {
         try {
             String email = req.payload.get("email").getAsString();
@@ -23,7 +48,7 @@ public class UtenteService {
 
             JsonObject payload = new JsonObject();
             payload.addProperty("id", u.getId());
-            payload.addProperty("username", u.getNome());   // 🔥 il client vuole "username"
+            payload.addProperty("username", u.getNome());   // il client vuole "username"
             payload.addProperty("email", u.getEmail());
             payload.addProperty("ruolo", u.getRuolo());
 
@@ -37,42 +62,52 @@ public class UtenteService {
     // ============================
     // REGISTRAZIONE
     // ============================
-        public static Response registrati(Request req) {
-            try {
-                // Lettura parametri dal client
-                String username = req.payload.get("username").getAsString();
-                String email = req.payload.get("email").getAsString();
-                String password = req.payload.get("password").getAsString();
 
-                // Ora leggiamo il ruolo inviato dal client
-                String ruolo = req.payload.has("ruolo")
-                        ? req.payload.get("ruolo").getAsString()
-                        : "CLIENTE"; // fallback di sicurezza
+    /**
+     * Registra un nuovo utente.
+     *
+     * Logica:
+     * 1. Legge username, email, password e ruolo dal payload
+     * 2. Inserisce l'utente nel DB tramite {@link UtenteDAO}
+     * 3. Recupera l'utente appena registrato
+     * 4. Restituisce i suoi dati al client
+     *
+     * @param req richiesta contenente i dati di registrazione
+     * @return risposta OK con i dati dell'utente o errore
+     */
+    public static Response registrati(Request req) {
+        try {
+            String username = req.payload.get("username").getAsString();
+            String email = req.payload.get("email").getAsString();
+            String password = req.payload.get("password").getAsString();
 
-                // Registrazione nel DB
-                boolean ok = UtenteDAO.registrati(username, email, password, ruolo);
+            // Ruolo opzionale, default CLIENTE
+            String ruolo = req.payload.has("ruolo")
+                    ? req.payload.get("ruolo").getAsString()
+                    : "CLIENTE";
 
-                if (!ok)
-                    return Response.error("Registrazione fallita");
+            boolean ok = UtenteDAO.registrati(username, email, password, ruolo);
 
-                // Recupera l'utente appena registrato
-                Utente u = UtenteDAO.getByEmail(email);
+            if (!ok)
+                return Response.error("Registrazione fallita");
 
-                if (u == null)
-                    return Response.error("Errore: utente non trovato dopo registrazione");
+            // Recupera l'utente appena registrato
+            Utente u = UtenteDAO.getByEmail(email);
 
-                // Costruzione risposta JSON
-                JsonObject payload = new JsonObject();
-                payload.addProperty("id", u.getId());
-                payload.addProperty("username", u.getNome());
-                payload.addProperty("email", u.getEmail());
-                payload.addProperty("ruolo", u.getRuolo());
+            if (u == null)
+                return Response.error("Errore: utente non trovato dopo registrazione");
 
-                return Response.ok(payload);
+            JsonObject payload = new JsonObject();
+            payload.addProperty("id", u.getId());
+            payload.addProperty("username", u.getNome());
+            payload.addProperty("email", u.getEmail());
+            payload.addProperty("ruolo", u.getRuolo());
 
-            } catch (Exception e) {
-                return Response.error("Errore registrazione: " + e.getMessage());
-            }
+            return Response.ok(payload);
+
+        } catch (Exception e) {
+            return Response.error("Errore registrazione: " + e.getMessage());
         }
+    }
 
 }

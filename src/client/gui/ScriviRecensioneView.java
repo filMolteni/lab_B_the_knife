@@ -5,6 +5,19 @@ import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 
+/**
+ * View grafica dedicata alla scrittura di una nuova recensione.
+ * Permette all’utente di:
+ * - selezionare un voto da 1 a 5
+ * - scrivere un commento testuale
+ * - visualizzare eventuali errori di validazione
+ * - inviare o annullare la recensione
+ *
+ * La view è strutturata come un BorderPane:
+ * - Top: titolo
+ * - Center: form con voto, commento e messaggi di errore
+ * - Bottom: pulsanti Invia e Annulla
+ */
 public class ScriviRecensioneView extends BorderPane {
 
     private ComboBox<Integer> cmbVoto;
@@ -13,10 +26,22 @@ public class ScriviRecensioneView extends BorderPane {
     private Button btnInvia;
     private Button btnAnnulla;
 
+    /**
+     * Costruisce la schermata e inizializza il layout.
+     */
     public ScriviRecensioneView() {
         creaLayout();
     }
 
+    /**
+     * Crea l’intero layout grafico:
+     * - titolo
+     * - combo box per il voto
+     * - area di testo per il commento
+     * - label per errori
+     * - pulsanti Invia e Annulla
+     * - scroll pane per rendere la view responsive
+     */
     private void creaLayout() {
 
         // ============================
@@ -44,7 +69,6 @@ public class ScriviRecensioneView extends BorderPane {
         txtCommento.setStyle("-fx-font-size: 14px;");
         txtCommento.setPrefRowCount(8);
 
-        // ⭐ Permette alla TextArea di espandersi
         VBox.setVgrow(txtCommento, Priority.ALWAYS);
 
         lblErrore = new Label();
@@ -66,7 +90,6 @@ public class ScriviRecensioneView extends BorderPane {
         contenuto.setPadding(new Insets(25));
         contenuto.setAlignment(Pos.TOP_CENTER);
 
-        // ⭐ ScrollPane per rendere tutto responsive
         ScrollPane scroll = new ScrollPane(contenuto);
         scroll.setFitToWidth(true);
         scroll.setPadding(new Insets(10));
@@ -80,9 +103,18 @@ public class ScriviRecensioneView extends BorderPane {
         this.setStyle("-fx-background-color: #f8f8f8;");
     }
 
+    /** @return ComboBox per la selezione del voto */
     public ComboBox<Integer> getCmbVoto() { return cmbVoto; }
+
+    /** @return area di testo per il commento */
     public TextArea getTxtCommento() { return txtCommento; }
+
+    /** @return label per mostrare errori */
     public Label getLblErrore() { return lblErrore; }
+
+    /** @return pulsante Invia */
     public Button getBtnInvia() { return btnInvia; }
+
+    /** @return pulsante Annulla */
     public Button getBtnAnnulla() { return btnAnnulla; }
 }

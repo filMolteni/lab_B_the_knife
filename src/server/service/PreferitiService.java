@@ -7,8 +7,33 @@ import common.Response;
 import server.dao.PreferitiDAO;
 import server.model.Ristorante;
 
+/**
+ * Service dedicato alla gestione dei ristoranti preferiti dell'utente.
+ *
+ * Questo service:
+ * - riceve una richiesta dal client
+ * - interroga il {@link PreferitiDAO}
+ * - converte i risultati in JSON
+ * - restituisce una {@link Response} pronta per essere inviata al client
+ *
+ * La logica principale consiste nel trasformare i model {@link Ristorante}
+ * in oggetti JSON compatibili con il client JavaFX.
+ */
 public class PreferitiService {
 
+    /**
+     * Restituisce la lista completa dei ristoranti preferiti dell'utente.
+     *
+     * Il metodo:
+     * 1. legge l'idUtente dal payload della richiesta
+     * 2. ottiene la lista dei ristoranti preferiti dal DAO
+     * 3. costruisce un array JSON con tutti i campi necessari al client
+     * 4. aggiunge la proprietà "fonte" (THEKNIFE / UTENTE)
+     * 5. restituisce una risposta OK con il payload
+     *
+     * @param req richiesta contenente idUtente
+     * @return risposta JSON con la lista dei preferiti
+     */
     public static Response visualizzaPreferiti(Request req) {
         try {
             int idUtente = req.payload.get("idUtente").getAsInt();
@@ -31,8 +56,7 @@ public class PreferitiService {
                 o.addProperty("delivery", r.isDelivery());
                 o.addProperty("prenotazione", r.isPrenotazione());
 
-                // ⭐ AGGIUNTA FONDAMENTALE
-                // Se il ristorante proviene da THEKNIFE o UTENTE
+                // ⭐ Indica se il ristorante proviene da THEKNIFE o UTENTE
                 if (r.isTheKnife()) {
                     o.addProperty("fonte", "THEKNIFE");
                 } else {

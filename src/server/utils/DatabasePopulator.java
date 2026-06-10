@@ -10,15 +10,44 @@ import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Utility per popolare il database con i ristoranti provenienti
+ * dal file CSV esportato da Google My Maps (michelin_my_maps.csv).
+ *
+ * Funzionalità principali:
+ * - lettura del CSV riga per riga
+ * - parsing sicuro dei campi (gestione virgolette)
+ * - inserimento batch nella tabella `ristorantitheknife`
+ * - commit unico per massime prestazioni
+ *
+ * Questo tool viene eseguito una tantum per inizializzare il database.
+ */
 public class DatabasePopulator {
 
     // Percorso RELATIVO come risorsa interna al progetto/JAR
     private static final String CSV_PATH = "/csv/michelin_my_maps.csv";
 
+    /**
+     * Entry point dell'utility.
+     * Esegue direttamente l'importazione del CSV.
+     */
     public static void main(String[] args) {
         importCSV();
     }
 
+    /**
+     * Importa il file CSV e inserisce i ristoranti nella tabella `ristorantitheknife`.
+     *
+     * Logica:
+     * 1. Apre connessione JDBC
+     * 2. Prepara un INSERT parametrico
+     * 3. Legge il CSV riga per riga
+     * 4. Effettua parsing robusto tramite {@link #parseCSV(String)}
+     * 5. Inserisce i record in batch
+     * 6. Esegue commit finale
+     *
+     * In caso di errore, stampa lo stack trace.
+     */
     public static void importCSV() {
 
         String sql = """
@@ -93,6 +122,16 @@ public class DatabasePopulator {
         }
     }
 
+    /**
+     * Parser CSV che gestisce correttamente:
+     * - campi con virgole tra virgolette
+     * - campi normali separati da virgole
+     *
+     * Implementazione manuale per evitare problemi con CSV complessi.
+     *
+     * @param line riga del CSV
+     * @return array di campi estratti
+     */
     private static String[] parseCSV(String line) {
         List<String> result = new ArrayList<>();
         boolean inQuotes = false;

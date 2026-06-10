@@ -6,6 +6,18 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 
+/**
+ * View grafica dedicata alla registrazione di un nuovo utente.
+ * Mostra:
+ * - un form con username, email, password e conferma password
+ * - un checkbox per registrarsi come gestore
+ * - pulsanti per registrarsi o tornare indietro
+ *
+ * La view è strutturata come un BorderPane:
+ * - Top: titolo
+ * - Center: form centrato
+ * - Bottom: pulsanti di navigazione
+ */
 public class RegisterView extends BorderPane {
 
     private TextField txtUsername;
@@ -18,10 +30,21 @@ public class RegisterView extends BorderPane {
     private Button btnRegistrati;
     private Button btnIndietro;
 
+    /**
+     * Costruisce la schermata di registrazione e inizializza il layout.
+     */
     public RegisterView() {
         creaLayout();
     }
 
+    /**
+     * Crea l’intero layout grafico della schermata:
+     * - titolo
+     * - form con i campi di registrazione
+     * - checkbox per ruolo gestore
+     * - pulsanti di azione
+     * - padding e stile generale
+     */
     private void creaLayout() {
 
         // ============================
@@ -104,13 +127,24 @@ public class RegisterView extends BorderPane {
         this.setStyle("-fx-background-color: #f8f8f8;");
     }
 
+    /** @return campo username */
     public TextField getTxtUsername() { return txtUsername; }
+
+    /** @return campo email */
     public TextField getTxtEmail() { return txtEmail; }
+
+    /** @return campo password */
     public PasswordField getTxtPassword() { return txtPassword; }
+
+    /** @return campo conferma password */
     public PasswordField getTxtConferma() { return txtConferma; }
 
+    /** @return checkbox per registrarsi come gestore */
     public CheckBox getChkGestore() { return chkGestore; }
 
+    /** @return pulsante Registrati */
     public Button getBtnRegistrati() { return btnRegistrati; }
+
+    /** @return pulsante Indietro */
     public Button getBtnIndietro() { return btnIndietro; }
 }

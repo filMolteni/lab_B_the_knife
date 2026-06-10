@@ -11,17 +11,34 @@ import common.MessageType;
 
 import java.util.function.BiConsumer;
 
+/**
+ * Controller dedicato alla ricerca dei ristoranti.
+ * Gestisce:
+ * - la lettura dei filtri dalla view
+ * - l'invio della richiesta di ricerca al server
+ * - la popolazione della tabella con i risultati
+ * - il doppio click per aprire i dettagli di un ristorante
+ * - il ritorno alla schermata precedente
+ */
 public class RicercaRistorantiController {
 
     private final RicercaRistorantiView view;
     private final ClientConnection connection;
     private final Runnable onBack;
-    private final BiConsumer<Integer, String> onOpenRistorante; 
+    private final BiConsumer<Integer, String> onOpenRistorante;
 
+    /**
+     * Costruisce il controller della ricerca e inizializza gli handler.
+     *
+     * @param view interfaccia grafica della ricerca ristoranti
+     * @param connection connessione al server
+     * @param onBack callback per tornare alla schermata precedente
+     * @param onOpenRistorante callback per aprire i dettagli di un ristorante (id, fonte)
+     */
     public RicercaRistorantiController(RicercaRistorantiView view,
                                        ClientConnection connection,
                                        Runnable onBack,
-                                       BiConsumer<Integer, String> onOpenRistorante) { 
+                                       BiConsumer<Integer, String> onOpenRistorante) {
 
         this.view = view;
         this.connection = connection;
@@ -31,6 +48,12 @@ public class RicercaRistorantiController {
         initHandlers();
     }
 
+    /**
+     * Inizializza gli handler dei pulsanti e il doppio click sulla tabella.
+     * - Indietro → torna alla schermata precedente
+     * - Cerca → avvia la ricerca
+     * - Doppio click → apre i dettagli del ristorante selezionato
+     */
     private void initHandlers() {
 
         // Bottone indietro
@@ -44,12 +67,23 @@ public class RicercaRistorantiController {
             if (e.getClickCount() == 2) {
                 RistoranteRow r = view.getTabella().getSelectionModel().getSelectedItem();
                 if (r != null) {
-                    onOpenRistorante.accept(r.getId(), r.getFonte()); 
+                    onOpenRistorante.accept(r.getId(), r.getFonte());
                 }
             }
         });
     }
 
+    /**
+     * Esegue la ricerca dei ristoranti in base ai filtri selezionati dall'utente.
+     *
+     * Funzionamento:
+     * 1. Legge tutti i filtri dalla view (testo, categoria, località, prezzo, servizi, stelle).
+     * 2. Costruisce il payload JSON.
+     * 3. Invia una richiesta CERCA_RISTORANTI al server.
+     * 4. Se la risposta è valida, popola la tabella con i risultati.
+     *
+     * Ogni ristorante viene rappresentato tramite un RistoranteRow.
+     */
     private void cerca() {
 
         String query = view.getTxtRicerca().getText().trim();

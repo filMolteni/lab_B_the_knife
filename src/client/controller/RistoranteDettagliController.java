@@ -13,6 +13,17 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.VBox;
 
+/**
+ * Controller dedicato alla schermata dei dettagli di un ristorante.
+ * Gestisce:
+ * - caricamento delle informazioni del ristorante
+ * - caricamento delle recensioni e delle risposte del gestore
+ * - invio di recensioni da parte del cliente
+ * - aggiunta ai preferiti
+ * - risposta alle recensioni (se il gestore è proprietario)
+ *
+ * La view viene aggiornata dinamicamente in base ai permessi dell'utente loggato.
+ */
 public class RistoranteDettagliController {
 
     private final RistoranteDettagliView view;
@@ -23,6 +34,18 @@ public class RistoranteDettagliController {
 
     private boolean gestoreProprietario = false;
 
+    /**
+     * Costruisce il controller e avvia subito:
+     * - controllo permessi cliente
+     * - controllo permessi gestore
+     * - caricamento dettagli ristorante
+     *
+     * @param view interfaccia grafica dei dettagli ristorante
+     * @param connection connessione al server
+     * @param idRistorante id del ristorante da visualizzare
+     * @param fonte indica se la richiesta arriva da UTENTE o THEKNIFE
+     * @param onBack callback per tornare alla schermata precedente
+     */
     public RistoranteDettagliController(RistoranteDettagliView view,
                                         ClientConnection connection,
                                         int idRistorante,
@@ -37,10 +60,16 @@ public class RistoranteDettagliController {
 
         initHandlers();
         controllaPermessiCliente();
-        controllaPermessiGestore();   
+        controllaPermessiGestore();
         caricaDettagli(idRistorante);
     }
 
+    /**
+     * Inizializza gli handler dei pulsanti:
+     * - Indietro
+     * - Aggiungi ai preferiti
+     * - Scrivi recensione
+     */
     private void initHandlers() {
         view.getBtnIndietro().setOnAction(e -> onBack.run());
         view.getBtnPreferiti().setOnAction(e -> aggiungiPreferito());
@@ -50,6 +79,10 @@ public class RistoranteDettagliController {
     // ============================================================
     // PERMESSI CLIENTE
     // ============================================================
+
+    /**
+     * Nasconde le funzioni riservate ai clienti se l'utente loggato non è un cliente.
+     */
     private void controllaPermessiCliente() {
         if (!UtenteDTO.getUtenteLoggato().isCliente()) {
             view.nascondiFunzioniCliente();
@@ -59,6 +92,11 @@ public class RistoranteDettagliController {
     // ============================================================
     // PERMESSI GESTORE
     // ============================================================
+
+    /**
+     * Verifica se il gestore loggato è proprietario del ristorante.
+     * Se sì, abilita la possibilità di rispondere alle recensioni.
+     */
     private void controllaPermessiGestore() {
         try {
             if (!UtenteDTO.getUtenteLoggato().isGestore()) {
@@ -86,6 +124,10 @@ public class RistoranteDettagliController {
     // ============================================================
     // AGGIUNGI AI PREFERITI
     // ============================================================
+
+    /**
+     * Aggiunge il ristorante ai preferiti dell'utente loggato.
+     */
     private void aggiungiPreferito() {
         try {
             int idUtente = UtenteDTO.getUtenteLoggato().getId();
@@ -117,6 +159,11 @@ public class RistoranteDettagliController {
     // ============================================================
     // INVIA RECENSIONE
     // ============================================================
+
+    /**
+     * Invia una recensione scritta dal cliente.
+     * Dopo l'invio ricarica la lista delle recensioni.
+     */
     private void inviaRecensione() {
         try {
             int idUtente = UtenteDTO.getUtenteLoggato().getId();
@@ -157,6 +204,14 @@ public class RistoranteDettagliController {
     // ============================================================
     // CARICA DETTAGLI RISTORANTE
     // ============================================================
+
+    /**
+     * Carica dal server tutte le informazioni del ristorante:
+     * - dati anagrafici
+     * - servizi
+     * - posizione
+     * - recensioni
+     */
     private void caricaDettagli(int idRistorante) {
         try {
             JsonObject payload = new JsonObject();
@@ -198,102 +253,117 @@ public class RistoranteDettagliController {
     // ============================================================
     // CARICA RECENSIONI + RISPOSTE + MEDIA VOTI
     // ============================================================
+
+    /**
+     * Carica tutte le recensioni del ristorante, includendo:
+     * - recensioni anonime o non anonime (in base al login)
+     * - eventuali risposte del gestore
+     * - media dei voti
+     *
+     * Se il gestore è proprietario, abilita la risposta alle recensioni.
+     */
     private void caricaRecensioni(int idRistorante) {
-    try {
-        JsonObject payload = new JsonObject();
-        payload.addProperty("idRistorante", idRistorante);
+        try {
+            JsonObject payload = new JsonObject();
+            payload.addProperty("idRistorante", idRistorante);
 
-        boolean utenteLoggato = UtenteDTO.getUtenteLoggato() != null;
+            boolean utenteLoggato = UtenteDTO.getUtenteLoggato() != null;
 
-        MessageType tipo = utenteLoggato
-                ? MessageType.VISUALIZZA_RECENSIONI_NON_ANONIME
-                : MessageType.VISUALIZZA_RECENSIONI_ANONIME;
+            MessageType tipo = utenteLoggato
+                    ? MessageType.VISUALIZZA_RECENSIONI_NON_ANONIME
+                    : MessageType.VISUALIZZA_RECENSIONI_ANONIME;
 
-        Request req = new Request(tipo, payload);
-        Response res = connection.sendRequest(req);
+            Request req = new Request(tipo, payload);
+            Response res = connection.sendRequest(req);
 
-        if (res == null || !res.isOk()) {
-            System.out.println("Errore caricamento recensioni");
-            return;
-        }
-
-        JsonArray arr = res.getData().getAsJsonArray("recensioni");
-
-        view.getRecensioniContainer().getChildren().clear();
-
-        int sommaVoti = 0;
-        int numeroRecensioni = 0;
-
-       
-        for (int i = 0; i < arr.size(); i++) {
-
-            JsonObject r = arr.get(i).getAsJsonObject();
-
-            int idRecensione = r.get("id").getAsInt();
-            String utente = r.has("nomeUtente") && !r.get("nomeUtente").isJsonNull()
-                    ? r.get("nomeUtente").getAsString()
-                    : "Anonimo";
-
-            int voto = r.get("voto").getAsInt();
-            String testo = r.get("testo").getAsString();
-            String data = r.get("data").getAsString();
-
-            sommaVoti += voto;
-            numeroRecensioni++;
-
-            String risposta = null;
-            if (r.has("risposta") && !r.get("risposta").isJsonNull()) {
-                risposta = r.get("risposta").getAsString();
+            if (res == null || !res.isOk()) {
+                System.out.println("Errore caricamento recensioni");
+                return;
             }
 
-            VBox card = new VBox(5);
-            card.setStyle("-fx-border-color: #ccc; -fx-padding: 10; -fx-background-color: #fafafa;");
+            JsonArray arr = res.getData().getAsJsonArray("recensioni");
 
-            Label lblUtente = new Label("👤 " + utente);
-            Label lblVoto = new Label("⭐ " + voto + "/5");
-            Label lblTesto = new Label(testo);
-            Label lblData = new Label("📅 " + data);
+            view.getRecensioniContainer().getChildren().clear();
 
-            card.getChildren().addAll(lblUtente, lblVoto, lblTesto, lblData);
+            int sommaVoti = 0;
+            int numeroRecensioni = 0;
 
-            if (risposta != null) {
-                Label lblRisposta = new Label("↳ Risposta del gestore: " + risposta);
-                lblRisposta.setStyle("-fx-text-fill: #444; -fx-padding: 0 0 0 20;");
-                card.getChildren().add(lblRisposta);
+            for (int i = 0; i < arr.size(); i++) {
+
+                JsonObject r = arr.get(i).getAsJsonObject();
+
+                int idRecensione = r.get("id").getAsInt();
+                String utente = r.has("nomeUtente") && !r.get("nomeUtente").isJsonNull()
+                        ? r.get("nomeUtente").getAsString()
+                        : "Anonimo";
+
+                int voto = r.get("voto").getAsInt();
+                String testo = r.get("testo").getAsString();
+                String data = r.get("data").getAsString();
+
+                sommaVoti += voto;
+                numeroRecensioni++;
+
+                String risposta = null;
+                if (r.has("risposta") && !r.get("risposta").isJsonNull()) {
+                    risposta = r.get("risposta").getAsString();
+                }
+
+                VBox card = new VBox(5);
+                card.setStyle("-fx-border-color: #ccc; -fx-padding: 10; -fx-background-color: #fafafa;");
+
+                Label lblUtente = new Label("👤 " + utente);
+                Label lblVoto = new Label("⭐ " + voto + "/5");
+                Label lblTesto = new Label(testo);
+                Label lblData = new Label("📅 " + data);
+
+                card.getChildren().addAll(lblUtente, lblVoto, lblTesto, lblData);
+
+                if (risposta != null) {
+                    Label lblRisposta = new Label("↳ Risposta del gestore: " + risposta);
+                    lblRisposta.setStyle("-fx-text-fill: #444; -fx-padding: 0 0 0 20;");
+                    card.getChildren().add(lblRisposta);
+                }
+
+                if (gestoreProprietario && risposta == null) {
+
+                    TextArea rispostaArea = new TextArea();
+                    rispostaArea.setPromptText("Scrivi una risposta...");
+                    rispostaArea.setPrefHeight(60);
+
+                    Button btnRispondi = new Button("💬 Rispondi");
+                    btnRispondi.setOnAction(e -> inviaRisposta(idRecensione, rispostaArea.getText()));
+
+                    card.getChildren().addAll(rispostaArea, btnRispondi);
+                }
+
+                view.getRecensioniContainer().getChildren().add(card);
             }
 
-            if (gestoreProprietario && risposta == null) {
-
-                TextArea rispostaArea = new TextArea();
-                rispostaArea.setPromptText("Scrivi una risposta...");
-                rispostaArea.setPrefHeight(60);
-
-                Button btnRispondi = new Button("💬 Rispondi");
-                btnRispondi.setOnAction(e -> inviaRisposta(idRecensione, rispostaArea.getText()));
-
-                card.getChildren().addAll(rispostaArea, btnRispondi);
+            //  CALCOLO MEDIA
+            if (numeroRecensioni > 0) {
+                double media = (double) sommaVoti / numeroRecensioni;
+                view.getLblMediaVoti().setText(String.format("Media voti: %.1f / 5", media));
+            } else {
+                view.getLblMediaVoti().setText("Nessuna recensione");
             }
 
-            view.getRecensioniContainer().getChildren().add(card);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
-        //  CALCOLO MEDIA
-        if (numeroRecensioni > 0) {
-            double media = (double) sommaVoti / numeroRecensioni;
-            view.getLblMediaVoti().setText(String.format("Media voti: %.1f / 5", media));
-        } else {
-            view.getLblMediaVoti().setText("Nessuna recensione");
-        }
-
-    } catch (Exception e) {
-        e.printStackTrace();
     }
-}
-
 
     // ============================================================
     // INVIA RISPOSTA
     // ============================================================
+
+    /**
+     * Invia la risposta del gestore a una recensione.
+     * Dopo l'invio ricarica la lista delle recensioni.
+     *
+     * @param idRecensione id della recensione a cui rispondere
+     * @param testo testo della risposta
+     */
     private void inviaRisposta(int idRecensione, String testo) {
         try {
             if (testo.trim().isEmpty()) {

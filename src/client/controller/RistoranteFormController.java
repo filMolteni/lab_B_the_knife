@@ -9,6 +9,15 @@ import com.google.gson.JsonObject;
 import common.MessageType;
 import javafx.stage.Stage;
 
+/**
+ * Controller del form di creazione/modifica ristorante.
+ * Gestisce:
+ * - la validazione dei campi
+ * - l'invio della richiesta di aggiunta o modifica al server
+ * - la chiusura della finestra al termine dell'operazione
+ *
+ * Il comportamento cambia automaticamente in base alla presenza o meno dell'idRistorante.
+ */
 public class RistoranteFormController {
 
     private final RistoranteFormView view;
@@ -18,23 +27,36 @@ public class RistoranteFormController {
 
     private final Stage stage;
 
-        public RistoranteFormController(
-                RistoranteFormView view,
-                ClientConnection connection,
-                Runnable onSuccess,
-                Integer idRistorante,
-                Stage stage) {
+    /**
+     * Costruisce il controller del form ristorante.
+     *
+     * @param view interfaccia grafica del form
+     * @param connection connessione al server
+     * @param onSuccess callback eseguita dopo un salvataggio riuscito
+     * @param idRistorante id del ristorante da modificare (null se aggiunta)
+     * @param stage finestra del popup da chiudere dopo il salvataggio
+     */
+    public RistoranteFormController(
+            RistoranteFormView view,
+            ClientConnection connection,
+            Runnable onSuccess,
+            Integer idRistorante,
+            Stage stage) {
 
-            this.view = view;
-            this.connection = connection;
-            this.onSuccess = onSuccess;
-            this.idRistorante = idRistorante;
-            this.stage = stage;
+        this.view = view;
+        this.connection = connection;
+        this.onSuccess = onSuccess;
+        this.idRistorante = idRistorante;
+        this.stage = stage;
 
-            initHandlers();
-        }
+        initHandlers();
+    }
 
-
+    /**
+     * Inizializza gli handler dei pulsanti:
+     * - Salva → invia i dati al server
+     * - Annulla → chiude il form richiamando la callback onSuccess
+     */
     private void initHandlers() {
 
         view.getBtnSalva().setOnAction(e -> salva());
@@ -44,6 +66,20 @@ public class RistoranteFormController {
         });
     }
 
+    /**
+     * Salva i dati del ristorante.
+     *
+     * Funzionamento:
+     * 1. Legge e valida i campi obbligatori.
+     * 2. Recupera latitudine e longitudine.
+     * 3. Prepara il payload JSON.
+     * 4. Se idRistorante è null → aggiunta.
+     *    Altrimenti → modifica.
+     * 5. Invia la richiesta al server.
+     * 6. Se l'operazione va a buon fine:
+     *    - esegue la callback onSuccess
+     *    - chiude la finestra
+     */
     private void salva() {
 
         String nome = view.getTxtNome().getText().trim();
@@ -91,7 +127,6 @@ public class RistoranteFormController {
             req = new Request(MessageType.MODIFICA_RISTORANTE, params);
         }
 
-
         try {
             Response res = connection.sendRequest(req);
 
@@ -106,7 +141,6 @@ public class RistoranteFormController {
                 if (stage != null)
                     stage.close();
             }
-
 
         } catch (Exception ex) {
             ex.printStackTrace();

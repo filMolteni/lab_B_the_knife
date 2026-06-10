@@ -7,6 +7,15 @@ import client.net.Response;
 import com.google.gson.JsonObject;
 import common.MessageType;
 
+/**
+ * Controller dedicato alla risposta del gestore a una recensione ricevuta.
+ * Gestisce:
+ * - la visualizzazione del testo della recensione originale
+ * - l'invio della risposta al server
+ * - la chiusura della finestra tramite callback
+ *
+ * Comunica con il server tramite ClientConnection e aggiorna la UI tramite RispondiRecensioneView.
+ */
 public class RispondiRecensioneController {
 
     private final RispondiRecensioneView view;
@@ -16,6 +25,15 @@ public class RispondiRecensioneController {
     private final int idRecensione;
     private final String testoRecensione;
 
+    /**
+     * Costruisce il controller e inizializza la view con il testo della recensione.
+     *
+     * @param view interfaccia grafica per rispondere alla recensione
+     * @param connection connessione al server
+     * @param onSuccess callback eseguita quando la risposta viene inviata correttamente
+     * @param idRecensione id della recensione a cui rispondere
+     * @param testoRecensione testo originale della recensione
+     */
     public RispondiRecensioneController(RispondiRecensioneView view,
                                         ClientConnection connection,
                                         Runnable onSuccess,
@@ -33,6 +51,11 @@ public class RispondiRecensioneController {
         initHandlers();
     }
 
+    /**
+     * Inizializza gli handler dei pulsanti:
+     * - Invia → invia la risposta al server
+     * - Annulla → chiude la finestra tramite callback
+     */
     private void initHandlers() {
 
         view.getBtnInvia().setOnAction(e -> inviaRisposta());
@@ -42,6 +65,17 @@ public class RispondiRecensioneController {
         });
     }
 
+    /**
+     * Invia la risposta del gestore al server.
+     *
+     * Funzionamento:
+     * 1. Legge il testo della risposta dalla view.
+     * 2. Verifica che non sia vuoto.
+     * 3. Invia una richiesta RISPONDI_RECENSIONE con idRecensione e risposta.
+     * 4. Se il server conferma, esegue la callback onSuccess.
+     *
+     * In caso di errore, stampa un messaggio nella console.
+     */
     private void inviaRisposta() {
 
         String risposta = view.getTxtRisposta().getText().trim();

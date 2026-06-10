@@ -1,5 +1,35 @@
 package common;
 
+/**
+ * Elenco di tutti i tipi di messaggi scambiati tra client e server.
+ *
+ * Ogni valore rappresenta un'operazione specifica del protocollo:
+ *
+ * --- UTENTE ---
+ * LOGIN, REGISTRAZIONE
+ *
+ * --- RISTORANTI MICHELIN (sola lettura) ---
+ * CERCA_RISTORANTI, VISUALIZZA
+ *
+ * --- RISTORANTI UTENTE (CRUD) ---
+ * AGGIUNGI_RISTORANTE, MODIFICA_RISTORANTE, ELIMINA_RISTORANTE,
+ * VISUALIZZA_RIEPILOGO_GESTORE, VISUALIZZA_UTENTE,
+ * VISUALIZZA_RECENSIONI_RISTORANTE, VISUALIZZA_RISTORANTE
+ *
+ * --- RECENSIONI ---
+ * AGGIUNGI_RECENSIONE, MODIFICA_RECENSIONE, ELIMINA_RECENSIONE,
+ * VISUALIZZA_RECENSIONI_ANONIME, VISUALIZZA_RECENSIONI_NON_ANONIME,
+ * VISUALIZZA_RECENSIONI_GESTORE, VISUALIZZA_RECENSIONI_UTENTE,
+ * RISPONDI_RECENSIONE, CONTROLLA_PROPRIETA_RISTORANTE
+ *
+ * --- PREFERITI ---
+ * AGGIUNGI_PREFERITO, RIMUOVI_PREFERITO, VISUALIZZA_PREFERITI
+ *
+ * L'enum è utilizzato da:
+ * - {@code Request} per indicare l'operazione richiesta
+ * - {@code Response} per indicare il tipo di risposta
+ * - Controller e ServerHandler per instradare la logica
+ */
 public enum MessageType {
 
     // UTENTE
@@ -16,7 +46,7 @@ public enum MessageType {
     ELIMINA_RISTORANTE,
     VISUALIZZA_RIEPILOGO_GESTORE,
     VISUALIZZA_UTENTE,              // usato per i dettagli lato utente loggato
-    
+
     VISUALIZZA_RECENSIONI_RISTORANTE,
     VISUALIZZA_RISTORANTE,
 

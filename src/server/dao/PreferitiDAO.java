@@ -9,11 +9,36 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Data Access Object (DAO) per la gestione dei ristoranti preferiti.
+ *
+ * Questa classe permette di:
+ * - aggiungere un ristorante ai preferiti dell'utente
+ * - rimuoverlo
+ * - recuperare la lista completa dei preferiti (sia THEKNIFE che UTENTE)
+ *
+ * La tabella "preferiti" contiene:
+ * - id_utente
+ * - id_ristorante
+ * - fonte (THEKNIFE / UTENTE)
+ *
+ * In base alla fonte, i dettagli del ristorante vengono caricati
+ * dalla tabella corretta.
+ */
 public class PreferitiDAO {
 
     // ============================================================
     // AGGIUNGI PREFERITO (con fonte)
     // ============================================================
+
+    /**
+     * Aggiunge un ristorante ai preferiti dell'utente.
+     *
+     * @param idUtente id dell'utente
+     * @param idRistorante id del ristorante
+     * @param fonte THEKNIFE o UTENTE
+     * @return true se l'inserimento è avvenuto con successo
+     */
     public static boolean aggiungi(int idUtente, int idRistorante, String fonte) {
         try {
             Connection conn = DBConnectionPool.get();
@@ -38,6 +63,14 @@ public class PreferitiDAO {
     // ============================================================
     // RIMUOVI PREFERITO
     // ============================================================
+
+    /**
+     * Rimuove un ristorante dai preferiti dell'utente.
+     *
+     * @param idUtente id dell'utente
+     * @param idRistorante id del ristorante
+     * @return true se la rimozione è avvenuta con successo
+     */
     public static boolean rimuovi(int idUtente, int idRistorante) {
         try {
             Connection conn = DBConnectionPool.get();
@@ -61,6 +94,17 @@ public class PreferitiDAO {
     // ============================================================
     // OTTIENI LISTA COMPLETA DEI PREFERITI (THEKNIFE + UTENTE)
     // ============================================================
+
+    /**
+     * Restituisce la lista completa dei ristoranti preferiti dell'utente.
+     * Per ogni ristorante:
+     * - legge la fonte dalla tabella preferiti
+     * - carica i dettagli dalla tabella corretta
+     * - imposta la fonte nel model
+     *
+     * @param idUtente id dell'utente
+     * @return lista di ristoranti preferiti
+     */
     public static List<Ristorante> getRistorantiPreferiti(int idUtente) {
         List<Ristorante> lista = new ArrayList<>();
 
@@ -103,6 +147,13 @@ public class PreferitiDAO {
     // ============================================================
     // CARICA RISTORANTE DA THEKNIFE
     // ============================================================
+
+    /**
+     * Carica un ristorante dalla tabella THEKNIFE.
+     *
+     * @param id id del ristorante
+     * @return oggetto Ristorante oppure null se non trovato
+     */
     private static Ristorante getByIdTheKnife(int id) {
         try {
             Connection conn = DBConnectionPool.get();
@@ -133,7 +184,7 @@ public class PreferitiDAO {
                     rs.getString("nazione"),
                     rs.getBoolean("delivery"),
                     rs.getBoolean("prenotazione"),
-                    "THEKNIFE" // ⭐ FONTE
+                    "THEKNIFE"
                 );
 
                 DBConnectionPool.release(conn);
@@ -152,6 +203,13 @@ public class PreferitiDAO {
     // ============================================================
     // CARICA RISTORANTE DA RISTORANTIUTENTE
     // ============================================================
+
+    /**
+     * Carica un ristorante dalla tabella RISTORANTIUTENTE.
+     *
+     * @param id id del ristorante
+     * @return oggetto Ristorante oppure null se non trovato
+     */
     private static Ristorante getByIdUtente(int id) {
         try {
             Connection conn = DBConnectionPool.get();
@@ -182,7 +240,7 @@ public class PreferitiDAO {
                     rs.getString("nazione"),
                     rs.getBoolean("delivery"),
                     rs.getBoolean("prenotazione"),
-                    "UTENTE" // ⭐ FONTE
+                    "UTENTE"
                 );
 
                 DBConnectionPool.release(conn);

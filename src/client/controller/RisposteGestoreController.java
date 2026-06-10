@@ -14,12 +14,28 @@ import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+/**
+ * Controller dedicato alla gestione delle recensioni ricevute dal gestore.
+ * Gestisce:
+ * - il caricamento delle recensioni dei ristoranti del gestore
+ * - l'apertura della finestra per rispondere a una recensione
+ * - il ritorno alla schermata precedente
+ *
+ * Comunica con il server tramite ClientConnection e aggiorna la UI tramite RisposteGestoreView.
+ */
 public class RisposteGestoreController {
 
     private final RisposteGestoreView view;
     private final ClientConnection connection;
     private final Runnable onGoBack;
 
+    /**
+     * Costruisce il controller e inizializza gli handler della view.
+     *
+     * @param view interfaccia grafica che mostra le recensioni ricevute
+     * @param connection connessione al server
+     * @param onGoBack callback per tornare alla schermata precedente
+     */
     public RisposteGestoreController(RisposteGestoreView view,
                                      ClientConnection connection,
                                      Runnable onGoBack) {
@@ -31,6 +47,11 @@ public class RisposteGestoreController {
         initHandlers();
     }
 
+    /**
+     * Inizializza gli handler dei pulsanti:
+     * - Indietro → torna alla schermata precedente
+     * - Rispondi → apre la finestra per rispondere alla recensione selezionata
+     */
     private void initHandlers() {
 
         // TORNA INDIETRO
@@ -41,7 +62,19 @@ public class RisposteGestoreController {
     }
 
     /**
-     * Carica tutte le recensioni ricevute dal gestore
+     * Carica tutte le recensioni ricevute dai ristoranti del gestore loggato.
+     *
+     * Funzionamento:
+     * 1. Invia una richiesta VISUALIZZA_RECENSIONI_GESTORE al server.
+     * 2. Riceve un array JSON con tutte le recensioni.
+     * 3. Popola la tabella della view tramite Platform.runLater().
+     *
+     * Ogni riga contiene:
+     * - id recensione
+     * - id utente autore
+     * - voto
+     * - testo
+     * - eventuale risposta del gestore
      */
     public void loadRecensioni() {
 
@@ -85,7 +118,13 @@ public class RisposteGestoreController {
     }
 
     /**
-     * Apre la finestra per rispondere alla recensione
+     * Apre la finestra per rispondere alla recensione selezionata.
+     * Se nessuna recensione è selezionata, mostra un messaggio in console.
+     *
+     * Funzionamento:
+     * 1. Recupera la recensione selezionata.
+     * 2. Crea la view e il controller della risposta.
+     * 3. Apre una nuova finestra con il form di risposta.
      */
     private void apriFormRisposta() {
 

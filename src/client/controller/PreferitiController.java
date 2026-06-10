@@ -13,6 +13,16 @@ import javafx.application.Platform;
 
 import java.util.function.BiConsumer;
 
+/**
+ * Controller della schermata dei ristoranti preferiti.
+ * Gestisce:
+ * - il caricamento dei preferiti dal server
+ * - la visualizzazione nella tabella
+ * - il doppio click per aprire i dettagli del ristorante
+ * - il ritorno alla schermata precedente
+ *
+ * Comunica con il server tramite ClientConnection e aggiorna la UI tramite PreferitiView.
+ */
 public class PreferitiController {
 
     private final PreferitiView view;
@@ -20,6 +30,14 @@ public class PreferitiController {
     private final Runnable onBack;
     private final BiConsumer<Integer, String> onOpenRistorante; // ⭐ NUOVO
 
+    /**
+     * Costruisce il controller dei preferiti e avvia subito il caricamento dei dati.
+     *
+     * @param view interfaccia grafica dei preferiti
+     * @param connection connessione al server
+     * @param onBack callback per tornare alla schermata precedente
+     * @param onOpenRistorante callback per aprire i dettagli di un ristorante (id, fonte)
+     */
     public PreferitiController(PreferitiView view,
                                ClientConnection connection,
                                Runnable onBack,
@@ -34,6 +52,11 @@ public class PreferitiController {
         loadPreferiti();
     }
 
+    /**
+     * Inizializza gli handler dei pulsanti e il doppio click sulla tabella.
+     * - Indietro → torna alla schermata precedente
+     * - Doppio click → apre i dettagli del ristorante selezionato
+     */
     private void initHandlers() {
 
         view.getBtnIndietro().setOnAction(e -> onBack.run());
@@ -49,6 +72,12 @@ public class PreferitiController {
         });
     }
 
+    /**
+     * Carica dal server la lista dei ristoranti preferiti dell'utente loggato.
+     * Invia una richiesta VISUALIZZA_PREFERITI e aggiorna la tabella.
+     *
+     * L'aggiornamento della UI avviene tramite Platform.runLater().
+     */
     private void loadPreferiti() {
 
         JsonObject params = new JsonObject();

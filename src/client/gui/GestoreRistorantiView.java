@@ -6,6 +6,18 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 
+/**
+ * View grafica dedicata alla gestione dei ristoranti da parte del gestore.
+ * Mostra:
+ * - una tabella con l'elenco dei ristoranti
+ * - pulsanti per aggiungere, modificare, eliminare e pulire la selezione
+ * - un pulsante per tornare indietro
+ *
+ * La view è strutturata come un BorderPane:
+ * - Top: titolo + pulsante indietro
+ * - Center: tabella dei ristoranti
+ * - Bottom: pulsanti di gestione
+ */
 public class GestoreRistorantiView extends BorderPane {
 
     private TableView<RistoranteRow> tabella;
@@ -16,10 +28,19 @@ public class GestoreRistorantiView extends BorderPane {
     private Button btnPulisci;
     private Button btnIndietro;
 
+    /**
+     * Costruisce la view e inizializza il layout.
+     */
     public GestoreRistorantiView() {
         creaLayout();
     }
 
+    /**
+     * Crea l'intero layout grafico della schermata:
+     * - titolo
+     * - tabella dei ristoranti
+     * - pulsanti di gestione
+     */
     private void creaLayout() {
 
         // ============================
@@ -89,11 +110,24 @@ public class GestoreRistorantiView extends BorderPane {
     }
 
     // GETTER
+
+    /**
+     * @return la tabella dei ristoranti
+     */
     public TableView<RistoranteRow> getTabella() { return tabella; }
 
+    /** @return pulsante Aggiungi */
     public Button getBtnAggiungi() { return btnAggiungi; }
+
+    /** @return pulsante Modifica */
     public Button getBtnModifica() { return btnModifica; }
+
+    /** @return pulsante Elimina */
     public Button getBtnElimina() { return btnElimina; }
+
+    /** @return pulsante Pulisci */
     public Button getBtnPulisci() { return btnPulisci; }
+
+    /** @return pulsante Indietro */
     public Button getBtnIndietro() { return btnIndietro; }
 }

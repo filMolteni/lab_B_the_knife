@@ -13,15 +13,40 @@ import server.dao.PreferitiDAO;
 import java.io.*;
 import java.net.Socket;
 
+/**
+ * Gestisce una singola connessione client-server.
+ *
+ * Ogni client connesso al server viene servito da un thread dedicato
+ * che esegue questa classe. Il ClientHandler:
+ *
+ * - legge richieste JSON dal socket
+ * - le converte in oggetti {@link Request}
+ * - le inoltra ai vari servizi tramite il metodo {@code process()}
+ * - invia al client una {@link Response} serializzata in JSON
+ *
+ * Il ciclo continua finché il client rimane connesso.
+ */
 public class ClientHandler implements Runnable {
 
     private final Socket socket;
     private final Gson gson = new Gson();
 
+    /**
+     * Costruisce un handler per un client connesso.
+     *
+     * @param socket socket della connessione client
+     */
     public ClientHandler(Socket socket) {
         this.socket = socket;
     }
 
+    /**
+     * Ciclo principale del thread:
+     * - apre gli stream
+     * - legge continuamente richieste JSON
+     * - le elabora tramite {@code process()}
+     * - invia la risposta al client
+     */
     @Override
     public void run() {
 
@@ -44,6 +69,12 @@ public class ClientHandler implements Runnable {
         }
     }
 
+    /**
+     * Smista la richiesta al servizio corretto in base al {@link common.MessageType}.
+     *
+     * @param req richiesta ricevuta dal client
+     * @return risposta generata dal servizio appropriato
+     */
     private Response process(Request req) {
 
         if (req == null || req.type == null)
@@ -61,9 +92,8 @@ public class ClientHandler implements Runnable {
             // RISTORANTI (MICHELIN + UTENTE)
             // ============================
             case CERCA_RISTORANTI -> RistoranteService.cerca(req);
-            case VISUALIZZA -> RistoranteService.visualizza(req);         
+            case VISUALIZZA -> RistoranteService.visualizza(req);
             case VISUALIZZA_UTENTE -> RistoranteService.visualizzaUtente(req);
-           
 
             case AGGIUNGI_RISTORANTE -> RistoranteService.aggiungi(req);
             case MODIFICA_RISTORANTE -> RistoranteService.modifica(req);
@@ -72,21 +102,19 @@ public class ClientHandler implements Runnable {
 
             case CONTROLLA_PROPRIETA_RISTORANTE -> RistoranteService.controllaProprieta(req);
 
-
             // ============================
             // RECENSIONI
             // ============================
             case AGGIUNGI_RECENSIONE -> RecensioneService.aggiungi(req);
             case MODIFICA_RECENSIONE -> RecensioneService.modifica(req);
             case ELIMINA_RECENSIONE -> RecensioneService.elimina(req);
-            
-            
+
             case VISUALIZZA_RECENSIONI_UTENTE ->
                     RecensioneService.getByUtente(req);
 
-
             case VISUALIZZA_RECENSIONI_ANONIME ->
-                    RistoranteService.visualizzaRecensioniAnonime(req);     // RECENSIONI ANONIME
+                    RistoranteService.visualizzaRecensioniAnonime(req);
+
             case VISUALIZZA_RECENSIONI_NON_ANONIME ->
                     RecensioneService.getNonAnonime(req);
 
@@ -99,10 +127,10 @@ public class ClientHandler implements Runnable {
             // ============================
             // PREFERITI
             // ============================
-           case AGGIUNGI_PREFERITO -> {
+            case AGGIUNGI_PREFERITO -> {
                 int idUtente = req.payload.get("idUtente").getAsInt();
                 int idRistorante = req.payload.get("idRistorante").getAsInt();
-                String fonte = req.payload.get("fonte").getAsString(); // THEKNIFE o UTENTE
+                String fonte = req.payload.get("fonte").getAsString();
 
                 boolean ok = PreferitiDAO.aggiungi(idUtente, idRistorante, fonte);
 
@@ -111,8 +139,6 @@ public class ClientHandler implements Runnable {
 
                 yield Response.ok();
             }
-
-
 
             case RIMUOVI_PREFERITO -> {
                 int idUtente = req.payload.get("idUtente").getAsInt();
@@ -126,11 +152,9 @@ public class ClientHandler implements Runnable {
                 yield Response.ok();
             }
 
-
             case VISUALIZZA_PREFERITI -> {
-            yield PreferitiService.visualizzaPreferiti(req);
-        }
-
+                yield PreferitiService.visualizzaPreferiti(req);
+            }
 
             // ============================
             // DEFAULT

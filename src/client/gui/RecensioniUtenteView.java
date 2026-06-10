@@ -6,6 +6,18 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 
+/**
+ * View grafica dedicata alla visualizzazione delle recensioni scritte dall’utente.
+ * Mostra:
+ * - un titolo centrale
+ * - una tabella con ristorante, voto, commento e data
+ * - pulsanti per tornare indietro, modificare o eliminare una recensione
+ *
+ * La view è strutturata come un BorderPane:
+ * - Top: titolo
+ * - Center: tabella delle recensioni
+ * - Bottom: pulsanti di gestione
+ */
 public class RecensioniUtenteView extends BorderPane {
 
     private TableView<RecensioneRow> tabella;
@@ -14,10 +26,20 @@ public class RecensioniUtenteView extends BorderPane {
     private Button btnModifica;
     private Button btnElimina;
 
+    /**
+     * Costruisce la schermata e inizializza il layout.
+     */
     public RecensioniUtenteView() {
         creaLayout();
     }
 
+    /**
+     * Crea l’intero layout grafico:
+     * - titolo
+     * - tabella con colonne dinamiche
+     * - pulsanti di gestione (Indietro, Modifica, Elimina)
+     * - padding e stile generale
+     */
     private void creaLayout() {
 
         // ============================
@@ -53,7 +75,6 @@ public class RecensioniUtenteView extends BorderPane {
         tabella.getColumns().addAll(colRistorante, colVoto, colCommento, colData);
         tabella.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
-        // ⭐ La tabella ora si espande a tutto lo spazio disponibile
         BorderPane.setMargin(tabella, new Insets(10));
         this.setCenter(tabella);
 
@@ -81,9 +102,15 @@ public class RecensioniUtenteView extends BorderPane {
         this.setStyle("-fx-background-color: #f8f8f8;");
     }
 
+    /** @return la tabella delle recensioni dell’utente */
     public TableView<RecensioneRow> getTabella() { return tabella; }
 
+    /** @return pulsante Indietro */
     public Button getBtnIndietro() { return btnIndietro; }
+
+    /** @return pulsante Modifica */
     public Button getBtnModifica() { return btnModifica; }
+
+    /** @return pulsante Elimina */
     public Button getBtnElimina() { return btnElimina; }
 }

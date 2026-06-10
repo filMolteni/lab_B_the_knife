@@ -9,22 +9,55 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
-    public class RistoranteDAO {
+/**
+ * Data Access Object (DAO) per la gestione dei ristoranti.
+ *
+ * Questa classe fornisce metodi per:
+ * - cercare ristoranti Michelin (tabella RistorantiTheKnife) con filtri avanzati
+ * - verificare se un ristorante appartiene a un utente
+ * - ottenere un ristorante per ID (fonte THEKNIFE)
+ *
+ * I metodi utilizzano connessioni dal {@link DBConnectionPool}.
+ */
+public class RistoranteDAO {
 
-        // ============================
-        // CERCA RISTORANTI THEKNIFE
-        // ============================
-            public static List<Ristorante> cerca(
-            String query,
-            String tipoCucina,
-            String localita,
-            int prezzoMin,
-            int prezzoMax,
-            boolean delivery,
-            boolean prenotazione,
-            int stelleMin
-    ) {
-        List<Ristorante> lista = new ArrayList<>();
+    // ============================
+    // CERCA RISTORANTI THEKNIFE
+    // ============================
+
+    /**
+     * Esegue una ricerca avanzata sui ristoranti Michelin (tabella RistorantiTheKnife).
+     *
+     * Supporta filtri su:
+     * - nome (LIKE)
+     * - tipo cucina
+     * - località (città o nazione)
+     * - fascia prezzo (min/max)
+     * - delivery
+     * - prenotazione
+     * - stelle minime (media recensioni)
+     *
+     * @param query testo da cercare nel nome
+     * @param tipoCucina filtro tipo cucina (o "Tutte")
+     * @param localita città o nazione (o "Tutte")
+     * @param prezzoMin fascia prezzo minima
+     * @param prezzoMax fascia prezzo massima
+     * @param delivery true se deve offrire delivery
+     * @param prenotazione true se deve accettare prenotazioni
+     * @param stelleMin media minima delle recensioni
+     * @return lista di ristoranti corrispondenti ai filtri
+     */
+   public static List<Ristorante> cerca(
+        String query,
+        String tipoCucina,
+        String localita,
+        int prezzoMin,
+        int prezzoMax,
+        boolean delivery,
+        boolean prenotazione,
+        int stelleMin
+) {
+    List<Ristorante> lista = new ArrayList<>();
 
         try (Connection conn = DBConnectionPool.get()) {
 
@@ -125,28 +158,39 @@ import java.util.List;
         return lista;
     }
 
+    
 
-
-
+    /**
+     * Verifica se un ristorante appartiene alla tabella RistorantiUtente.
+     *
+     * @param idRistorante id del ristorante
+     * @return true se esiste nella tabella ristorantiutente
+     */
     public static boolean esisteUtente(int idRistorante) {
-    try (Connection conn = DBConnectionPool.get()) {
-        String sql = "SELECT 1 FROM ristorantiutente WHERE id = ? LIMIT 1";
-        PreparedStatement ps = conn.prepareStatement(sql);
-        ps.setInt(1, idRistorante);
+        try (Connection conn = DBConnectionPool.get()) {
+            String sql = "SELECT 1 FROM ristorantiutente WHERE id = ? LIMIT 1";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setInt(1, idRistorante);
 
-        ResultSet rs = ps.executeQuery();
-        return rs.next();
+            ResultSet rs = ps.executeQuery();
+            return rs.next();
 
-    } catch (Exception e) {
-        e.printStackTrace();
-        return false;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
-}
-
 
     // ============================
     // GET BY ID (THEKNIFE)
     // ============================
+
+    /**
+     * Restituisce un ristorante Michelin (THEKNIFE) dato il suo ID.
+     *
+     * @param id id del ristorante
+     * @return oggetto Ristorante oppure null se non trovato
+     */
     public static Ristorante getById(int id) {
         Ristorante r = null;
 
@@ -171,7 +215,7 @@ import java.util.List;
                         rs.getString("nazione"),
                         rs.getBoolean("delivery"),
                         rs.getBoolean("prenotazione"),
-                        "THEKNIFE"   // ⭐ FONTE AGGIUNTA
+                        "THEKNIFE"
                 );
             }
 

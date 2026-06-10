@@ -10,48 +10,79 @@ import server.model.Recensione;
 
 import java.util.List;
 
+/**
+ * Service che gestisce tutte le operazioni relative alle recensioni:
+ *
+ * - aggiunta di una recensione
+ * - modifica
+ * - eliminazione
+ * - recupero recensioni per ristorante
+ * - recupero recensioni non anonime
+ * - recupero recensioni scritte da un utente
+ * - recupero recensioni dei ristoranti di un gestore
+ * - risposta del gestore a una recensione
+ *
+ * Ogni metodo:
+ * - legge i parametri dal payload della {@link Request}
+ * - interagisce con il {@link RecensioneDAO}
+ * - costruisce una {@link Response} JSON per il client
+ */
 public class RecensioneService {
 
     // ============================
     // AGGIUNGI RECENSIONE
     // ============================
+
+    /**
+     * Aggiunge una nuova recensione.
+     *
+     * Logica:
+     * 1. Legge idUtente, idRistorante, voto, testo
+     * 2. Determina automaticamente la fonte (THEKNIFE / UTENTE)
+     * 3. Verifica che l'utente non abbia già recensito il ristorante
+     * 4. Inserisce la recensione tramite DAO
+     *
+     * @param req richiesta contenente i dati della recensione
+     * @return risposta OK o errore
+     */
     public static Response aggiungi(Request req) {
-    try {
-        JsonObject p = req.payload;
+        try {
+            JsonObject p = req.payload;
 
-        int idUtente = p.get("idUtente").getAsInt();
-        int idRistorante = p.get("idRistorante").getAsInt();
-        int voto = p.get("voto").getAsInt();
-        String testo = p.get("testo").getAsString();
+            int idUtente = p.get("idUtente").getAsInt();
+            int idRistorante = p.get("idRistorante").getAsInt();
+            int voto = p.get("voto").getAsInt();
+            String testo = p.get("testo").getAsString();
 
-        // ⭐ Determina automaticamente la fonte
-        String fonte;
-        if (RistoranteDAO.esisteUtente(idRistorante)) {
-            fonte = "UTENTE";
-        } else {
-            fonte = "THEKNIFE";
+            // Determina la fonte del ristorante
+            String fonte = RistoranteDAO.esisteUtente(idRistorante) ? "UTENTE" : "THEKNIFE";
+
+            if (RecensioneDAO.recensioneEsiste(idUtente, idRistorante)) {
+                return Response.error("Hai già recensito questo ristorante.");
+            }
+
+            boolean ok = RecensioneDAO.aggiungi(idUtente, idRistorante, voto, testo, fonte);
+
+            if (!ok)
+                return Response.error("Impossibile aggiungere recensione");
+
+            return Response.ok();
+
+        } catch (Exception e) {
+            return Response.error("Errore aggiunta recensione: " + e.getMessage());
         }
-
-        if (RecensioneDAO.recensioneEsiste(idUtente, idRistorante)) {
-            return Response.error("Hai già recensito questo ristorante.");
-        }
-
-        boolean ok = RecensioneDAO.aggiungi(idUtente, idRistorante, voto, testo, fonte);
-
-        if (!ok)
-            return Response.error("Impossibile aggiungere recensione");
-
-        return Response.ok();
-
-    } catch (Exception e) {
-        return Response.error("Errore aggiunta recensione: " + e.getMessage());
     }
-}
-
 
     // ============================
     // MODIFICA RECENSIONE
     // ============================
+
+    /**
+     * Modifica una recensione esistente.
+     *
+     * @param req richiesta contenente idRecensione, voto e testo aggiornati
+     * @return risposta OK o errore
+     */
     public static Response modifica(Request req) {
         try {
             JsonObject p = req.payload;
@@ -75,6 +106,13 @@ public class RecensioneService {
     // ============================
     // ELIMINA RECENSIONE
     // ============================
+
+    /**
+     * Elimina una recensione.
+     *
+     * @param req richiesta contenente idRecensione
+     * @return risposta OK o errore
+     */
     public static Response elimina(Request req) {
         try {
             int idRecensione = req.payload.get("idRecensione").getAsInt();
@@ -92,8 +130,16 @@ public class RecensioneService {
     }
 
     // ============================
-    // RECENSIONI DI UN RISTORANTE (UTENTE + THEKNIFE)
+    // RECENSIONI DI UN RISTORANTE
     // ============================
+
+    /**
+     * Restituisce tutte le recensioni (anonime + non anonime)
+     * di un ristorante.
+     *
+     * @param req richiesta contenente idRistorante
+     * @return lista JSON delle recensioni
+     */
     public static Response getByRistorante(Request req) {
         try {
             int idRistorante = req.payload.get("idRistorante").getAsInt();
@@ -107,7 +153,7 @@ public class RecensioneService {
                 o.addProperty("id", r.getId());
                 o.addProperty("idUtente", r.getIdUtente());
                 o.addProperty("idRistorante", r.getIdRistorante());
-                o.addProperty("nomeRistorante", r.getNomeRistorante()); // ⭐ NUOVO
+                o.addProperty("nomeRistorante", r.getNomeRistorante());
                 o.addProperty("voto", r.getVoto());
                 o.addProperty("testo", r.getTesto());
                 o.addProperty("data", r.getData());
@@ -125,11 +171,21 @@ public class RecensioneService {
         }
     }
 
-       public static Response getNonAnonime(Request req) {
+    // ============================
+    // RECENSIONI NON ANONIME
+    // ============================
+
+    /**
+     * Restituisce solo le recensioni NON anonime di un ristorante,
+     * includendo anche la risposta del gestore (se presente).
+     *
+     * @param req richiesta contenente idRistorante
+     * @return lista JSON delle recensioni non anonime
+     */
+    public static Response getNonAnonime(Request req) {
         try {
             int idRistorante = req.payload.get("idRistorante").getAsInt();
 
-            // ⭐ Recupera recensioni NON anonime
             List<Recensione> lista = RecensioneDAO.getNonAnonimeByRistorante(idRistorante);
 
             JsonArray arr = new JsonArray();
@@ -147,7 +203,7 @@ public class RecensioneService {
                 o.addProperty("data", r.getData());
                 o.addProperty("fonte", r.getFonte());
 
-                // ⭐ AGGIUNGI LA RISPOSTA (se esiste)
+                // Aggiunge la risposta del gestore, se esiste
                 String risposta = RecensioneDAO.getRispostaByRecensione(r.getId());
                 if (risposta != null)
                     o.addProperty("risposta", risposta);
@@ -167,12 +223,16 @@ public class RecensioneService {
         }
     }
 
-
-
-
     // ============================
     // RECENSIONI SCRITTE DA UN UTENTE
     // ============================
+
+    /**
+     * Restituisce tutte le recensioni scritte da un utente.
+     *
+     * @param req richiesta contenente idUtente
+     * @return lista JSON delle recensioni
+     */
     public static Response getByUtente(Request req) {
         try {
             int idUtente = req.payload.get("idUtente").getAsInt();
@@ -185,7 +245,7 @@ public class RecensioneService {
                 JsonObject o = new JsonObject();
                 o.addProperty("id", r.getId());
                 o.addProperty("idRistorante", r.getIdRistorante());
-                o.addProperty("nomeRistorante", r.getNomeRistorante()); // ⭐ NUOVO
+                o.addProperty("nomeRistorante", r.getNomeRistorante());
                 o.addProperty("voto", r.getVoto());
                 o.addProperty("testo", r.getTesto());
                 o.addProperty("data", r.getData());
@@ -206,6 +266,13 @@ public class RecensioneService {
     // ============================
     // RECENSIONI DEI RISTORANTI DI UN GESTORE
     // ============================
+
+    /**
+     * Restituisce tutte le recensioni dei ristoranti gestiti da un gestore.
+     *
+     * @param req richiesta contenente idGestore
+     * @return lista JSON delle recensioni
+     */
     public static Response getByGestore(Request req) {
         try {
             int idGestore = req.payload.get("idGestore").getAsInt();
@@ -219,7 +286,7 @@ public class RecensioneService {
                 o.addProperty("id", r.getId());
                 o.addProperty("idUtente", r.getIdUtente());
                 o.addProperty("idRistorante", r.getIdRistorante());
-                o.addProperty("nomeRistorante", r.getNomeRistorante()); // ⭐ NUOVO
+                o.addProperty("nomeRistorante", r.getNomeRistorante());
                 o.addProperty("voto", r.getVoto());
                 o.addProperty("testo", r.getTesto());
                 o.addProperty("data", r.getData());
@@ -240,6 +307,13 @@ public class RecensioneService {
     // ============================
     // RISPONDI A RECENSIONE
     // ============================
+
+    /**
+     * Permette al gestore di rispondere a una recensione.
+     *
+     * @param req richiesta contenente idRecensione e testo della risposta
+     * @return risposta OK o errore
+     */
     public static Response rispondi(Request req) {
         try {
             int idRecensione = req.payload.get("idRecensione").getAsInt();

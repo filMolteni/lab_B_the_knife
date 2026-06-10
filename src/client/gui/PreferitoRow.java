@@ -2,6 +2,16 @@ package client.gui;
 
 import javafx.beans.property.*;
 
+/**
+ * Modello dati per rappresentare un ristorante salvato nei preferiti.
+ * Contiene tutte le informazioni necessarie per popolare la tabella dei preferiti:
+ * - dati anagrafici del ristorante
+ * - servizi disponibili (delivery, prenotazione)
+ * - fascia prezzo
+ * - fonte del ristorante (THEKNIFE o UTENTE)
+ *
+ * Ogni campo è gestito tramite proprietà JavaFX per supportare il binding nella UI.
+ */
 public class PreferitoRow {
 
     private final IntegerProperty id;
@@ -16,6 +26,20 @@ public class PreferitoRow {
 
     private final StringProperty fonte; // ⭐ NUOVO
 
+    /**
+     * Costruisce un oggetto rappresentante un ristorante nei preferiti.
+     *
+     * @param id id del ristorante
+     * @param nome nome del ristorante
+     * @param indirizzo indirizzo completo
+     * @param citta città del ristorante
+     * @param nazione nazione del ristorante
+     * @param tipoCucina tipo di cucina
+     * @param fasciaPrezzo fascia di prezzo (1–5)
+     * @param delivery true se il ristorante offre consegna
+     * @param prenotazione true se il ristorante accetta prenotazioni
+     * @param fonte indica se il ristorante proviene da THEKNIFE o UTENTE
+     */
     public PreferitoRow(int id, String nome, String indirizzo, String citta, String nazione,
                         String tipoCucina, int fasciaPrezzo, boolean delivery, boolean prenotazione,
                         String fonte) {
@@ -34,18 +58,39 @@ public class PreferitoRow {
     }
 
     // ===== GETTER =====
+
+    /** @return id del ristorante */
     public int getId() { return id.get(); }
+
+    /** @return nome del ristorante */
     public String getNome() { return nome.get(); }
+
+    /** @return indirizzo del ristorante */
     public String getIndirizzo() { return indirizzo.get(); }
+
+    /** @return città del ristorante */
     public String getCitta() { return citta.get(); }
+
+    /** @return nazione del ristorante */
     public String getNazione() { return nazione.get(); }
+
+    /** @return tipo di cucina */
     public String getTipoCucina() { return tipoCucina.get(); }
+
+    /** @return fascia prezzo */
     public int getFasciaPrezzo() { return fasciaPrezzo.get(); }
+
+    /** @return true se offre delivery */
     public boolean isDelivery() { return delivery.get(); }
+
+    /** @return true se accetta prenotazioni */
     public boolean isPrenotazione() { return prenotazione.get(); }
-    public String getFonte() { return fonte.get(); } // ⭐ NUOVO
+
+    /** @return fonte del ristorante (THEKNIFE o UTENTE) */
+    public String getFonte() { return fonte.get(); }
 
     // ===== PROPERTY =====
+
     public IntegerProperty idProperty() { return id; }
     public StringProperty nomeProperty() { return nome; }
     public StringProperty indirizzoProperty() { return indirizzo; }
@@ -55,9 +100,10 @@ public class PreferitoRow {
     public IntegerProperty fasciaPrezzoProperty() { return fasciaPrezzo; }
     public BooleanProperty deliveryProperty() { return delivery; }
     public BooleanProperty prenotazioneProperty() { return prenotazione; }
-    public StringProperty fonteProperty() { return fonte; } // ⭐ NUOVO
+    public StringProperty fonteProperty() { return fonte; }
 
     // ===== SETTER =====
+
     public void setNome(String nome) { this.nome.set(nome); }
     public void setIndirizzo(String indirizzo) { this.indirizzo.set(indirizzo); }
     public void setCitta(String citta) { this.citta.set(citta); }
@@ -66,5 +112,5 @@ public class PreferitoRow {
     public void setFasciaPrezzo(int fasciaPrezzo) { this.fasciaPrezzo.set(fasciaPrezzo); }
     public void setDelivery(boolean delivery) { this.delivery.set(delivery); }
     public void setPrenotazione(boolean prenotazione) { this.prenotazione.set(prenotazione); }
-    public void setFonte(String fonte) { this.fonte.set(fonte); } // ⭐ NUOVO
+    public void setFonte(String fonte) { this.fonte.set(fonte); }
 }

@@ -5,6 +5,20 @@ import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 
+/**
+ * View grafica dedicata alla visualizzazione dei dettagli di un ristorante.
+ * Mostra:
+ * - informazioni anagrafiche (nome, indirizzo, città, nazione)
+ * - dettagli tecnici (latitudine, longitudine, fascia prezzo, tipo cucina)
+ * - servizi disponibili (delivery, prenotazione)
+ * - media voti
+ * - elenco recensioni
+ * - sezione per scrivere una nuova recensione (solo per clienti)
+ * - pulsanti per aggiungere ai preferiti e tornare indietro
+ *
+ * La view è strutturata come un BorderPane:
+ * - Center: contenuto scrollabile con tutti i dettagli
+ */
 public class RistoranteDettagliView extends BorderPane {
 
     private Label lblNome;
@@ -29,10 +43,21 @@ public class RistoranteDettagliView extends BorderPane {
     private TextArea txtRecensione;
     private Spinner<Integer> votoSpinner;
 
+    /**
+     * Costruisce la schermata e inizializza il layout.
+     */
     public RistoranteDettagliView() {
         creaLayout();
     }
 
+    /**
+     * Crea l’intero layout grafico:
+     * - inizializza tutte le label dei dettagli
+     * - crea il contenitore delle recensioni
+     * - crea la sezione per scrivere una recensione
+     * - imposta un layout scrollabile per contenere tutte le informazioni
+     * - applica stile e padding
+     */
     private void creaLayout() {
 
         // ============================
@@ -110,7 +135,6 @@ public class RistoranteDettagliView extends BorderPane {
         contenuto.setPadding(new Insets(25));
         contenuto.setAlignment(Pos.TOP_LEFT);
 
-        // ⭐ ScrollPane per rendere tutto responsive
         ScrollPane scroll = new ScrollPane(contenuto);
         scroll.setFitToWidth(true);
         scroll.setPadding(new Insets(10));
@@ -127,6 +151,16 @@ public class RistoranteDettagliView extends BorderPane {
     // ============================================================
     // NASCONDI FUNZIONI CLIENTE
     // ============================================================
+
+    /**
+     * Nasconde tutti i controlli dedicati ai clienti:
+     * - area di testo per recensione
+     * - spinner del voto
+     * - pulsante invia recensione
+     * - pulsante aggiungi ai preferiti
+     *
+     * Usato quando la view è mostrata a un gestore.
+     */
     public void nascondiFunzioniCliente() {
         txtRecensione.setManaged(false);
         txtRecensione.setVisible(false);
@@ -144,6 +178,7 @@ public class RistoranteDettagliView extends BorderPane {
     // ============================================================
     // GETTERS
     // ============================================================
+
     public Label getLblNome() { return lblNome; }
     public Label getLblIndirizzo() { return lblIndirizzo; }
     public Label getLblCitta() { return lblCitta; }

@@ -5,6 +5,20 @@ import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 
+/**
+ * View grafica dedicata alla ricerca dei ristoranti.
+ * Permette all’utente di filtrare i risultati tramite:
+ * - testo libero
+ * - tipo di cucina
+ * - località
+ * - fascia di prezzo minima/massima
+ * - disponibilità di delivery e prenotazione
+ * - numero minimo di stelle
+ *
+ * La view è strutturata come un BorderPane:
+ * - Top: barra dei filtri (scrollabile orizzontalmente)
+ * - Center: tabella dei risultati
+ */
 public class RicercaRistorantiView extends BorderPane {
 
     // ============================
@@ -29,11 +43,19 @@ public class RicercaRistorantiView extends BorderPane {
 
     private final TableView<RistoranteRow> tabella = new TableView<>();
 
-
+    /**
+     * Costruisce la schermata di ricerca e inizializza il layout.
+     */
     public RicercaRistorantiView() {
         creaLayout();
     }
 
+    /**
+     * Crea l’intero layout grafico:
+     * - barra dei filtri (scrollabile)
+     * - tabella dei risultati
+     * - padding e stile generale
+     */
     private void creaLayout() {
 
         // ============================
@@ -116,7 +138,7 @@ public class RicercaRistorantiView extends BorderPane {
         barra.setPadding(new Insets(10));
         barra.setAlignment(Pos.CENTER_LEFT);
 
-        // ⭐ Se la barra è troppo lunga → scroll orizzontale
+        // ⭐ Scroll orizzontale se la barra è troppo lunga
         ScrollPane scrollBarra = new ScrollPane(barra);
         scrollBarra.setFitToHeight(true);
         scrollBarra.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
@@ -139,7 +161,6 @@ public class RicercaRistorantiView extends BorderPane {
         tabella.getColumns().addAll(colNome, colIndirizzo, colTipoCucina);
         tabella.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
-        // ⭐ La tabella ora si espande a tutto lo schermo
         BorderPane.setMargin(tabella, new Insets(10));
         this.setCenter(tabella);
 
@@ -151,15 +172,36 @@ public class RicercaRistorantiView extends BorderPane {
     // GETTERS
     // ============================
 
+    /** @return campo di ricerca testuale */
     public TextField getTxtRicerca() { return txtRicerca; }
+
+    /** @return filtro tipo cucina */
     public ComboBox<String> getFiltroCategoria() { return filtroTipoCucina; }
+
+    /** @return filtro località */
     public ComboBox<String> getFiltroLocalita() { return filtroLocalita; }
+
+    /** @return filtro prezzo minimo */
     public ComboBox<Integer> getFiltroPrezzoMin() { return filtroPrezzoMin; }
+
+    /** @return filtro prezzo massimo */
     public ComboBox<Integer> getFiltroPrezzoMax() { return filtroPrezzoMax; }
+
+    /** @return checkbox delivery */
     public CheckBox getChkDelivery() { return chkDelivery; }
+
+    /** @return checkbox prenotazione */
     public CheckBox getChkPrenotazione() { return chkPrenotazione; }
+
+    /** @return filtro stelle minime */
     public ComboBox<Integer> getFiltroStelleMin() { return filtroStelleMin; }
+
+    /** @return pulsante Cerca */
     public Button getBtnCerca() { return btnCerca; }
+
+    /** @return pulsante Indietro */
     public Button getBtnIndietro() { return btnIndietro; }
+
+    /** @return tabella dei risultati */
     public TableView<RistoranteRow> getTabella() { return tabella; }
 }

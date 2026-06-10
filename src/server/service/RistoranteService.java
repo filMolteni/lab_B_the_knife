@@ -12,12 +12,45 @@ import server.model.Recensione;
 
 import java.util.List;
 
+/**
+ * Service che gestisce tutte le operazioni relative ai ristoranti:
+ *
+ * - ricerca ristoranti (THEKNIFE + UTENTE)
+ * - controllo proprietà ristorante
+ * - visualizzazione dettagli ristorante
+ * - CRUD ristoranti utente (aggiungi, modifica, elimina)
+ * - riepilogo ristoranti di un gestore
+ * - visualizzazione recensioni anonime
+ *
+ * Ogni metodo:
+ * - legge i parametri dal payload della {@link Request}
+ * - interagisce con i DAO (RistoranteDAO, RistoranteUtenteDAO, RecensioneDAO)
+ * - costruisce una {@link Response} JSON per il client
+ */
 public class RistoranteService {
 
     // ============================================================
     // CERCA RISTORANTI (ALL)
     // ============================================================
-    public static Response cerca(Request req) {
+
+    /**
+     * Esegue una ricerca combinata tra:
+     * - ristoranti THEKNIFE
+     * - ristoranti UTENTE
+     *
+     * Applica filtri su:
+     * - nome
+     * - tipo cucina
+     * - località
+     * - fascia prezzo
+     * - delivery
+     * - prenotazione
+     * - stelle minime
+     *
+     * @param req richiesta contenente i filtri
+     * @return lista JSON dei ristoranti trovati
+     */
+  public static Response cerca(Request req) {
         try {
 
             // ============================
@@ -133,6 +166,7 @@ public class RistoranteService {
             JsonObject payload = new JsonObject();
             payload.add("ristoranti", arr);
 
+            System.out.println("Ricerca completata. Ristoranti trovati: " + arr.size());
             return Response.ok(payload);
 
         } catch (Exception e) {
@@ -141,28 +175,38 @@ public class RistoranteService {
         }
     }
 
+    /**
+     * Verifica se un ristorante appartiene a un gestore.
+     *
+     * @param req richiesta contenente idRistorante e idGestore
+     * @return OK se il gestore è proprietario, errore altrimenti
+     */
     public static Response controllaProprieta(Request req) {
-    try {
-        int idRistorante = req.payload.get("idRistorante").getAsInt();
-        int idGestore = req.payload.get("idGestore").getAsInt();
+        try {
+            int idRistorante = req.payload.get("idRistorante").getAsInt();
+            int idGestore = req.payload.get("idGestore").getAsInt();
 
-        boolean proprietario = RistoranteUtenteDAO.isOwnedBy(idRistorante, idGestore);
+            boolean proprietario = RistoranteUtenteDAO.isOwnedBy(idRistorante, idGestore);
 
-        if (proprietario) {
-            return Response.ok(); 
-        } else {
-            return Response.error("Non sei il proprietario del ristorante");
+            return proprietario
+                    ? Response.ok()
+                    : Response.error("Non sei il proprietario del ristorante");
+
+        } catch (Exception e) {
+            return Response.error("Errore controllo proprietà: " + e.getMessage());
         }
-
-    } catch (Exception e) {
-        return Response.error("Errore controllo proprietà: " + e.getMessage());
     }
-}
-
 
     // ============================================================
     // VISUALIZZA DETTAGLI RISTORANTE (THEKNIFE)
     // ============================================================
+
+    /**
+     * Restituisce i dettagli di un ristorante THEKNIFE.
+     *
+     * @param req richiesta contenente id
+     * @return dettagli JSON del ristorante
+     */
     public static Response visualizza(Request req) {
         try {
             int id = req.payload.get("id").getAsInt();
@@ -195,6 +239,13 @@ public class RistoranteService {
     // ============================================================
     // VISUALIZZA DETTAGLI RISTORANTE UTENTE
     // ============================================================
+
+    /**
+     * Restituisce i dettagli di un ristorante UTENTE.
+     *
+     * @param req richiesta contenente id
+     * @return dettagli JSON del ristorante
+     */
     public static Response visualizzaUtente(Request req) {
         try {
             int id = req.payload.get("id").getAsInt();
@@ -227,6 +278,13 @@ public class RistoranteService {
     // ============================================================
     // AGGIUNGI RISTORANTE UTENTE
     // ============================================================
+
+    /**
+     * Aggiunge un nuovo ristorante creato da un gestore.
+     *
+     * @param req richiesta contenente tutti i campi del ristorante
+     * @return OK o errore
+     */
     public static Response aggiungi(Request req) {
         try {
             int idGestore = req.payload.get("idGestore").getAsInt();
@@ -248,10 +306,7 @@ public class RistoranteService {
                     delivery, prenotazione
             );
 
-            if (!ok)
-                return Response.error("Impossibile aggiungere ristorante");
-
-            return Response.ok();
+            return ok ? Response.ok() : Response.error("Impossibile aggiungere ristorante");
 
         } catch (Exception e) {
             return Response.error("Errore aggiunta ristorante: " + e.getMessage());
@@ -261,6 +316,13 @@ public class RistoranteService {
     // ============================================================
     // MODIFICA RISTORANTE UTENTE
     // ============================================================
+
+    /**
+     * Modifica un ristorante creato da un gestore.
+     *
+     * @param req richiesta contenente i nuovi valori
+     * @return OK o errore
+     */
     public static Response modifica(Request req) {
         try {
             int id = req.payload.get("id").getAsInt();
@@ -302,31 +364,30 @@ public class RistoranteService {
                     delivery, prenotazione
             );
 
-            if (!ok)
-                return Response.error("Impossibile modificare ristorante");
-
-            return Response.ok();
+            return ok ? Response.ok() : Response.error("Impossibile modificare ristorante");
 
         } catch (Exception e) {
-            e.printStackTrace();
             return Response.error("Errore modifica ristorante: " + e.getMessage());
         }
     }
 
-
     // ============================================================
     // ELIMINA RISTORANTE
     // ============================================================
+
+    /**
+     * Elimina un ristorante creato da un gestore.
+     *
+     * @param req richiesta contenente id
+     * @return OK o errore
+     */
     public static Response elimina(Request req) {
         try {
             int id = req.payload.get("id").getAsInt();
 
             boolean ok = RistoranteUtenteDAO.elimina(id);
 
-            if (!ok)
-                return Response.error("Impossibile eliminare ristorante");
-
-            return Response.ok();
+            return ok ? Response.ok() : Response.error("Impossibile eliminare ristorante");
 
         } catch (Exception e) {
             return Response.error("Errore eliminazione ristorante: " + e.getMessage());
@@ -336,6 +397,13 @@ public class RistoranteService {
     // ============================================================
     // RIEPILOGO GESTORE
     // ============================================================
+
+    /**
+     * Restituisce la lista dei ristoranti gestiti da un gestore.
+     *
+     * @param req richiesta contenente idGestore
+     * @return lista JSON dei ristoranti
+     */
     public static Response riepilogoGestore(Request req) {
         try {
             int idGestore = req.payload.get("idGestore").getAsInt();
@@ -351,7 +419,6 @@ public class RistoranteService {
                 o.addProperty("citta", r.getCitta());
                 o.addProperty("nazione", r.getNazione());
                 o.addProperty("fonte", "UTENTE");
-
                 arr.add(o);
             }
 
@@ -368,38 +435,45 @@ public class RistoranteService {
     // ============================================================
     // RECENSIONI ANONIME
     // ============================================================
+
+    /**
+     * Restituisce le recensioni ANONIME di un ristorante,
+     * includendo eventuali risposte del gestore.
+     *
+     * @param req richiesta contenente idRistorante
+     * @return lista JSON delle recensioni anonime
+     */
     public static Response visualizzaRecensioniAnonime(Request req) {
-    try {
-        int idRistorante = req.payload.get("idRistorante").getAsInt();
-        List<Recensione> lista = RecensioneDAO.getByRistorante(idRistorante);
+        try {
+            int idRistorante = req.payload.get("idRistorante").getAsInt();
+            List<Recensione> lista = RecensioneDAO.getByRistorante(idRistorante);
 
-        JsonArray arr = new JsonArray();
+            JsonArray arr = new JsonArray();
 
-        for (Recensione r : lista) {
-            JsonObject o = new JsonObject();
+            for (Recensione r : lista) {
+                JsonObject o = new JsonObject();
 
-            o.addProperty("id", r.getId());               // ⭐ NECESSARIO PER RISPOSTE
-            o.addProperty("voto", r.getVoto());
-            o.addProperty("testo", r.getTesto());
+                o.addProperty("id", r.getId());
+                o.addProperty("voto", r.getVoto());
+                o.addProperty("testo", r.getTesto());
 
-            // ⭐ AGGIUNGI LA RISPOSTA (può essere null)
-            String risposta = RecensioneDAO.getRispostaByRecensione(r.getId());
-            if (risposta != null)
-                o.addProperty("risposta", risposta);
-            else
-                o.add("risposta", null);
+                // Risposta del gestore (può essere null)
+                String risposta = RecensioneDAO.getRispostaByRecensione(r.getId());
+                if (risposta != null)
+                    o.addProperty("risposta", risposta);
+                else
+                    o.add("risposta", null);
 
-            arr.add(o);
+                arr.add(o);
+            }
+
+            JsonObject data = new JsonObject();
+            data.add("recensioni", arr);
+
+            return Response.ok(data);
+
+        } catch (Exception e) {
+            return Response.error("Errore caricamento recensioni anonime: " + e.getMessage());
         }
-
-        JsonObject data = new JsonObject();
-        data.add("recensioni", arr);
-
-        return Response.ok(data);
-
-    } catch (Exception e) {
-        return Response.error("Errore caricamento recensioni anonime: " + e.getMessage());
     }
-}
-
 }

@@ -7,6 +7,15 @@ import client.net.Response;
 import com.google.gson.JsonObject;
 import common.MessageType;
 
+/**
+ * Controller della schermata di registrazione.
+ * Gestisce:
+ * - la creazione di un nuovo account utente
+ * - la validazione dei campi inseriti
+ * - la navigazione verso la schermata precedente
+ *
+ * Comunica con il server tramite ClientConnection per inviare la richiesta di registrazione.
+ */
 public class RegisterController {
 
     private final RegisterView view;
@@ -14,6 +23,14 @@ public class RegisterController {
     private final Runnable onGoBack;
     private final Runnable onRegisterSuccess;
 
+    /**
+     * Costruisce il controller della registrazione e inizializza gli handler dei pulsanti.
+     *
+     * @param view interfaccia grafica della schermata di registrazione
+     * @param connection connessione al server
+     * @param onGoBack callback per tornare alla schermata precedente
+     * @param onRegisterSuccess callback eseguita quando la registrazione va a buon fine
+     */
     public RegisterController(RegisterView view,
                               ClientConnection connection,
                               Runnable onGoBack,
@@ -27,6 +44,11 @@ public class RegisterController {
         initHandlers();
     }
 
+    /**
+     * Inizializza gli handler dei pulsanti:
+     * - Indietro → torna alla schermata precedente
+     * - Registrati → avvia la procedura di registrazione
+     */
     private void initHandlers() {
 
         view.getBtnIndietro().setOnAction(e -> onGoBack.run());
@@ -34,6 +56,19 @@ public class RegisterController {
         view.getBtnRegistrati().setOnAction(e -> doRegister());
     }
 
+    /**
+     * Esegue la registrazione di un nuovo utente.
+     *
+     * Funzionamento:
+     * 1. Legge i campi dalla view (username, email, password, conferma password).
+     * 2. Verifica che nessun campo sia vuoto.
+     * 3. Verifica che le password coincidano.
+     * 4. Determina il ruolo (CLIENTE o GESTORE).
+     * 5. Invia una richiesta REGISTRAZIONE al server.
+     * 6. Se la registrazione va a buon fine, esegue la callback onRegisterSuccess.
+     *
+     * In caso di errore, stampa un messaggio nella console.
+     */
     private void doRegister() {
 
         String username = view.getTxtUsername().getText().trim();
