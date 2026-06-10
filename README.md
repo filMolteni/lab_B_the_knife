@@ -73,6 +73,7 @@ Per creare automaticamente tabelle, dati iniziali e importare i dataset:
 
 Codice
 java -jar DatabasePopulator.jar
+
 2️⃣ Avvio del server
 Codice
 java -jar server.jar
