@@ -1,12 +1,9 @@
-NOME DEL PROGETTO
 TheKnife – Piattaforma di gestione ristoranti, recensioni e preferiti
+Descrizione generale
+TheKnife è un sistema completo per la gestione centralizzata di ristoranti provenienti da fonti differenti, recensioni degli utenti, risposte dei gestori e liste personalizzate di preferiti.
+L’applicazione integra funzionalità per utenti clienti e gestori, offrendo un flusso operativo completo dalla consultazione dei ristoranti alla gestione delle interazioni.
 
-DESCRIZIONE GENERALE
-TheKnife è un sistema progettato per la gestione centralizzata di ristoranti provenienti da fonti differenti, recensioni degli utenti, risposte dei gestori e liste personalizzate di preferiti.
-L’applicazione integra funzionalità per utenti clienti e utenti gestori, garantendo un flusso operativo completo dalla consultazione dei ristoranti alla gestione delle interazioni.
-
-FUNZIONALITA PRINCIPALI
-
+Funzionalità principali
 Autenticazione utenti con ruoli differenziati
 
 Ricerca e consultazione ristoranti
@@ -21,10 +18,9 @@ Creazione e gestione ristoranti da parte dei gestori
 
 Integrazione dataset esterni per ristoranti predefiniti
 
-Pulsante “Copia” per operazioni rapide su contenuti generati
+Pulsante “Copia” per operazioni rapide
 
-COMPONENTI PRINCIPALI
-
+Componenti principali
 Modulo autenticazione
 
 Modulo gestione ristoranti
@@ -35,49 +31,86 @@ Modulo preferiti
 
 Modulo ricerca
 
-Modulo interfaccia grafica
+Interfaccia grafica (JavaFX)
 
-Modulo di popolamento dati (DatabasePopulator)
+DatabasePopulator
 
-Modulo di accesso al database (DAO)
+DAO (Data Access Object)
 
-DATABASE E POPOLAMENTO
-Il progetto utilizza una classe dedicata al popolamento del database, responsabile dell’inserimento dei dati iniziali e della sincronizzazione con i dataset esterni.
-I percorsi delle librerie, dei dataset e dei file di supporto sono stati aggiornati e normalizzati per garantire compatibilità e caricamento corretto in fase di esecuzione.
-Il populator esegue automaticamente la creazione delle entità e l’inserimento dei dati di base necessari al funzionamento dell’applicazione.
+Database e popolamento
+Il progetto include una classe dedicata al popolamento del database, responsabile di:
 
-NOTA IMPORTANTE SUI PERCORSI  
-All’interno del progetto sono presenti file che richiedono la modifica manuale dei percorsi locali in base alla macchina su cui viene eseguito il sistema.
-In particolare:
+creazione delle tabelle
 
-nel file settings.json vanno aggiornati i percorsi delle librerie esterne
+inserimento dei dati iniziali
 
-nella classe DatabasePopulator vanno aggiornati i percorsi relativi ai dataset e ai file SQL
+sincronizzazione con dataset esterni
 
-Questi percorsi devono essere adattati dall’utente in base alla propria struttura locale.
+Il popolamento avviene automaticamente all’avvio del server.
 
-INTERFACCIA E USABILITA
-È stato introdotto un pulsante “Copia” nelle sezioni che richiedono operazioni rapide, come la copia di identificativi, query, testi o contenuti generati.
-La funzionalità utilizza la clipboard di sistema ed è disponibile in tutte le schermate rilevanti.
+Interfaccia e usabilità
+L’applicazione include un pulsante “Copia” nelle sezioni che richiedono operazioni rapide (ID, query, testi, contenuti generati).
+La funzionalità utilizza la clipboard di sistema.
 
-STATO DEL PROGETTO
-Il sistema è stato testato dopo l’aggiornamento dei percorsi, della classe di popolamento e delle dipendenze.
-L’applicazione risulta stabile, funzionante e pronta per l’utilizzo o per ulteriori estensioni.
+Stato del progetto
+Il sistema è stato testato dopo l’aggiornamento delle dipendenze e del popolamento.
+L’applicazione risulta stabile, funzionante e pronta all’uso.
 
-REQUISITI
-
-Java
+Avvio del progetto
+Requisiti
+Java 21+
 
 MySQL
 
-Driver JDBC
+Librerie esterne già incluse nella cartella lib/
 
-Dataset ristoranti aggiornato
+JavaFX SDK già incluso in lib/javafx-sdk-21.0.2/
 
-Librerie esterne incluse nel progetto (settings.json)
+JAR già generati nella cartella dist/
 
-Estensione PlantUML
+Nessuna modifica ai percorsi è necessaria.
 
-NOTE FINALI
-Il progetto è stato sviluppato con attenzione alla modularità, alla separazione delle responsabilità e alla manutenibilità del codice.
-La struttura attuale consente estensioni future senza modifiche invasive ai moduli esistenti
+Avvio del server
+Dalla cartella dist/:
+
+Codice
+java -jar server.jar
+Avvio del client (JavaFX)
+Dalla cartella dist/:
+
+Codice
+java --module-path "../lib/javafx-sdk-21.0.2/lib" --add-modules javafx.controls,javafx.fxml -jar client.jar
+Il percorso è relativo, quindi portabile su qualsiasi macchina.
+
+Avvio tramite file .bat (opzionale)
+run-client.bat
+Codice
+java --module-path "../lib/javafx-sdk-21.0.2/lib" --add-modules javafx.controls,javafx.fxml -jar client.jar
+run-server.bat
+Codice
+java -jar server.jar
+Esportazione JAR (VS Code)
+Il progetto è configurato per essere esportato tramite:
+
+Java Projects → Export Jar
+
+oppure CTRL + SHIFT + P → “Export Jar”
+
+VS Code genera automaticamente:
+
+manifest
+
+classpath
+
+JAR eseguibili
+
+Note finali
+Il progetto è stato sviluppato con attenzione a:
+
+modularità
+
+separazione delle responsabilità
+
+manutenibilità
+
+La struttura attuale consente estensioni future senza modifiche invasive.

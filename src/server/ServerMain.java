@@ -30,7 +30,7 @@ public class ServerMain {
      */
     public static void main(String[] args) {
 
-        /*
+        
         // Versione interattiva per configurazione manuale
         Scanner sc = new Scanner(System.in);
 
@@ -47,13 +47,13 @@ public class ServerMain {
 
         System.out.print("DB Password: ");
         String password = sc.nextLine();
-        */
+        
 
         // Configurazione predefinita (sviluppo locale)
-        String host = "localhost";
-        String dbName = "theknife";
-        String user = "root";
-        String password = "";
+        //String host = "localhost";
+        //String dbName = "theknife";
+        //String user = "root";
+        //String password = "";
 
         // Inizializza il pool di connessioni
         DBConnectionPool.initialize(host, dbName, user, password);
