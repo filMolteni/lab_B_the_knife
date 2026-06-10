@@ -14,116 +14,116 @@ import java.util.List;
         // ============================
         // CERCA RISTORANTI THEKNIFE
         // ============================
-        public static List<Ristorante> cerca(
-        String query,
-        String tipoCucina,
-        String localita,
-        int prezzoMin,
-        int prezzoMax,
-        boolean delivery,
-        boolean prenotazione,
-        int stelleMin
-) {
-    List<Ristorante> lista = new ArrayList<>();
+            public static List<Ristorante> cerca(
+            String query,
+            String tipoCucina,
+            String localita,
+            int prezzoMin,
+            int prezzoMax,
+            boolean delivery,
+            boolean prenotazione,
+            int stelleMin
+    ) {
+        List<Ristorante> lista = new ArrayList<>();
 
-    try (Connection conn = DBConnectionPool.get()) {
+        try (Connection conn = DBConnectionPool.get()) {
 
-        StringBuilder sql = new StringBuilder(
-            "SELECT r.*, COALESCE(AVG(rec.voto), 0) AS stelle " +
-            "FROM RistorantiTheKnife r " +
-            "LEFT JOIN Recensioni rec ON rec.id_ristorante = r.id " +
-            "WHERE LOWER(r.nome) LIKE LOWER(?) "
-        );
+            StringBuilder sql = new StringBuilder(
+                "SELECT r.*, COALESCE(AVG(rec.voto), 0) AS stelle " +
+                "FROM RistorantiTheKnife r " +
+                "LEFT JOIN Recensioni rec ON rec.id_ristorante = r.id " +
+                "WHERE LOWER(r.nome) LIKE LOWER(?) "
+            );
 
-        List<Object> params = new ArrayList<>();
-        params.add("%" + query + "%");
+            List<Object> params = new ArrayList<>();
+            params.add("%" + query + "%");
 
-        // ============================
-        // FILTRO TIPO CUCINA
-        // ============================
-        if (!tipoCucina.equalsIgnoreCase("Tutte")) {
-            sql.append(" AND LOWER(r.tipo_cucina) LIKE LOWER(?) ");
-            params.add("%" + tipoCucina + "%");
+            // ============================
+            // FILTRO TIPO CUCINA
+            // ============================
+            if (!tipoCucina.equalsIgnoreCase("Tutte")) {
+                sql.append(" AND LOWER(r.tipo_cucina) LIKE LOWER(?) ");
+                params.add("%" + tipoCucina + "%");
+            }
+
+            // ============================
+            // FILTRO LOCALITÀ (città o nazione)
+            // ============================
+            if (!localita.equalsIgnoreCase("Tutte")) {
+                sql.append(" AND (LOWER(r.citta) = LOWER(?) OR LOWER(r.nazione) = LOWER(?)) ");
+                params.add(localita.toLowerCase());
+                params.add(localita.toLowerCase());
+            }
+
+            // ============================
+            // FILTRO PREZZO (1–5)
+            // ============================
+            sql.append(" AND r.fascia_prezzo BETWEEN ? AND ? ");
+            params.add(prezzoMin);
+            params.add(prezzoMax);
+
+            // ============================
+            // FILTRO DELIVERY
+            // ============================
+            if (delivery) {
+                sql.append(" AND r.delivery = TRUE ");
+            }
+
+            // ============================
+            // FILTRO PRENOTAZIONE
+            // ============================
+            if (prenotazione) {
+                sql.append(" AND r.prenotazione = TRUE ");
+            }
+
+            // ============================
+            // GROUP BY PER MEDIA STELLE
+            // ============================
+            sql.append(" GROUP BY r.id ");
+
+            // ============================
+            // FILTRO STELLE (HAVING)
+            // ============================
+            if (stelleMin > 0) {
+                sql.append(" HAVING stelle >= ? ");
+                params.add(stelleMin);
+            }
+
+            PreparedStatement ps = conn.prepareStatement(sql.toString());
+
+            // Bind parametri
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                lista.add(new Ristorante(
+                        rs.getInt("id"),
+                        rs.getString("nome"),
+                        rs.getString("indirizzo"),
+                        rs.getString("tipo_cucina"),
+                        rs.getInt("fascia_prezzo"),
+                        rs.getDouble("latitudine"),
+                        rs.getDouble("longitudine"),
+                        rs.getString("citta"),
+                        rs.getString("nazione"),
+                        rs.getBoolean("delivery"),
+                        rs.getBoolean("prenotazione"),
+                        "THEKNIFE"
+                ));
+            }
+
+            rs.close();
+            ps.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
-        // ============================
-        // FILTRO LOCALITÀ (città o nazione)
-        // ============================
-        if (!localita.equalsIgnoreCase("Tutte")) {
-            sql.append(" AND (LOWER(r.citta) = LOWER(?) OR LOWER(r.nazione) = LOWER(?)) ");
-            params.add(localita.toLowerCase());
-            params.add(localita.toLowerCase());
-        }
-
-        // ============================
-        // FILTRO PREZZO (1–5)
-        // ============================
-        sql.append(" AND r.fascia_prezzo BETWEEN ? AND ? ");
-        params.add(prezzoMin);
-        params.add(prezzoMax);
-
-        // ============================
-        // FILTRO DELIVERY
-        // ============================
-        if (delivery) {
-            sql.append(" AND r.delivery = TRUE ");
-        }
-
-        // ============================
-        // FILTRO PRENOTAZIONE
-        // ============================
-        if (prenotazione) {
-            sql.append(" AND r.prenotazione = TRUE ");
-        }
-
-        // ============================
-        // GROUP BY PER MEDIA STELLE
-        // ============================
-        sql.append(" GROUP BY r.id ");
-
-        // ============================
-        // FILTRO STELLE (HAVING)
-        // ============================
-        if (stelleMin > 0) {
-            sql.append(" HAVING stelle >= ? ");
-            params.add(stelleMin);
-        }
-
-        PreparedStatement ps = conn.prepareStatement(sql.toString());
-
-        // Bind parametri
-        for (int i = 0; i < params.size(); i++) {
-            ps.setObject(i + 1, params.get(i));
-        }
-
-        ResultSet rs = ps.executeQuery();
-
-        while (rs.next()) {
-            lista.add(new Ristorante(
-                    rs.getInt("id"),
-                    rs.getString("nome"),
-                    rs.getString("indirizzo"),
-                    rs.getString("tipo_cucina"),
-                    rs.getInt("fascia_prezzo"),
-                    rs.getDouble("latitudine"),
-                    rs.getDouble("longitudine"),
-                    rs.getString("citta"),
-                    rs.getString("nazione"),
-                    rs.getBoolean("delivery"),
-                    rs.getBoolean("prenotazione"),
-                    "THEKNIFE"
-            ));
-        }
-
-        rs.close();
-        ps.close();
-
-    } catch (Exception e) {
-        e.printStackTrace();
+        return lista;
     }
-
-    return lista;
-}
 
 
 

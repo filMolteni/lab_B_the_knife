@@ -20,7 +20,8 @@
             "name": "Run Client",
             "request": "launch",
             "mainClass": "client.ClientMain",
-            "vmArgs": "--module-path \"C:/Users/Fil/Desktop/UNI/lab_B/lib/javafx-sdk-21.0.2/lib\" --add-modules javafx.controls,javafx.fxml"
+            "vmArgs": "--module-path ${workspaceFolder}/lib/javafx-sdk-21.0.2/lib --add-modules javafx.controls,javafx.fxml"
+
         }
     ]
 }

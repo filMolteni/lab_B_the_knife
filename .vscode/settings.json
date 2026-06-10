@@ -1,6 +1,7 @@
 {
     "java.project.referencedLibraries": [
         "lib/**/*.jar",
-        "C:/Users/Fil/Desktop/UNI/lab_B/lib/javafx-sdk-21.0.2/lib/*.jar"
+        "${workspaceFolder}/lib/javafx-sdk-21.0.2/lib/*.jar"
+
     ]
 }

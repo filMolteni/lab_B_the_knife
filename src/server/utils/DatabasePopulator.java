@@ -1,7 +1,9 @@
 package server.utils;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -10,8 +12,8 @@ import java.util.List;
 
 public class DatabasePopulator {
 
-    private static final String CSV_PATH =
-            "C:\\Users\\Fil\\Desktop\\UNI\\lab_B\\database\\michelin_my_maps.csv";
+    // Percorso RELATIVO come risorsa interna al progetto/JAR
+    private static final String CSV_PATH = "/csv/michelin_my_maps.csv";
 
     public static void main(String[] args) {
         importCSV();
@@ -32,10 +34,18 @@ public class DatabasePopulator {
                 "jdbc:mysql://localhost:3306/theknife?useSSL=false&serverTimezone=UTC",
                 "root",
                 "");
-             PreparedStatement ps = conn.prepareStatement(sql);
-             BufferedReader br = new BufferedReader(new FileReader(CSV_PATH))) {
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
             conn.setAutoCommit(false);
+
+            // Carica il CSV come RISORSA (funziona nel JAR e nel progetto)
+            InputStream is = DatabasePopulator.class.getResourceAsStream(CSV_PATH);
+            if (is == null) {
+                throw new RuntimeException("❌ File CSV non trovato: " + CSV_PATH);
+            }
+
+            BufferedReader br = new BufferedReader(
+                    new InputStreamReader(is, StandardCharsets.UTF_8));
 
             br.readLine(); // salta header
 
