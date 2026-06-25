@@ -86,16 +86,10 @@ public class RistoranteDettagliController {
     private void controllaPermessiCliente() {
         UtenteDTO utente = UtenteDTO.getUtenteLoggato();
 
-        if (utente == null) {
-            view.nascondiFunzioniCliente();
-            return;
-        }
-
-        if (!utente.isCliente()) {
+        if (utente == null || !utente.isCliente()) {
             view.nascondiFunzioniCliente();
         }
     }
-
 
     // ============================================================
     // PERMESSI GESTORE
@@ -106,13 +100,16 @@ public class RistoranteDettagliController {
      * Se sì, abilita la possibilità di rispondere alle recensioni.
      */
     private void controllaPermessiGestore() {
-        try {
-            if (!UtenteDTO.getUtenteLoggato().isGestore()) {
-                gestoreProprietario = false;
-                return;
-            }
 
-            int idGestore = UtenteDTO.getUtenteLoggato().getId();
+        UtenteDTO utente = UtenteDTO.getUtenteLoggato();
+
+        if (utente == null || !utente.isGestore()) {
+            gestoreProprietario = false;
+            return;
+        }
+
+        try {
+            int idGestore = utente.getId();
 
             JsonObject payload = new JsonObject();
             payload.addProperty("idRistorante", idRistorante);
@@ -138,7 +135,14 @@ public class RistoranteDettagliController {
      */
     private void aggiungiPreferito() {
         try {
-            int idUtente = UtenteDTO.getUtenteLoggato().getId();
+            UtenteDTO utente = UtenteDTO.getUtenteLoggato();
+
+            if (utente == null) {
+                System.out.println("Devi essere loggato per aggiungere ai preferiti.");
+                return;
+            }
+
+            int idUtente = utente.getId();
 
             JsonObject payload = new JsonObject();
             payload.addProperty("idUtente", idUtente);
@@ -174,7 +178,14 @@ public class RistoranteDettagliController {
      */
     private void inviaRecensione() {
         try {
-            int idUtente = UtenteDTO.getUtenteLoggato().getId();
+            UtenteDTO utente = UtenteDTO.getUtenteLoggato();
+
+            if (utente == null) {
+                System.out.println("Devi essere loggato per scrivere una recensione.");
+                return;
+            }
+
+            int idUtente = utente.getId();
             String testo = view.getTxtRecensione().getText().trim();
             int voto = view.getVotoSpinner().getValue();
 
@@ -348,7 +359,6 @@ public class RistoranteDettagliController {
                 view.getRecensioniContainer().getChildren().add(card);
             }
 
-            //  CALCOLO MEDIA
             if (numeroRecensioni > 0) {
                 double media = (double) sommaVoti / numeroRecensioni;
                 view.getLblMediaVoti().setText(String.format("Media voti: %.1f / 5", media));

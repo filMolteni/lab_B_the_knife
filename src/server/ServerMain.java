@@ -30,8 +30,6 @@ public class ServerMain {
      */
     public static void main(String[] args) {
 
-        
-        // Versione interattiva per configurazione manuale
         Scanner sc = new Scanner(System.in);
 
         System.out.println("=== TheKnife Server ===");
@@ -47,22 +45,30 @@ public class ServerMain {
 
         System.out.print("DB Password: ");
         String password = sc.nextLine();
-        
 
         // Configurazione predefinita (sviluppo locale)
-        //String host = "localhost";
-        //String dbName = "theknife";
-        //String user = "root";
-        //String password = "";
+        // String host = "localhost";
+        // String dbName = "theknife";
+        // String user = "root";
+        // String password = "";
 
-        // Inizializza il pool di connessioni
-        DBConnectionPool.initialize(host, dbName, user, password);
+        try {
+            // Tentativo di connessione
+            DBConnectionPool.initialize(host, dbName, user, password);
+            System.out.println("Connessione al database riuscita!");
+
+        } catch (Exception e) {
+            System.out.println("Errore di connessione al database:");
+            System.out.println(e.getMessage());
+            System.out.println("Il server verrà terminato.");
+            return; // evita crash
+        }
 
         int port = 5555;
         System.out.println("Avvio server sulla porta " + port + "...");
 
-        // Avvia il listener TCP
         ServerListener listener = new ServerListener(port);
         listener.start();
     }
 }
+
