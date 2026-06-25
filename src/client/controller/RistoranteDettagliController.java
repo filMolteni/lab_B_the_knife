@@ -84,10 +84,18 @@ public class RistoranteDettagliController {
      * Nasconde le funzioni riservate ai clienti se l'utente loggato non è un cliente.
      */
     private void controllaPermessiCliente() {
-        if (!UtenteDTO.getUtenteLoggato().isCliente()) {
+        UtenteDTO utente = UtenteDTO.getUtenteLoggato();
+
+        if (utente == null) {
+            view.nascondiFunzioniCliente();
+            return;
+        }
+
+        if (!utente.isCliente()) {
             view.nascondiFunzioniCliente();
         }
     }
+
 
     // ============================================================
     // PERMESSI GESTORE
