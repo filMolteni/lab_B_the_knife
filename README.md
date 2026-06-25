@@ -38,22 +38,20 @@ DatabasePopulator
 DAO (Data Access Object)
 
 Database e popolamento
-Il progetto include una classe dedicata al popolamento del database, responsabile di:
+Il progetto include una classe dedicata al popolamento del database (DatabasePopulator), responsabile di:
 
-creazione delle tabelle
+creazione automatica delle tabelle
 
 inserimento dei dati iniziali
 
-sincronizzazione con dataset esterni
+caricamento dei dataset esterni
 
-Il popolamento avviene automaticamente all’avvio del server.
+sincronizzazione dei ristoranti predefiniti
 
-Interfaccia e usabilità
-L’applicazione include un pulsante “Copia” nelle sezioni che richiedono operazioni rapide (ID, query, testi, contenuti generati).
-La funzionalità utilizza la clipboard di sistema.
+Il popolamento può essere eseguito tramite DatabasePopulator.jar.
 
 Stato del progetto
-Il sistema è stato testato dopo l’aggiornamento delle dipendenze e del popolamento.
+Il sistema è stato testato dopo l’aggiornamento delle dipendenze, del popolamento e della struttura delle cartelle.
 L’applicazione risulta stabile, funzionante e pronta all’uso.
 
 Avvio del progetto
@@ -66,29 +64,44 @@ Librerie esterne già incluse nella cartella lib/
 
 JavaFX SDK già incluso in lib/javafx-sdk-21.0.2/
 
-JAR già generati nella cartella dist/
+File JAR eseguibili nella cartella principale del progetto
 
 Nessuna modifica ai percorsi è necessaria.
 
-Avvio del server
-Dalla cartella dist/:
+1️⃣ Avvio del DatabasePopulator
+Per creare automaticamente tabelle, dati iniziali e importare i dataset:
 
+Codice
+java -jar DatabasePopulator.jar
+
+2️⃣ Avvio del server
 Codice
 java -jar server.jar
-Avvio del client (JavaFX)
-Dalla cartella dist/:
+Il server:
+
+si connette al database
+
+gestisce le richieste del client
+
+fornisce API interne per autenticazione, ristoranti, recensioni, preferiti
+
+3️⃣ Avvio del client (JavaFX)
+Il client utilizza JavaFX, già incluso nel progetto.
 
 Codice
-java --module-path "../lib/javafx-sdk-21.0.2/lib" --add-modules javafx.controls,javafx.fxml -jar client.jar
+java --module-path "lib/javafx-sdk-21.0.2/lib" --add-modules javafx.controls,javafx.fxml -jar client.jar
 Il percorso è relativo, quindi portabile su qualsiasi macchina.
 
-Avvio tramite file .bat (opzionale)
+4️⃣ Avvio tramite file .bat (opzionale)
 run-client.bat
 Codice
-java --module-path "../lib/javafx-sdk-21.0.2/lib" --add-modules javafx.controls,javafx.fxml -jar client.jar
+java --module-path "lib/javafx-sdk-21.0.2/lib" --add-modules javafx.controls,javafx.fxml -jar client.jar
 run-server.bat
 Codice
 java -jar server.jar
+run-populator.bat
+Codice
+java -jar DatabasePopulator.jar
 Esportazione JAR (VS Code)
 Il progetto è configurato per essere esportato tramite:
 
